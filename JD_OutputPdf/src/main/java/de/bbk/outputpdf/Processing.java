@@ -224,15 +224,18 @@ public class Processing {
      * @return a clone from tsData with has a max lenght from 2 years
      */
     private TsData onlyLast2years(TsData tsData) {
-        TsData tsData2 = tsData.clone();
-        int freq = tsData2.getFrequency().intValue();
-        int drop = tsData2.getLength() - 2 * freq;
-        if (drop > 0) {
-            return tsData2.drop(drop, 0);
-        } else {
-            return tsData2;
-        }
 
+        if (tsData != null && !tsData.isEmpty()) {
+            TsData tsData2 = tsData.clone();
+            int freq = tsData2.getFrequency().intValue();
+            int drop = tsData2.getLength() - 2 * freq;
+            if (drop > 0) {
+                return tsData2.drop(drop, 0);
+            } else {
+                return tsData2;
+            }
+        }
+        return tsData;
     }
 
 }

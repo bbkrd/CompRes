@@ -41,18 +41,21 @@ public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElemen
         //Die TSCollection Information um die write methode zu verwenden
         Ts tsY, tsSA, tsSASaved;
         TsData tsYData, tsSAData;
+        TsCollection tc = TsFactory.instance.createTsCollection();
         tsYData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y).getTsData();
         tsY = TsFactory.instance.createTs(ModellingDictionary.Y, null, tsYData.fittoDomain(domMax5));
+        tc.add(tsY);
+
         tsSAData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA).getTsData();
         tsSA = TsFactory.instance.createTs(ModellingDictionary.SA, null, tsSAData.fittoDomain(domMax5));
-        tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(x13doc);
-        tsSASaved.set(tsSASaved.getTsData().fittoDomain(domMax5));
-       
-        TsCollection tc = TsFactory.instance.createTsCollection();
-
-        tc.add(tsY);
         tc.add(tsSA);
-        tc.add(tsSASaved);
+
+        tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(x13doc);
+        if (tsSASaved.getTsData() != null && !tsSASaved.getTsData().isEmpty()) {
+            tsSASaved.set(tsSASaved.getTsData().fittoDomain(domMax5));
+            tc.add(tsSASaved);
+        }
+
         TsCollectionInformation collectionInformation;
         collectionInformation = new TsCollectionInformation(tc, TsInformationType.Data);
         final BBKChart tschart = new BBKChart();

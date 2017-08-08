@@ -4,13 +4,13 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>outputcustomized-parent</artifactId>
-        <version>0.5.2</version>
+        <version>0.5.3</version>
     </parent>  
 
 
     <groupId>de.bbk</groupId>
     <artifactId>OutputCustomized</artifactId>
-    <version>0.5.2</version>
+    <version>0.5.3</version>
     <packaging>nbm</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
