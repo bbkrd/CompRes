@@ -38,27 +38,33 @@ public class HtmlCCA extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         writeTitle(stream);
-        writeTextWithoutTitle(stream);
-    }
-
-    public void writeTextWithoutTitle(HtmlStream stream)  throws IOException{
         if (spec != null) {
             writeSpecification(stream);
         }
+        writeTextForHTML(stream);
+
         if (stats != null) {
             writeCochranResult(stream);
         }
+    }
+
+    public void writeTextForHTML(HtmlStream stream) throws IOException {
+
         if (decomposition != null) {
             writeFinalFilters(stream);
-            HtmlBBKSummary.writeCombinedSeasonalityTest(stream, decomposition);
         }
 
         if (stats != null) {
             if (stats.getRms() != null) {
                 writeMovingSeasonalityRatios(stream);
             }
-
+            writeICRatio(stream);
         }
+
+        if (decomposition != null) {
+            HtmlBBKSummary.writeCombinedSeasonalityTest(stream, decomposition);
+        }
+
     }
 
     private void writeTitle(HtmlStream stream) throws IOException {

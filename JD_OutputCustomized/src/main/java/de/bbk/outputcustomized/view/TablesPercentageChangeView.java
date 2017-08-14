@@ -98,7 +98,7 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
     private Ts percentageChange(Ts ts) {
         TsData tsData = ts.getTsData();
         tsData = percentageChange(tsData);
-        Ts tsPercentageChange = TsFactory.instance.createTs("Percentage Change " + ts.getName());
+        Ts tsPercentageChange = TsFactory.instance.createTs(ts.getName()+" (PtP GR)");
         tsPercentageChange.set(tsData);
         return tsPercentageChange;
     }

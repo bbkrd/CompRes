@@ -8,6 +8,7 @@ package de.bbk.outputcustomized.view;
 import de.bbk.outputcustomized.html.HtmlBBKSummary;
 import static de.bbk.outputcustomized.util.SavedTables.*;
 import de.bbk.outputcustomized.util.SeasonallyAdjusted_Saved;
+import de.bbk.outputcustomized.util.FixTimeDomain;
 import ec.nbdemetra.ui.NbComponents;
 import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
@@ -16,6 +17,7 @@ import ec.tss.sa.documents.X13Document;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.tstoolkit.algorithm.CompositeResults;
 import ec.tstoolkit.timeseries.simplets.TsData;
+import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.ui.Disposables;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -39,6 +41,7 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
     private final Box document;
     private final JTsChart chart;
     private X13Document doc;
+    private FixTimeDomain td;
 
     public MainBBKResultsView() {
         setLayout(new BorderLayout());
@@ -72,20 +75,26 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
         HtmlBBKSummary summary = new HtmlBBKSummary(MultiLineNameUtil.join(doc.getInput().getName()), doc);
         Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
 
+        td = new FixTimeDomain(getMainSeries(COMPOSITE_RESULTS_SERIES_WITH_FORECAST));
         List<Ts> list = Arrays.asList(
-                getMainSeries(COMPOSITE_RESULTS_SERIES_WITH_FORECAST),
-                getMainSeries(COMPOSITE_RESULTS_TREND_WITH_FORECAST),
-                getMainSeries(COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST));
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_SERIES_WITH_FORECAST),
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_TREND_WITH_FORECAST),
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST));
         chart.getTsCollection().replace(list);
 
-       
         Ts savedSA = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
-        chart.getTsCollection().add(savedSA);
+        chart.getTsCollection().add(td.getTsWithDomain(savedSA));
 
     }
 
     private Ts getMainSeries(String str) {
         return DocumentManager.instance.getTs(doc, str);
+    }
+
+    private Ts getMainSeriesLast5Years(String str) {
+        Ts t = getMainSeries(str);
+        return td.getTsWithDomain(t);
+       
     }
 
     @Override

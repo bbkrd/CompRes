@@ -25,8 +25,8 @@ import org.openide.util.lookup.ServiceProvider;
  */
 public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
 
-    public static final String BBK = "Customized Output BBK";
-    public static final String CCA = "CCA multiplicative in percent";
+    public static final String BBK = "Customized Output";
+    public static final String CCA = "CCA (multiplicative in pct.)";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
     public static final String OLD = "Old";

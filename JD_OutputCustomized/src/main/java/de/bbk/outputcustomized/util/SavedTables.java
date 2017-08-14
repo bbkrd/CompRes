@@ -21,12 +21,12 @@ public class SavedTables {
     }
 
 //Label for calculated time series
-    public static final String NAME_SEASONALLY_ADJUSTED_SAVED = "Saved Seasonally Adjusted (Y o D10 o A6)";
-    public static final String NAME_SEASONAL_FACTOR_SAVED = "Saved Seasonal Factor (D10)";
-    public static final String NAME_CALENDAR_FACTOR_SAVED = "Saved Calendar Factor (A6)";
+    public static final String NAME_SEASONALLY_ADJUSTED_SAVED = "Seasonally Adjusted (current)";
+    public static final String NAME_SEASONAL_FACTOR_SAVED = "Seasonal Factor (current)";
+    public static final String NAME_CALENDAR_FACTOR_SAVED = "Calendar Factor (current)";
     public static final String NAME_ONLY_SEASONALLY_ADJUSTED = "Only Seasonally Adjusted";
-    public static final String NAME_SEASONAL_FACTOR = "Seasonal Factor (D10)";
-    public static final String NAME_CALENDAR_FACTOR = "Calendar Factor (A6)";
+    public static final String NAME_SEASONAL_FACTOR = "Seasonal Factor";
+    public static final String NAME_CALENDAR_FACTOR = "Calendar Factor";
 
     //    Ts x = DocumentManager.instance.getTs(doc, "@composite@Series=,final.y,final.y_f", false);
     public static final String COMPOSITE_RESULTS_SERIES_WITH_FORECAST = "@composite@Series=,final.y,final.y_f";

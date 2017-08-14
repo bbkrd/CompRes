@@ -40,7 +40,7 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "CTL_SelectionSaveCalendarfactorToWorkspace=Calendar Factor",
     "CTL_ConfirmSaveCalendarfactorToWorkspace=Are you sure you want to remember the new Calendar factor? (This will delete the old Calendar factor)",
-    "CTL_NoSaveCalendarfactorToWorkspace=There is no Calendar factor(A6) to save!"})
+    "CTL_NoSaveCalendarfactorToWorkspace=There is no Calendar factor(A6,A7) to save!"})
 
 public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<SaBatchUI> {
 
@@ -75,10 +75,27 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
             if (results != null) {
                 //  TsData cal = results.getData(ModellingDictionary.CAL, TsData.class).update(results.getData(ModellingDictionary.CAL + SeriesInfo.F_SUFFIX, TsData.class));
                 // this is only available for x13
-                TsData cal = results.getData("decomposition.a-tables.a6", TsData.class);
-                //   boolean isLog = results.getData("log", Boolean.class);
+                TsData a6 = results.getData("decomposition.a-tables.a6", TsData.class);
+                TsData a7 = results.getData("decomposition.a-tables.a7", TsData.class);
+
+                TsData cal = null;
+                if (a6 == null && a7 != null) {
+                    cal = a7;
+                }
+                if (a7 == null && a6 != null) {
+                    cal = a6;
+                }
 
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
+
+                if (a6 != null && a7 != null) {
+                    if (mode.isMultiplicative()) {
+                        cal = a6.times(a7);
+                    } else {
+                        cal = a6.plus(a7);
+                    }
+                }
+
                 if (cal != null) {
                     cal = convertTsDataInPercentIfMult(cal, mode.isMultiplicative());
                     TsData_MetaDataConverter.convertTsToMetaData(cal, meta, SavedTables.CALENDARFACTOR);

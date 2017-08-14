@@ -11,7 +11,9 @@ import ec.satoolkit.x11.X11Results;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
+import ec.tss.html.implementation.HtmlProcessingInformation;
 import ec.tss.html.implementation.HtmlRegArima;
+import ec.tss.html.implementation.HtmlX13Summary;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -36,6 +38,7 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         writeTitle(stream);
+        writeMainResultsSummary(stream);
         if (model != null) {
             writeOutliers(stream);
             writeDetails(stream);
@@ -44,6 +47,18 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
             writeCombinedSeasonalityTest(stream, decomposition);
         }
 
+    }
+
+    private void writeMainResultsSummary(HtmlStream stream) throws IOException {
+        HtmlProcessingInformation hpi = new HtmlProcessingInformation(this.decomposition);
+        hpi.write(stream);
+
+        if (model == null) {
+            stream.write(HtmlTag.HEADER2, h2, "No pre-processing").newLine();
+        } else {
+            stream.write(HtmlTag.HEADER2, h2, "Pre-processing (RegArima)").newLine();
+            stream.write(new HtmlRegArima(model, true));
+        }
     }
 
     private void writeTitle(HtmlStream stream) throws IOException {
@@ -70,17 +85,18 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
 
     private void writeDetails(HtmlStream stream) throws IOException {
         HtmlRegArima htmlRegArima = new HtmlRegArima(model, true);
-        stream.write(HtmlTag.HEADER2, h2, "Arima model");
-        htmlRegArima.writeArima(stream);
-        stream.write(HtmlTag.LINEBREAK);
         stream.write(HtmlTag.HEADER2, h2, "Regression model");
         htmlRegArima.writeRegression(stream);
         stream.write(HtmlTag.LINEBREAK);
+        stream.write(HtmlTag.HEADER2, h2, "Arima model");
+        htmlRegArima.writeArima(stream);
+        stream.write(HtmlTag.LINEBREAK);
+
     }
 
     public static void writeCombinedSeasonalityTest(HtmlStream stream, X11Results decomposition) throws IOException {
         CombinedSeasonalityTest test = new CombinedSeasonalityTest(decomposition.getData(X11Kernel.D8, TsData.class),
-                                                                   decomposition.getSeriesDecomposition().getMode().isMultiplicative());
+                decomposition.getSeriesDecomposition().getMode().isMultiplicative());
 
         stream.write(HtmlTag.HEADER2, h2, "F-Test for stable seasonality").newLine();
         stream.write("Stable Value: " + df4.format(test.getStableSeasonality().getValue())).newLine();
@@ -89,6 +105,11 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         stream.write(HtmlTag.HEADER2, h2, "F-Test for moving seasonality").newLine();
         stream.write("Evolutive Value: " + df4.format(test.getEvolutiveSeasonality().getValue())).newLine();
         stream.write("Evolutive PValue: " + df4.format(test.getEvolutiveSeasonality().getPValue())).newLines(2);
+    
+       // stream.write(HtmlTag.HEADER2, h2, "m-statistics").newLine();
+    
+       
+    
     }
 
 }
