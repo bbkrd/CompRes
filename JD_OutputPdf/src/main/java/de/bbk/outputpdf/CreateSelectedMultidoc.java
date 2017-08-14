@@ -39,7 +39,7 @@ import org.openide.util.actions.NodeAction;
         displayName = "#CTL_CreateSelectedMultidoc", lazy = false)
 @ActionReference(path = "Menu/Tools", position = 2100)
 
-@Messages({"CTL_CreateSelectedMultidoc=Create HTMLs for selected multi-documents",
+@Messages({"CTL_CreateSelectedMultidoc=Create HTML for selected multi-documents",
     "CTL_CreateSelectedMultidoc_Message=Do you really want to create the output for the selected multi-documents?"})
 
 public final class CreateSelectedMultidoc extends NodeAction {

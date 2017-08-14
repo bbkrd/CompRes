@@ -17,17 +17,14 @@ import ec.util.chart.ObsFunction;
 import ec.util.chart.SeriesFunction;
 import ec.util.chart.swing.JTimeSeriesChart;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import org.jfree.data.xy.IntervalXYDataset;
 
 /**
  *
  * @author Christiane Hofer
  */
-public class BBKChart extends JTsChart implements IDisposable {
+public class BBKMainChart extends JTsChart implements IDisposable {
 
     private static final int WIDTH=450, HEIGHT=450;
 

@@ -6,7 +6,7 @@
 package de.bbk.outputpdf.html;
 
 import de.bbk.outputcustomized.util.SeasonallyAdjusted_Saved;
-import de.bbk.outputpdf.BBKChart;
+import de.bbk.outputpdf.BBKMainChart;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.TsCollectionInformation;
@@ -58,7 +58,7 @@ public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElemen
 
         TsCollectionInformation collectionInformation;
         collectionInformation = new TsCollectionInformation(tc, TsInformationType.Data);
-        final BBKChart tschart = new BBKChart();
+        final BBKMainChart tschart = new BBKMainChart();
         tschart.writeChart(collectionInformation, stream);
 
     }

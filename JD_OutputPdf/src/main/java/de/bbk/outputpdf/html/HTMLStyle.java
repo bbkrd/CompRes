@@ -17,7 +17,7 @@ public class HTMLStyle {
 "width:1000px; \n" +
 "max-width:1000px;}\n" +
 "hr { background: red; height: 2px; border: none } \n" +
-"h1 {	font-size:110%;\n" +
+"h1 {	font-size:100%;\n" +
 "	margin-top: 0px;\n" +
 "        margin-bottom: -5px;\n" +
 "        line-height: 1.1;}\n" +

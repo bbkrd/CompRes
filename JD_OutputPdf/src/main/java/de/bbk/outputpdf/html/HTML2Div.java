@@ -14,27 +14,26 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTML2Div extends AbstractHtmlElement implements IHtmlElement{
-    
-    private final AbstractHtmlElement leftHtmlElement,rightHtmlElement;
-    public HTML2Div(AbstractHtmlElement leftHtmlElement,AbstractHtmlElement rightHtmlElement)
-    {this.leftHtmlElement=leftHtmlElement;
-    this.rightHtmlElement=rightHtmlElement;
+public class HTML2Div extends AbstractHtmlElement implements IHtmlElement {
+
+    private final AbstractHtmlElement leftHtmlElement, rightHtmlElement;
+
+    public HTML2Div(AbstractHtmlElement leftHtmlElement, AbstractHtmlElement rightHtmlElement) {
+        this.leftHtmlElement = leftHtmlElement;
+        this.rightHtmlElement = rightHtmlElement;
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-     stream.write("<div id=\"div1left\">");
-     this.leftHtmlElement.write(stream);
-     stream.write("</div>");
-        
-     stream.write("<div id=\"div2right\">");
-     this.rightHtmlElement.write(stream);
-     stream.write("</div>");  
-        
-     stream.write(" <div class=\"clear\"></div>");
+        stream.write("<div id=\"div1left\">");
+        this.leftHtmlElement.write(stream);
+        stream.write("</div>");
+
+        stream.write("<div id=\"div2right\">");
+        this.rightHtmlElement.write(stream);
+        stream.write("</div>");
+
+        stream.write(" <div class=\"clear\"></div>");
     }
 
-   
-            
 }

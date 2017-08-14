@@ -10,28 +10,26 @@ import de.bbk.outputcustomized.view.TablesPercentageChangeView;
 import de.bbk.outputpdf.files.HTMLFiles;
 import de.bbk.outputpdf.html.HTML2Div;
 import de.bbk.outputpdf.html.HTMLBBKChartMain;
-import de.bbk.outputpdf.html.HTMLBBKFooter;
-import de.bbk.outputpdf.html.HTMLBBKPeriodogram;
 import de.bbk.outputpdf.html.HTMLBBKTableD8A;
 import de.bbk.outputpdf.html.HTMLBBKText1;
 import de.bbk.outputpdf.html.HTMLBBkHeader;
 import de.bbk.outputpdf.html.HTMLStyle;
 import de.bbk.outputpdf.util.Pagebreak;
+import de.bbk.outputcustomized.util.FixTimeDomain;
+import de.bbk.outputpdf.html.HTMLBBKBox;
+import de.bbk.outputpdf.html.HTMLBBKChartAutocorrelations;
 import ec.satoolkit.ISaSpecification;
-import ec.satoolkit.x11.Mstatistics;
 import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.documents.TsDocument;
+import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.implementation.HtmlMstatistics;
 import ec.tss.html.implementation.HtmlSingleTsData;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
-import ec.tstoolkit.modelling.ComponentInformation;
-import ec.tstoolkit.modelling.ComponentType;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
@@ -59,7 +57,7 @@ public class Processing {
         if (htmlf.isOutputfileSelected()) {
             startWithOutFileSelection(selection, name);
         } else {
-            JOptionPane.showMessageDialog(null, "The html('s) are not generated, you haven't selected a folder. ");
+            JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
         }
 
     }
@@ -75,7 +73,7 @@ public class Processing {
                 startWithOutFileSelection(selection, singleKey);
             });
         } else {
-            JOptionPane.showMessageDialog(null, "The html('s) are not generated, you haven't selected a folder. ");
+            JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
         }
 
     }
@@ -111,17 +109,13 @@ public class Processing {
                 str = str.replace("\n", "-");
                 if (t.getClass() == X13Document.class) {
                     X13Document x13doc = (X13Document) t;
-                    X11Results x11Results = x13doc.getDecompositionPart();
                     //   CompositeResults results = doc.getResults();
 
                     TsDomain domCharMax5years;
                     Ts tsY;
                     tsY = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y);
-                    TsDomain domTsY = tsY.getTsData().getDomain();
-                    int int5Jahre = domTsY.getFrequency().intValue() * 5;
-                    domCharMax5years = new TsDomain(domTsY.getEnd().minus(int5Jahre), int5Jahre);
-                    domCharMax5years = domCharMax5years.intersection(domTsY);
 
+                    domCharMax5years = FixTimeDomain.domLastFiveYears(tsY);
                     HtmlStream stream;
                     StringWriter writer = new StringWriter();
                     try {
@@ -132,7 +126,7 @@ public class Processing {
                         // stream.write("<link rel=\"stylesheet\" href=\"" + cssPath + "\">");
                         stream.write(HTMLStyle.getStyle());
                         //Einleitung Kopf
-                        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(saProcessingName, item.getRawName(), item.getTs().getRawName());
+                        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
                         headerbbk.write(stream);
                         stream.newLine();
 
@@ -140,16 +134,22 @@ public class Processing {
                         HTMLBBKChartMain chartMain = new HTMLBBKChartMain(x13doc, domCharMax5years);
                         final HTMLBBKText1 bBKText1 = new HTMLBBKText1(x13doc);
 
-                        final HTML2Div hTML2Div = new HTML2Div(bBKText1, chartMain);
+                        AbstractHtmlElement[] htmlElements = new AbstractHtmlElement[3];
+                        htmlElements[0] = chartMain;
+                        final HTMLBBKBox bBKBox = new HTMLBBKBox(htmlElements);
+
+                        HTMLBBKChartAutocorrelations autocorrelation = new HTMLBBKChartAutocorrelations(x13doc, false);
+                        htmlElements[1] = autocorrelation;
+
+                        HTMLBBKChartAutocorrelations partialautocorrelation = new HTMLBBKChartAutocorrelations(x13doc, true);
+                        htmlElements[2] = partialautocorrelation;
+
+                        final HTML2Div hTML2Div = new HTML2Div(bBKText1, bBKBox);
                         hTML2Div.write(stream);
-                        stream.write("Irregular ??").newLine();
-                        final HTMLBBKPeriodogram htmlBBKPeriodogram = new HTMLBBKPeriodogram(x13doc.getDecompositionPart().getSeriesDecomposition().getSeries(ComponentType.Irregular, ComponentInformation.Value));
+//                        stream.write("Irregular ??").newLine();
+//                        final HTMLBBKPeriodogram htmlBBKPeriodogram = new HTMLBBKPeriodogram(x13doc.getDecompositionPart().getSeriesDecomposition().getSeries(ComponentType.Irregular, ComponentInformation.Value));
+//                        htmlBBKPeriodogram.write(stream);
 
-                        htmlBBKPeriodogram.write(stream);
-
-                        final HTMLBBKFooter bBKFooter = new HTMLBBKFooter(item.getTs());
-                        bBKFooter.write(stream);
-                        stream.newLine();
                         final Pagebreak p = new Pagebreak();
                         p.write(stream);
 
@@ -160,35 +160,29 @@ public class Processing {
                         hTMLBBKTableD8B.write(stream);
                         stream.newLine();
 
-                        HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
-                        htmlCCA.writeTextWithoutTitle(stream);
-
-                        Mstatistics mstats = Mstatistics.computeFromX11(x11Results.getSeriesDecomposition().getMode(), x11Results.getInformation());
-                        final HtmlMstatistics htmlMstatistics = new HtmlMstatistics(mstats);
-                        htmlMstatistics.writeSummary(stream);
-
-                        p.write(stream);
-
                         TablesPercentageChangeView tpcv = new TablesPercentageChangeView();
                         tpcv.set(x13doc);
+                        TsDomain domain = x13doc.getSeries().getDomain();
                         Ts SeasonallyadjustedPercentageChange = tpcv.GetSeasonallyadjustedPercentageChange();
 
                         HtmlSingleTsData htmlSingleTsData = new HtmlSingleTsData(
-                                onlyLast2years(SeasonallyadjustedPercentageChange.getTsData()), SeasonallyadjustedPercentageChange.getName());
+                                lastYearOfSeries(domain, SeasonallyadjustedPercentageChange.getTsData()), SeasonallyadjustedPercentageChange.getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
-                        htmlSingleTsData = new HtmlSingleTsData(onlyLast2years(tpcv.GetSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.GetSavedSeasonallyAdjustedPercentageChange().getName());
+                        htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.GetSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.GetSavedSeasonallyAdjustedPercentageChange().getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
 //footer
-                        bBKFooter.write(stream);
+                        HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
+                        htmlCCA.writeTextForHTML(stream);
 
                         stream.close();
 
                         String output = writer.getBuffer().toString();
-
-                        //    htmlf.createHTMLTempFiles(output);
-                        htmlf.creatHTMLFile(output, this.saProcessingName, item.getName());
+                        String old = "<h1 style=\"font-weight:bold;font-size:110%;text-decoration:underline;\">";
+                        String corrected = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
+                        output = output.replace(old, corrected);
+                        htmlf.creatHTMLFile(output, item.getName());
 
                         // hTMLBBKTableD8B.dispose();
                     } catch (IOException ex) {
@@ -218,24 +212,14 @@ public class Processing {
 
     }
 
-    /**
-     *
-     * @param tsData
-     * @return a clone from tsData with has a max lenght from 2 years
-     */
-    private TsData onlyLast2years(TsData tsData) {
-
-        if (tsData != null && !tsData.isEmpty()) {
-            TsData tsData2 = tsData.clone();
-            int freq = tsData2.getFrequency().intValue();
-            int drop = tsData2.getLength() - 2 * freq;
-            if (drop > 0) {
-                return tsData2.drop(drop, 0);
-            } else {
-                return tsData2;
-            }
+    private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
+        TsData tsDataDom=new TsData(dom);
+        if (tsData != null) {
+            dom = FixTimeDomain.domLastYear(dom);
+            tsDataDom = tsData.fittoDomain(dom);
         }
-        return tsData;
+        return tsDataDom;
+
     }
 
 }

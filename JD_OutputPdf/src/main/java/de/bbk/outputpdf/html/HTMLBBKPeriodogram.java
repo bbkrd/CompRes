@@ -11,17 +11,11 @@ import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
 import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.ui.view.PeriodogramView;
 import ec.util.chart.swing.Charts;
-import ec.util.chart.swing.JTimeSeriesChart;
 import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import javax.swing.JPanel;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.Plot;
 
 /**
  *

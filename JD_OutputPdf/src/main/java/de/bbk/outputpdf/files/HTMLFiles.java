@@ -6,6 +6,7 @@
 package de.bbk.outputpdf.files;
 
 import com.google.common.io.Files;
+import de.bbk.outputpdf.util.Frozen;
 import ec.nbdemetra.ws.Workspace;
 import ec.nbdemetra.ws.WorkspaceFactory;
 import java.awt.Desktop;
@@ -15,6 +16,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HTMLFiles {
 
-   private String currentDir;
+    private String currentDir;
 
     private static HTMLFiles hTMLFiles;
 
@@ -60,6 +63,23 @@ public class HTMLFiles {
         }
 
     }
+
+    private File selectFileName(File file) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileFilter defaultFilter = new FileNameExtensionFilter("HTML (.html)", "html");
+        fileChooser.addChoosableFileFilter(defaultFilter);
+        fileChooser.setDialogTitle("The file " +file.getName() + " already exists.");
+        fileChooser.setCurrentDirectory(file);
+        int showSaveDialog = fileChooser.showSaveDialog(null);
+        if (showSaveDialog == JFileChooser.CANCEL_OPTION) {
+            return null;
+        } else if (showSaveDialog == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+        return null;
+    }
+
     private boolean OutputfileSelected = false;
 
     public boolean isOutputfileSelected() {
@@ -67,6 +87,41 @@ public class HTMLFiles {
     }
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * Creats all files in the selected folder
+     *
+     * @param html
+     * @param saItemName
+     */
+    public void creatHTMLFile(String html, String saItemName) {
+        try {
+            saItemName = removeCharacters(saItemName);
+
+            StringBuilder fileName = new StringBuilder();
+            fileName.append(currentDir);
+            fileName.append("\\").append(Frozen.removeFrozen(saItemName));
+            fileName.append(".html");
+            //   fileName = NumberForFile(fileName);
+            File file = new File(fileName.toString());
+            if (file.exists()) {
+            file=    selectFileName(file);
+            }
+            if (file != null) {
+                Files.write(html, file, Charset.defaultCharset());
+                Desktop.getDesktop().open(file);
+            }//ToDo löschen
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+
+    /**
+     * Saves the html file in subfolder for each mulitdoc
+     *
+     * @param html
+     * @param multiName
+     * @param saItemName
+     */
     public void creatHTMLFile(String html, String multiName, String saItemName) {
 
         try {

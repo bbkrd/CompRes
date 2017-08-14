@@ -29,7 +29,7 @@ import org.openide.util.NbBundle.Messages;
     @ActionReference(path = MultiProcessingManager.LOCALPATH, position = 2260)
 })
 
-@Messages("CTL_Pdf=Create HTML('s)")
+@Messages("CTL_Pdf=Create HTML")
 public final class Pdf extends AbstractViewAction<SaBatchUI> {
 
   

@@ -43,11 +43,11 @@ import org.openide.util.NbBundle.Messages;
         displayName = "#CTL_CreateAllMultidocs"
 )
 @ActionReference(path = "Menu/Tools", position = 2000)
-@Messages("CTL_CreateAllMultidocs=Create HTMLs for all multi-documents")
+@Messages("CTL_CreateAllMultidocs=Create HTML for all multi-documents")
 public final class CreateAllMultidocs implements ActionListener {
 
     @Messages({
-        "CTL_Message=Do you really want to create the HTMLs for all multi-documents?"
+        "CTL_Message=Do you really want to create the HTML for all multi-documents?"
     })
     @Override
     public void actionPerformed(ActionEvent ev) {

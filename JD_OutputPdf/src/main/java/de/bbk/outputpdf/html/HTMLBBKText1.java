@@ -5,6 +5,8 @@
  */
 package de.bbk.outputpdf.html;
 
+import ec.satoolkit.x11.X11Specification;
+import ec.satoolkit.x13.X13Specification;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlStyle;
@@ -13,6 +15,7 @@ import ec.tss.html.HtmlTableCell;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.IHtmlElement;
 import ec.tss.html.implementation.HtmlRegArima;
+import ec.tss.html.implementation.HtmlX13Summary;
 import ec.tss.sa.diagnostics.ResidualsDiagnosticsConfiguration;
 import java.io.IOException;
 import ec.tss.sa.documents.X13Document;
@@ -25,11 +28,15 @@ import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
 import ec.tstoolkit.modelling.arima.tramo.SeasonalityTests;
 import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
+import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
+import ec.tstoolkit.modelling.arima.x13.SingleOutlierSpec;
 import ec.tstoolkit.sarima.SarimaComponent;
 import ec.tstoolkit.sarima.SarimaSpecification;
 import ec.tstoolkit.stats.LjungBoxTest;
 import ec.tstoolkit.stats.NiidTests;
+import ec.tstoolkit.timeseries.regression.OutlierDefinition;
 import ec.tstoolkit.timeseries.simplets.TsData;
+import java.util.Map;
 
 /**
  *
@@ -58,63 +65,107 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
 
     @Override
     public void write(HtmlStream stream) throws IOException {
+        stream.write(HtmlTag.HEADER2, h2, "Specification");
         if (model != null) {
-            if (model.description.getTransformation() == DefaultTransformationType.Log) {
-                stream.write("Series has been log-transformed").newLine();
-            } else {
-                stream.write("Series has not been transformed").newLine();
+            RegArimaSpecification regSpec = x13Document.getSpecification().getRegArimaSpecification();
+            stream.write("Transform: ");
+            stream.write(regSpec.getTransform().getFunction().toString()).newLine();
+//Outlier   
+            for (SingleOutlierSpec type : regSpec.getOutliers().getTypes()) {
+                stream.write("Outlier detection: " + type.getType().name()).newLine();
             }
-            if (statistics != null) {
-                stream.write("AIC = ").write(df4.format(statistics.AIC)).newLines(1);
+            double criticalValue = regSpec.getOutliers().getDefaultCriticalValue();
+            if (criticalValue == 0) {
+                criticalValue = DEF_VA;
+            }
+            stream.write("Outliers critical value is: " + criticalValue).newLine();
+
+            if (regSpec.getRegression().getTradingDays().isUsed()) {
+                stream.write("Regression variables: Trading days").newLine();
+            }
+            for (OutlierDefinition variable : regSpec.getRegression().getOutliers()) {
+                stream.write("Regression variable: " + variable.toString()).newLine();
             }
 
+            if (regSpec.isUsingAutoModel()) {
+                stream.write("ARIMA model: auto");
+            } else {
+                stream.write("ARIMA model: (" + regSpec.getArima().getP());
+                stream.write(" " + regSpec.getArima().getD());
+                stream.write(" " + regSpec.getArima().getQ() + ")");
+                stream.write("(" + regSpec.getArima().getBP());
+                stream.write(" " + regSpec.getArima().getBD());
+                stream.write(" " + regSpec.getArima().getBQ() + ")").newLine();
+            }
+
+        }
+        X11Specification x11Spec = x13Document.getSpecification().getX11Specification();
+        stream.write("Forecast horizon: " + x11Spec.getForecastHorizon()).newLine();
+        stream.write("Sigmalimit: [" + x11Spec.getLowerSigma() + ";" + x11Spec.getUpperSigma() + "]").newLine();
+
+        if (x11Spec.isSeasonal() && x11Spec.getSeasonalFilters() != null) {
+            stream.write("Seasonal filters:" + x11Spec.getSeasonalFilters()[0].name() + ",");
+            for (int i = 1; i < x11Spec.getSeasonalFilters().length - 1; i++) {
+                stream.write(x11Spec.getSeasonalFilters()[i].name() + ",");
+            }
+            if (x11Spec.getSeasonalFilters().length > 1) {
+                stream.write(x11Spec.getSeasonalFilters()[x11Spec.getSeasonalFilters().length - 1].name()).newLine();
+            }
+        } else {
+            stream.write("Seasonal filters: Msr").newLine();
+        }
+
+        if (x11Spec.isAutoHenderson()) {
+            stream.write("Trendfilter: auto").newLine();
+        } else {
+            stream.write("Trendfilter: " + x11Spec.getHendersonFilterLength()).newLine();
+        }
+        stream.write("Calendarsigma: " + x11Spec.getCalendarSigma().name()).newLine();
+        stream.write("Excludefcst: " + x11Spec.isExcludefcst()).newLines(1);
+
+        if (model != null) {
+
+            HtmlRegArima htmlRegArimaSummary = new HtmlRegArima(model, true);
+            stream.write(htmlRegArimaSummary).newLine(); //H1 muss hier auf 100 gesetzt werden, sonst copy and paste
             //Arima Model
             HtmlRegArima htmlRegArima = new HtmlRegArima(model, false);
-            stream.write(HtmlTag.HEADER2, h2, "Arima model: ");
-            writeArima(stream);
-            stream.newLines(1);
+
             stream.write(HtmlTag.HEADER2, h2, "Regresssion model:");
             htmlRegArima.writeRegression(stream, true);
             stream.newLines(1);
-            
-            double criticalValue=x13Document.getSpecification().getRegArimaSpecification().getOutliers().getDefaultCriticalValue();
-                 if (criticalValue == 0) {
-               criticalValue=DEF_VA;
-            }
-            
-            
-            stream.write("Outliers critical value is: " + criticalValue);
+            stream.write(HtmlTag.HEADER2, h2, "Arima model: ");
+            writeArima(stream);
             stream.newLines(1);
-            writeACF(stream);
+           
         }
     }
 
     private void writeACF(HtmlStream stream) throws IOException {
         if (seasonalityTests != null && niidTests.getLjungBox() != null) {
 
-            boolean first=true;
+            boolean first = true;
             LjungBoxTest lb = niidTests.getLjungBox();
             int ifreq = seasonalityTests.getDifferencing().getOriginal().getFrequency().intValue();
             stream.write("ACF-Ljung-Box tests on residuals: ");
 
-
             for (int i = 1; i < ifreq / 2 + 1; i++) {
                 lb.setK(i);
                 if (lb.isValid()) {
-                  
-                    stream.write("P-Value(").write(i).write(")=").write(df4.format(lb.getPValue()),PValue(lb.getPValue()));
-                  first=false;
-                  if(!first)
-                      stream.write("; ");
+
+                    stream.write("P-Value(").write(i).write(")=").write(df4.format(lb.getPValue()), PValue(lb.getPValue()));
+                    first = false;
+                    if (!first) {
+                        stream.write("; ");
+                    }
                 }
             }
             lb.setK(ifreq);
             if (lb.isValid()) {
-                stream.write("P-Value(").write(ifreq).write(")=").write(df4.format(lb.getPValue()),PValue(lb.getPValue()));
+                stream.write("P-Value(").write(ifreq).write(")=").write(df4.format(lb.getPValue()), PValue(lb.getPValue()));
             }
             lb.setK(2 * ifreq);
             if (lb.isValid()) {
-                stream.write("; P-Value(").write(2 * ifreq).write(")=").write(df4.format(lb.getPValue()),PValue(lb.getPValue()));
+                stream.write("; P-Value(").write(2 * ifreq).write(")=").write(df4.format(lb.getPValue()), PValue(lb.getPValue()));
             }
         }
     }

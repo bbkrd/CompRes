@@ -11,7 +11,7 @@ package de.bbk.outputpdf.util;
  */
 public class Frozen {
 
-    private static final String FROZEN = " [frozen]";
+    private static final String FROZEN = "[frozen]";
 
     public static String removeFrozen(String stringWithFrozen) {
         if (stringWithFrozen.contains(FROZEN)) {
