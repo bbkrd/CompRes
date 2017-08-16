@@ -18,6 +18,7 @@ import de.bbk.outputpdf.util.Pagebreak;
 import de.bbk.outputcustomized.util.FixTimeDomain;
 import de.bbk.outputpdf.html.HTMLBBKBox;
 import de.bbk.outputpdf.html.HTMLBBKChartAutocorrelations;
+import de.bbk.outputpdf.html.HTMLBBKSIRatioView;
 import ec.satoolkit.ISaSpecification;
 import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
@@ -96,7 +97,7 @@ public class Processing {
         @Override
         public void run() {
             StringBuilder sbError = new StringBuilder();
-            StringBuilder sbSuccussfull = new StringBuilder();
+            StringBuilder sbSuccessful = new StringBuilder();
 
             for (SaItem item : items) {
 
@@ -104,7 +105,7 @@ public class Processing {
                 //   int index = cur.getCurrentProcessing().indexOf(selection[i]);
                 SaDocument<ISaSpecification> doc = item.toDocument();
                 TsDocument t = item.toDocument();
-                String str = item.getName()
+                String str = item.getRawName()
                         + "in Multi-doc " + this.saProcessingName;
                 str = str.replace("\n", "-");
                 if (t.getClass() == X13Document.class) {
@@ -155,7 +156,6 @@ public class Processing {
 
                         headerbbk.write(stream);
 
-                        //soll durch das schöne Table aus dem Output ersetzt werden
                         final HTMLBBKTableD8A hTMLBBKTableD8B = new HTMLBBKTableD8A(x13doc, domCharMax5years);
                         hTMLBBKTableD8B.write(stream);
                         stream.newLine();
@@ -172,7 +172,14 @@ public class Processing {
                         htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.GetSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.GetSavedSeasonallyAdjustedPercentageChange().getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
-//footer
+                       
+                        HTMLBBKSIRatioView sIRatioView = new HTMLBBKSIRatioView(x13doc);
+                        sIRatioView.write(stream);
+
+                        stream.newLine();
+
+                        headerbbk.write(stream);
+
                         HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
                         htmlCCA.writeTextForHTML(stream);
 
@@ -182,6 +189,7 @@ public class Processing {
                         String old = "<h1 style=\"font-weight:bold;font-size:110%;text-decoration:underline;\">";
                         String corrected = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
                         output = output.replace(old, corrected);
+                        output=output.replace("<hr />", "");
                         htmlf.creatHTMLFile(output, item.getName());
 
                         // hTMLBBKTableD8B.dispose();
@@ -189,8 +197,8 @@ public class Processing {
                         LOGGER.error(ex.getMessage());
                     }
 
-                    sbSuccussfull.append(str);
-                    sbSuccussfull.append("\n");
+                    sbSuccessful.append(str);
+                    sbSuccessful.append("\n");
                 } else {
 
                     sbError.append(str);
@@ -204,16 +212,16 @@ public class Processing {
                 JOptionPane.showMessageDialog(null, sbError.toString(), "This output is not available. ", JOptionPane.ERROR_MESSAGE);
             }
 
-            if (!"".equals(sbSuccussfull.toString())) {
+            if (!"".equals(sbSuccessful.toString())) {
 
-                JOptionPane.showMessageDialog(null, sbSuccussfull.toString(), "This output is available for:. ", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, sbSuccessful.toString(), "This output is available for:. ", JOptionPane.INFORMATION_MESSAGE);
             }
         }
 
     }
 
     private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
-        TsData tsDataDom=new TsData(dom);
+        TsData tsDataDom = new TsData(dom);
         if (tsData != null) {
             dom = FixTimeDomain.domLastYear(dom);
             tsDataDom = tsData.fittoDomain(dom);

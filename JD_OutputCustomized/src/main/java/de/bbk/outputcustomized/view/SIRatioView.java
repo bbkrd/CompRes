@@ -34,31 +34,7 @@ public class SIRatioView extends JComponent implements IDisposable {
     }
 
     public void set(X13Document doc) {
-        if (doc == null) {
-            return;
-        }
-
-        Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
-        if (seasonalfactor == null) {
-            return;
-        }
-        X11Results x11 = doc.getDecompositionPart();
-        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
-        if (x11 != null) {
-
-            TsData si = x11.getData("d8", TsData.class);
-            TsData seas = x11.getData("d10", TsData.class);
-
-            if (x11.getSeriesDecomposition().getMode() == DecompositionMode.LogAdditive) {
-                si = si.exp();
-            }
-            seas = convertTsDataInPercentIfMult(seas, mode.isMultiplicative());
-            si = convertTsDataInPercentIfMult(si, mode.isMultiplicative());
-            siView.setSiData(seas, si, seasonalfactor.getTsData());
-
-        } else {
-            siView.reset();
-        }
+     siView.setDoc(doc);
     }
 
     @Override

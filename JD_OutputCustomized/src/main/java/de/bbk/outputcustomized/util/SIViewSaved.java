@@ -5,8 +5,13 @@
  */
 package de.bbk.outputcustomized.util;
 
+import static de.bbk.outputcustomized.util.InPercent.convertTsDataInPercentIfMult;
 import ec.nbdemetra.ui.DemetraUI;
+import ec.satoolkit.DecompositionMode;
+import ec.satoolkit.x11.X11Results;
+import ec.tss.Ts;
 import ec.tss.TsInformation;
+import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.data.DataBlock;
 import ec.tstoolkit.timeseries.simplets.*;
 import ec.ui.ATsView;
@@ -68,6 +73,10 @@ public class SIViewSaved extends ATsView {
     private final XYLineAndShapeRenderer siDetailRenderer;
     private final XYLineAndShapeRenderer siMasterRenderer;
     private final JFreeChart masterChart;
+
+    public JFreeChart getJFreeChart() {
+        return masterChart;
+    }
     private final JFreeChart detailChart;
     private final DecimalFormat format = new DecimalFormat("0");
     private NumberFormat numberFormat;
@@ -328,11 +337,43 @@ public class SIViewSaved extends ATsView {
         }
     }
 
+    public void setDoc(X13Document doc) {
+
+        if (doc == null) {
+            this.reset();
+            return;
+        }
+
+        Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
+        if (seasonalfactor == null) {
+            this.reset();
+            return;
+        }
+        X11Results x11 = doc.getDecompositionPart();
+        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
+        if (x11 != null) {
+
+            TsData si = x11.getData("d8", TsData.class);
+            TsData seas = x11.getData("d10", TsData.class);
+
+            if (x11.getSeriesDecomposition().getMode() == DecompositionMode.LogAdditive) {
+                si = si.exp();
+            }
+            seas = convertTsDataInPercentIfMult(seas, mode.isMultiplicative());
+            si = convertTsDataInPercentIfMult(si, mode.isMultiplicative());
+            this.setSiData(seas, si, seasonalfactor.getTsData());
+
+        } else {
+            this.reset();
+        }
+
+    }
+
     /**
      * This method needs a saved D10 else the wrong class is used
      *
-     * @param seas       D10
-     * @param irr        D8
+     * @param seas D10
+     * @param irr D8
      * @param seas_saved D10_saved
      */
     public void setData(TsData seas, TsData irr, TsData seas_saved) {

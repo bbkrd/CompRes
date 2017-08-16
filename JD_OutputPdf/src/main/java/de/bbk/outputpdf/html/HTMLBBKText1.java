@@ -121,7 +121,8 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
             stream.write("Trendfilter: " + x11Spec.getHendersonFilterLength()).newLine();
         }
         stream.write("Calendarsigma: " + x11Spec.getCalendarSigma().name()).newLine();
-        stream.write("Excludefcst: " + x11Spec.isExcludefcst()).newLines(1);
+        stream.write("Excludefcst: " + x11Spec.isExcludefcst()).newLines(2);
+        
 
         if (model != null) {
 

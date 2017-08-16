@@ -5,19 +5,15 @@
  */
 package de.bbk.outputpdf.html;
 
-import ec.nbdemetra.ws.WorkspaceFactory;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.HtmlTag;
 import ec.tss.html.IHtmlElement;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import de.bbk.outputpdf.util.Frozen;
 import ec.tss.Ts;
-import static ec.tss.TsInformationType.MetaData;
 import ec.tss.html.HtmlStyle;
 import java.time.format.DateTimeFormatter;
-import ec.tstoolkit.MetaData;
 
 /**
  *
@@ -48,7 +44,7 @@ public class HTMLBBkHeader extends AbstractHtmlElement implements IHtmlElement {
         nameSeries = Frozen.removeFrozen(nameSeries);
         stream.write( nameSAItem, HtmlStyle.Bold).newLine();
         stream.write(nameSeries).newLine();
-        stream.write("From " + ts.getTsData().getStart() + " to " + ts.getTsData().getEnd() + " ").newLine();
+        stream.write("From " + ts.getTsData().getStart() + " to " + ts.getTsData().getLastPeriod() + " ").newLine(); // ToDo Series Span?
     }
 
    
