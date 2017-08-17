@@ -6,7 +6,6 @@
 package de.bbk.outputpdf.html;
 
 import de.bbk.outputpdf.BbkPeriodogramView;
-import de.bbk.outputpdf.SVGJComponent;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
@@ -21,10 +20,10 @@ import org.jfree.chart.JFreeChart;
  *
  * @author Christiane Hofer
  */
+@Deprecated
 public class HTMLBBKPeriodogram extends AbstractHtmlElement implements IHtmlElement {
 
-    private TsData tsData;
-    private SVGJComponent svgJComponent;
+    private final TsData tsData;
     private final int width = 900;
     private final int height = 450;
 
@@ -68,10 +67,4 @@ public class HTMLBBKPeriodogram extends AbstractHtmlElement implements IHtmlElem
 //        svgJComponent.write(stream);
 
     }
-
-    public void dispose() {
-        this.svgJComponent.dispose();
-        this.tsData = null;
-    }
-
 }

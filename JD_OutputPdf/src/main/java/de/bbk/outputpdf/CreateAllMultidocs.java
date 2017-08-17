@@ -65,9 +65,9 @@ public final class CreateAllMultidocs implements ActionListener {
                 SaProcessing saProcessing = item.getElement().getCurrent();
                 map.put(item.getDisplayName(), saProcessing);
             });
-        Processing p=new Processing();
-        p.start(map);
-        
+            Processing p = new Processing();
+            p.start(map);
+
         }
     }
 }

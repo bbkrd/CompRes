@@ -32,8 +32,6 @@ public class HTML2Div extends AbstractHtmlElement implements IHtmlElement {
         stream.write("<div id=\"div2right\">");
         this.rightHtmlElement.write(stream);
         stream.write("</div>");
-
-        stream.write(" <div class=\"clear\"></div>");
     }
 
 }

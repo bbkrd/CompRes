@@ -7,11 +7,7 @@ package de.bbk.outputpdf.html;
 
 import de.bbk.outputcustomized.util.SeasonallyAdjusted_Saved;
 import de.bbk.outputpdf.BBKMainChart;
-import ec.tss.Ts;
-import ec.tss.TsCollection;
-import ec.tss.TsCollectionInformation;
-import ec.tss.TsFactory;
-import ec.tss.TsInformationType;
+import ec.tss.*;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
@@ -38,27 +34,23 @@ public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElemen
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        //Die TSCollection Information um die write methode zu verwenden
-        Ts tsY, tsSA, tsSASaved;
-        TsData tsYData, tsSAData;
         TsCollection tc = TsFactory.instance.createTsCollection();
-        tsYData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y).getTsData();
-        tsY = TsFactory.instance.createTs(ModellingDictionary.Y, null, tsYData.fittoDomain(domMax5));
+        TsData tsYData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y).getTsData();
+        Ts tsY = TsFactory.instance.createTs(ModellingDictionary.Y, null, tsYData.fittoDomain(domMax5));
         tc.add(tsY);
 
-        tsSAData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA).getTsData();
-        tsSA = TsFactory.instance.createTs(ModellingDictionary.SA, null, tsSAData.fittoDomain(domMax5));
+        TsData tsSAData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA).getTsData();
+        Ts tsSA = TsFactory.instance.createTs(ModellingDictionary.SA, null, tsSAData.fittoDomain(domMax5));
         tc.add(tsSA);
 
-        tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(x13doc);
+        Ts tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(x13doc);
         if (tsSASaved.getTsData() != null && !tsSASaved.getTsData().isEmpty()) {
             tsSASaved.set(tsSASaved.getTsData().fittoDomain(domMax5));
             tc.add(tsSASaved);
         }
 
-        TsCollectionInformation collectionInformation;
-        collectionInformation = new TsCollectionInformation(tc, TsInformationType.Data);
-        final BBKMainChart tschart = new BBKMainChart();
+        TsCollectionInformation collectionInformation = new TsCollectionInformation(tc, TsInformationType.Data);
+        BBKMainChart tschart = new BBKMainChart();
         tschart.writeChart(collectionInformation, stream);
 
     }

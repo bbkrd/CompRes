@@ -13,12 +13,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-
-import org.apache.batik.svggen.SVGGraphics2D;
-
-
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -52,23 +48,23 @@ public class SVGJComponent implements IDisposable {
 
     private static SVGGraphics2D drawSvgGraphics(JPanel component, Rectangle bounds) {
 
-        // Get a SVGDOMImplementation and create an XML document 
+        // Get a SVGDOMImplementation and create an XML document
         DOMImplementation domImpl = SVGDOMImplementation.getDOMImplementation();
         String svgNS = "http://www.w3.org/2000/svg";
         SVGDocument svgDocument = (SVGDocument) domImpl.createDocument(svgNS, "svg", null);
 
-        // Create an instance of the SVG Generator 
+        // Create an instance of the SVG Generator
         SVGGraphics2D svgGenerator = new SVGGraphics2D(svgDocument);
         svgGenerator.setSVGCanvasSize(bounds.getSize());
 
-        // draw the panel in the SVG generator 
+        // draw the panel in the SVG generator
         component.setVisible(true);
 
         JFrame jp = new JFrame();
-        jp.setLayout(new FlowLayout()); // needed to get all on the screen other whise it is centeresd
-        jp.setVisible(true);  // is needed ohter whise no information from the top component
+        jp.setLayout(new FlowLayout()); // needed to get all on the screen otherwise it is centeresd
+        jp.setVisible(true);  // is needed otherwise no information from the top component
         jp.add(component);
-     //   jp.setSize(component.getSize());
+        //   jp.setSize(component.getSize());
         jp.validate();
         component.update(svgGenerator);
         jp.dispose(); //workaround to get rid of the jp

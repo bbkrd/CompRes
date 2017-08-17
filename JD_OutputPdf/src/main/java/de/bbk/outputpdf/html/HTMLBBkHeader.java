@@ -5,15 +5,17 @@
  */
 package de.bbk.outputpdf.html;
 
-import ec.tss.html.AbstractHtmlElement;
-import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import de.bbk.outputpdf.util.Frozen;
 import ec.tss.Ts;
+import ec.tss.html.AbstractHtmlElement;
+import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlStyle;
+import ec.tss.html.IHtmlElement;
+import ec.tstoolkit.timeseries.simplets.TsData;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  *
@@ -21,31 +23,27 @@ import java.time.format.DateTimeFormatter;
  */
 public class HTMLBBkHeader extends AbstractHtmlElement implements IHtmlElement {
 
-    private String nameSAItem;
-    private String nameSeries;
-    private final Ts ts;
+    private final String nameSAItem;
+    private final String nameSeries;
+    private final TsData tsData;
 
-    
     public HTMLBBkHeader(String nameSaItem, Ts ts) {
 
-        this.nameSAItem = nameSaItem;
+        this.nameSAItem = Frozen.removeFrozen(nameSaItem);
         this.nameSeries = ts.getRawName();
-        this.ts = ts;
-    
+        this.tsData = ts.getTsData();
+
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
         //WorkspaceFactory.getInstance().getActiveWorkspace().getName(); // Name von  aktiven WS
         stream.write(" <p style='text-align:right; '>");
-        stream.write(  LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + " " + System.getProperty("user.name"));
+        stream.write(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + " " + System.getProperty("user.name"));
         stream.write("</p>");
-        nameSAItem = Frozen.removeFrozen(nameSAItem);
-        nameSeries = Frozen.removeFrozen(nameSeries);
-        stream.write( nameSAItem, HtmlStyle.Bold).newLine();
+        stream.write(nameSAItem, HtmlStyle.Bold).newLine();
         stream.write(nameSeries).newLine();
-        stream.write("From " + ts.getTsData().getStart() + " to " + ts.getTsData().getLastPeriod() + " ").newLine(); // ToDo Series Span?
+        stream.write("From " + tsData.getStart() + " to " + tsData.getLastPeriod()).newLine(); // ToDo Series Span?
     }
 
-   
 }

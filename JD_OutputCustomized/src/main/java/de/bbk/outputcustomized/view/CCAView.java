@@ -6,34 +6,20 @@
 package de.bbk.outputcustomized.view;
 
 import de.bbk.outputcustomized.html.HtmlCCA;
-import de.bbk.outputcustomized.util.InPercent;
 import de.bbk.outputcustomized.util.JPanelCCA;
-import de.bbk.outputcustomized.util.JTsOutlierGrid;
-import de.bbk.outputcustomized.util.SavedTables;
-import de.bbk.outputcustomized.util.TsData_Saved;
 import ec.nbdemetra.ui.NbComponents;
-import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Results;
-import ec.tss.Ts;
-import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.X13Document;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.tstoolkit.algorithm.CompositeResults;
-import ec.tstoolkit.timeseries.regression.OutlierEstimation;
-import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.ui.Disposables;
-import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
-import ec.ui.interfaces.ITsCollectionView;
-import ec.ui.interfaces.ITsGrid;
 import ec.ui.view.tsprocessing.ITsViewToolkit;
 import ec.ui.view.tsprocessing.TsViewToolkit;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 /**
  *
@@ -45,12 +31,10 @@ public class CCAView extends JComponent implements IDisposable {
     private final Box document;
     private final JPanelCCA jPanelCCA;
 
-  
-
     public CCAView() {
         setLayout(new BorderLayout());
         this.document = Box.createHorizontalBox();
-        this.jPanelCCA=new JPanelCCA();
+        this.jPanelCCA = new JPanelCCA();
         JScrollPane mainscroll = NbComponents.newJScrollPane(jPanelCCA);
 
         JSplitPane mainsplit = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, document, mainscroll);
@@ -77,13 +61,8 @@ public class CCAView extends JComponent implements IDisposable {
         Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
 
         jPanelCCA.set(doc);
-        
-   
+
     }
-
-
-
-   
 
     @Override
     public void dispose() {

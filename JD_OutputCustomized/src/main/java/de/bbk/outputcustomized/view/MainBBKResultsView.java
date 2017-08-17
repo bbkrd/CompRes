@@ -6,18 +6,15 @@
 package de.bbk.outputcustomized.view;
 
 import de.bbk.outputcustomized.html.HtmlBBKSummary;
+import de.bbk.outputcustomized.util.FixTimeDomain;
 import static de.bbk.outputcustomized.util.SavedTables.*;
 import de.bbk.outputcustomized.util.SeasonallyAdjusted_Saved;
-import de.bbk.outputcustomized.util.FixTimeDomain;
 import ec.nbdemetra.ui.NbComponents;
-import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.X13Document;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.tstoolkit.algorithm.CompositeResults;
-import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.ui.Disposables;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -94,7 +91,7 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
     private Ts getMainSeriesLast5Years(String str) {
         Ts t = getMainSeries(str);
         return td.getTsWithDomain(t);
-       
+
     }
 
     @Override

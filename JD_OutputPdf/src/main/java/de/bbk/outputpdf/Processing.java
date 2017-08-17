@@ -6,21 +6,12 @@
 package de.bbk.outputpdf;
 
 import de.bbk.outputcustomized.html.HtmlCCA;
+import de.bbk.outputcustomized.util.FixTimeDomain;
 import de.bbk.outputcustomized.view.TablesPercentageChangeView;
 import de.bbk.outputpdf.files.HTMLFiles;
-import de.bbk.outputpdf.html.HTML2Div;
-import de.bbk.outputpdf.html.HTMLBBKChartMain;
-import de.bbk.outputpdf.html.HTMLBBKTableD8A;
-import de.bbk.outputpdf.html.HTMLBBKText1;
-import de.bbk.outputpdf.html.HTMLBBkHeader;
-import de.bbk.outputpdf.html.HTMLStyle;
+import de.bbk.outputpdf.html.*;
 import de.bbk.outputpdf.util.Pagebreak;
-import de.bbk.outputcustomized.util.FixTimeDomain;
-import de.bbk.outputpdf.html.HTMLBBKBox;
-import de.bbk.outputpdf.html.HTMLBBKChartAutocorrelations;
-import de.bbk.outputpdf.html.HTMLBBKSIRatioView;
 import ec.satoolkit.ISaSpecification;
-import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.documents.TsDocument;
@@ -54,8 +45,7 @@ public class Processing {
 
     public void start(SaItem[] selection, String name) {
         htmlf = HTMLFiles.getInstance();
-        htmlf.selectFolder();
-        if (htmlf.isOutputfileSelected()) {
+        if (htmlf.selectFolder()) {
             startWithOutFileSelection(selection, name);
         } else {
             JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
@@ -66,8 +56,7 @@ public class Processing {
     public void start(Map<String, List<SaItem>> map) {
 
         htmlf = HTMLFiles.getInstance();
-        htmlf.selectFolder();
-        if (htmlf.isOutputfileSelected()) {
+        if (htmlf.selectFolder()) {
             Set<String> keySet = map.keySet();
             keySet.stream().forEach((singleKey) -> {
                 SaItem[] selection = (SaItem[]) map.get(singleKey).toArray();
@@ -89,7 +78,7 @@ public class Processing {
         private final SaItem[] items;
         private final String saProcessingName;
 
-        public MyRun(SaItem[] items, String saProcessingName) {
+        MyRun(SaItem[] items, String saProcessingName) {
             this.items = items;
             this.saProcessingName = saProcessingName;
         }
@@ -123,15 +112,13 @@ public class Processing {
                         //Open the stream
                         stream = new HtmlStream(writer);
                         stream.open();
-                        // String cssPath = "C:\\Daten\\style.css";
-                        // stream.write("<link rel=\"stylesheet\" href=\"" + cssPath + "\">");
-                        stream.write(HTMLStyle.getStyle());
-                        //Einleitung Kopf
+                     
+                        stream.write(HTMLStyle.STYLE);
+                  
                         final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
                         headerbbk.write(stream);
                         stream.newLine();
 
-                        //Uerbersichts Chart mit y Seasonally and calendar adjusted von gespeichert und aktuelle
                         HTMLBBKChartMain chartMain = new HTMLBBKChartMain(x13doc, domCharMax5years);
                         final HTMLBBKText1 bBKText1 = new HTMLBBKText1(x13doc);
 
@@ -156,7 +143,7 @@ public class Processing {
 
                         headerbbk.write(stream);
 
-                        final HTMLBBKTableD8A hTMLBBKTableD8B = new HTMLBBKTableD8A(x13doc, domCharMax5years);
+                        final HTMLBBKTableD8A hTMLBBKTableD8B = new HTMLBBKTableD8A(x13doc);
                         hTMLBBKTableD8B.write(stream);
                         stream.newLine();
 
@@ -172,7 +159,7 @@ public class Processing {
                         htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.GetSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.GetSavedSeasonallyAdjustedPercentageChange().getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
-                       
+
                         HTMLBBKSIRatioView sIRatioView = new HTMLBBKSIRatioView(x13doc);
                         sIRatioView.write(stream);
 
@@ -189,7 +176,7 @@ public class Processing {
                         String old = "<h1 style=\"font-weight:bold;font-size:110%;text-decoration:underline;\">";
                         String corrected = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
                         output = output.replace(old, corrected);
-                        output=output.replace("<hr />", "");
+                        output = output.replace("<hr />", "");
                         htmlf.creatHTMLFile(output, item.getName());
 
                         // hTMLBBKTableD8B.dispose();
@@ -206,15 +193,15 @@ public class Processing {
 
                 }
             }
-            if (!"".equals(sbError.toString())) {
+            if (!sbError.toString().isEmpty()) {
                 String str = "These documents are not X13: \n";
                 sbError.insert(0, str);
-                JOptionPane.showMessageDialog(null, sbError.toString(), "This output is not available. ", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, sbError.toString(), "This output is not available ", JOptionPane.ERROR_MESSAGE);
             }
 
-            if (!"".equals(sbSuccessful.toString())) {
+            if (!sbSuccessful.toString().isEmpty()) {
 
-                JOptionPane.showMessageDialog(null, sbSuccessful.toString(), "This output is available for:. ", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, sbSuccessful.toString(), "This output is available for: ", JOptionPane.INFORMATION_MESSAGE);
             }
         }
 

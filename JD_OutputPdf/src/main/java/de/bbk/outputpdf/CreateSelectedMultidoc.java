@@ -34,13 +34,13 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.NodeAction;
 
 @ActionID(category = "Edit",
-        id = "de.bundesbank.jdemetra.sa.multidocextension.CreateSelectedMultidoc")
+          id = "de.bundesbank.jdemetra.sa.multidocextension.CreateSelectedMultidoc")
 @ActionRegistration(
         displayName = "#CTL_CreateSelectedMultidoc", lazy = false)
 @ActionReference(path = "Menu/Tools", position = 2100)
 
 @Messages({"CTL_CreateSelectedMultidoc=Create HTML for selected multi-documents",
-    "CTL_CreateSelectedMultidoc_Message=Do you really want to create the output for the selected multi-documents?"})
+           "CTL_CreateSelectedMultidoc_Message=Do you really want to create the output for the selected multi-documents?"})
 
 public final class CreateSelectedMultidoc extends NodeAction {
 
@@ -84,9 +84,8 @@ public final class CreateSelectedMultidoc extends NodeAction {
             map.put(item.getDisplayName(), saProcessing);
         }
 
-      Processing p=new Processing();
+        Processing p = new Processing();
         p.start(map);
-  
+
     }
 }
-

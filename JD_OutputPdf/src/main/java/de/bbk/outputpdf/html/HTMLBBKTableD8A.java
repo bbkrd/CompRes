@@ -12,8 +12,6 @@ import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
-import ec.ui.interfaces.IDisposable;
 import java.io.IOException;
 
 /**
@@ -22,13 +20,10 @@ import java.io.IOException;
  */
 public class HTMLBBKTableD8A extends AbstractHtmlElement implements IHtmlElement {
 
-    private  X13Document x13doc;
-    private  TsDomain domMax5;
-    private SVGJComponent bBKTableD8B;
+    private final X13Document x13doc;
 
-    public HTMLBBKTableD8A(X13Document x13doc, TsDomain tsDom) {
+    public HTMLBBKTableD8A(X13Document x13doc) {
         this.x13doc = x13doc;
-        this.domMax5 = tsDom;
     }
 
     @Override
@@ -37,17 +32,9 @@ public class HTMLBBKTableD8A extends AbstractHtmlElement implements IHtmlElement
         JPanelCCA jpcca = new JPanelCCA();
         jpcca.set(x13doc);
 
-        bBKTableD8B = new SVGJComponent(jpcca.getCCPanel());
-//ersetzte alle 3 scroll panels durch panels
+        SVGJComponent bBKTableD8B = new SVGJComponent(jpcca.getCCAPanel());
         bBKTableD8B.write(stream);
 
         stream.newLine();
-    }
-
- 
-    public void dispose() {
-        this.bBKTableD8B.dispose(); 
-        this.x13doc=null;
-        this.domMax5=null;
     }
 }

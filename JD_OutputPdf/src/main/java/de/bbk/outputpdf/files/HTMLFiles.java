@@ -13,7 +13,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -43,7 +42,7 @@ public class HTMLFiles {
     private HTMLFiles() {
     }
 
-    public void selectFolder() {
+    public boolean selectFolder() {
         JFileChooser fileChooser;
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -51,16 +50,12 @@ public class HTMLFiles {
         if (currentDir != null) {
             fileChooser.setCurrentDirectory(new File(currentDir));
         }
-        int showSaveDialog = fileChooser.showSaveDialog(null);
-
-        if (showSaveDialog == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             currentDir = fileChooser.getSelectedFile().getAbsolutePath();
             fileChooser.setCurrentDirectory(new File(currentDir));
-            OutputfileSelected = true;
+            return true;
         }
-        if (showSaveDialog == JFileChooser.CANCEL_OPTION) {
-            OutputfileSelected = false;
-        }
+        return false;
 
     }
 
@@ -69,22 +64,14 @@ public class HTMLFiles {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileFilter defaultFilter = new FileNameExtensionFilter("HTML (.html)", "html");
         fileChooser.addChoosableFileFilter(defaultFilter);
-        fileChooser.setDialogTitle("The file " +file.getName() + " already exists.");
+        fileChooser.setDialogTitle("The file " + file.getName() + " already exists.");
         fileChooser.setCurrentDirectory(file);
-        int showSaveDialog = fileChooser.showSaveDialog(null);
-        if (showSaveDialog == JFileChooser.CANCEL_OPTION) {
-            return null;
-        } else if (showSaveDialog == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile();
         }
         return null;
     }
 
-    private boolean OutputfileSelected = false;
-
-    public boolean isOutputfileSelected() {
-        return OutputfileSelected;
-    }
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -104,7 +91,7 @@ public class HTMLFiles {
             //   fileName = NumberForFile(fileName);
             File file = new File(fileName.toString());
             if (file.exists()) {
-            file=    selectFileName(file);
+                file = selectFileName(file);
             }
             if (file != null) {
                 Files.write(html, file, Charset.defaultCharset());

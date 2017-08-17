@@ -13,7 +13,6 @@ import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.implementation.HtmlProcessingInformation;
 import ec.tss.html.implementation.HtmlRegArima;
-import ec.tss.html.implementation.HtmlX13Summary;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -40,7 +39,6 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         writeTitle(stream);
         writeMainResultsSummary(stream);
         if (model != null) {
-            writeOutliers(stream);
             writeDetails(stream);
         }
         if (decomposition != null) {
@@ -67,22 +65,6 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         }
     }
 
-    private void writeOutliers(HtmlStream stream) throws IOException {
-        int no = model.description.getOutliers().size();
-        int npo = model.description.getPrespecifiedOutliers().size();
-
-        if (npo > 1) {
-            stream.write(Integer.toString(npo)).write(" pre-specified outliers").newLine();
-        } else if (npo == 1) {
-            stream.write(Integer.toString(npo)).write(" pre-specified outlier").newLine();
-        }
-        if (no > 1) {
-            stream.write(Integer.toString(no)).write(" detected outliers").newLine();
-        } else if (no == 1) {
-            stream.write(Integer.toString(no)).write(" detected outlier").newLine();
-        }
-    }
-
     private void writeDetails(HtmlStream stream) throws IOException {
         HtmlRegArima htmlRegArima = new HtmlRegArima(model, true);
         stream.write(HtmlTag.HEADER2, h2, "Regression model");
@@ -96,7 +78,7 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
 
     public static void writeCombinedSeasonalityTest(HtmlStream stream, X11Results decomposition) throws IOException {
         CombinedSeasonalityTest test = new CombinedSeasonalityTest(decomposition.getData(X11Kernel.D8, TsData.class),
-                decomposition.getSeriesDecomposition().getMode().isMultiplicative());
+                                                                   decomposition.getSeriesDecomposition().getMode().isMultiplicative());
 
         stream.write(HtmlTag.HEADER2, h2, "F-Test for stable seasonality").newLine();
         stream.write("Stable Value: " + df4.format(test.getStableSeasonality().getValue())).newLine();
@@ -105,11 +87,6 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         stream.write(HtmlTag.HEADER2, h2, "F-Test for moving seasonality").newLine();
         stream.write("Evolutive Value: " + df4.format(test.getEvolutiveSeasonality().getValue())).newLine();
         stream.write("Evolutive PValue: " + df4.format(test.getEvolutiveSeasonality().getPValue())).newLines(2);
-    
-       // stream.write(HtmlTag.HEADER2, h2, "m-statistics").newLine();
-    
-       
-    
     }
 
 }

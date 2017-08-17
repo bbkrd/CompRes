@@ -10,7 +10,6 @@ import ec.tss.TsInformation;
 import ec.tss.html.HtmlStream;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
-
 import ec.ui.chart.TsXYDatasets;
 import ec.ui.interfaces.IDisposable;
 import ec.util.chart.ObsFunction;
@@ -26,8 +25,7 @@ import org.jfree.data.xy.IntervalXYDataset;
  */
 public class BBKMainChart extends JTsChart implements IDisposable {
 
-    private static final int WIDTH=450, HEIGHT=450;
-
+    private static final int WIDTH = 450, HEIGHT = 450;
 
     public void writeChart(TsCollectionInformation col, HtmlStream stream) throws IOException {
 
@@ -45,7 +43,6 @@ public class BBKMainChart extends JTsChart implements IDisposable {
 
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Implementation details">
     private void applyContent(JTimeSeriesChart chart, TsCollectionInformation info) {
         chart.setTitle(info.name);
         chart.setDataset(getDataset(info));
@@ -72,15 +69,13 @@ public class BBKMainChart extends JTsChart implements IDisposable {
         };
     }
 
-    
-
     private IntervalXYDataset getDataset(TsCollectionInformation info) {
         TsXYDatasets.Builder result = TsXYDatasets.builder();
         info.items.stream().filter(TsInformation::hasData).forEach((o) -> {
-            if (o.data!=null) {
-                     result.add(o.name, o.data);   
+            if (o.data != null) {
+                result.add(o.name, o.data);
             }
-    
+
         });
         return result.build();
     }

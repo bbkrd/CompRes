@@ -20,7 +20,6 @@ import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
 import ec.ui.interfaces.ITsGrid;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.BoxLayout;
@@ -33,7 +32,7 @@ import javax.swing.JSplitPane;
  * @author Christiane Hofer
  */
 public class JPanelCCA extends JPanel implements IDisposable {
-    
+
     private final JTsOutlierGrid d8Grid;
     private final JTsGrid d10Grid, d10SavedGrid;
     private final JSplitPane d8Pane;
@@ -41,51 +40,51 @@ public class JPanelCCA extends JPanel implements IDisposable {
     private final JSplitPane d10aOldPane;
     private transient X13Document doc;
     private static final int ROW_HEIGHT = 19;
-    private static final int ROW_WIDTH = 70; //70 war mal gut, es muss ausrichend breit sein, 
-                                             // keine Ahnugn woraus man das erreichen muss
-    
-    public JPanelCCA()  {
-        
+    private static final int ROW_WIDTH = 70; //70 war mal gut, es muss ausrichend breit sein,
+    // keine Ahnugn woraus man das erreichen muss
+
+    public JPanelCCA() {
+
         this.d8Grid = new JTsOutlierGrid();
         d8Grid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         d8Grid.setMode(ITsGrid.Mode.SINGLETS);
-        
+
         this.d10Grid = new JTsGrid();
         d10Grid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         d10Grid.setMode(ITsGrid.Mode.SINGLETS);
-        
+
         this.d10SavedGrid = new JTsGrid();
         d10SavedGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         d10SavedGrid.setMode(ITsGrid.Mode.SINGLETS);
-        
+
         JLabel lblD8 = new JLabel("D8B", JLabel.CENTER);
         d8Pane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD8, d8Grid);
-        
+
         d8Pane.setEnabled(false);
         d8Pane.setDividerSize(0);
         JLabel lblD10a = new JLabel(SavedTables.SEASONALFACTOR, JLabel.CENTER);
         d10aPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD10a, d10Grid);
-        
+
         d10aPane.setEnabled(false);
         d10aPane.setDividerSize(0);
-        
+
         JLabel lblD10aOld = new JLabel(SavedTables.NAME_SEASONAL_FACTOR_SAVED, JLabel.CENTER);
         d10aOldPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD10aOld, d10SavedGrid);
-        
+
         d10aOldPane.setEnabled(false);
         d10aOldPane.setDividerSize(0);
-        
+
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(d8Pane);
         this.add(d10aPane);
         this.add(d10aOldPane);
-        
+
     }
-    
-    public JPanel getCCPanel() {
+
+    public JPanel getCCAPanel() {
         JPanel jPanel = new JPanel();
         jPanel.add(this);
-        int width = d8Pane.getMaximumSize().width ;
+        int width = d8Pane.getMaximumSize().width;
         int hight = d8Pane.getMaximumSize().height + d10aPane.getMaximumSize().height + d10aOldPane.getMaximumSize().height;
         jPanel.setSize(width, hight);
         jPanel.setMaximumSize(new Dimension(width, hight));
@@ -93,7 +92,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
         jPanel.setPreferredSize(new Dimension(width, hight));
         return jPanel;
     }
-    
+
     public void set(X13Document doc) {
         this.doc = doc;
         X11Results x11 = doc.getDecompositionPart();
@@ -116,21 +115,21 @@ public class JPanelCCA extends JPanel implements IDisposable {
                 ArrayList<OutlierEstimation> list = new ArrayList<>();
                 list.addAll(Arrays.asList(prespecified));
                 list.addAll(Arrays.asList(estimations));
-                d8Grid.setOutliers(list.toArray(new OutlierEstimation[0]));
+                d8Grid.setOutliers(list.toArray(new OutlierEstimation[list.size()]));
             }
-            
+
             Ts d9 = getMainSeries("decomposition.d-tables.d9");
             d9 = InPercent.convertTsInPercentIfMult(d9, mode.isMultiplicative());
             d8Grid.setD9(d9.getTsData());
-            
+
             Ts d10 = getMainSeries("decomposition.d-tables.d10");
             d10 = InPercent.convertTsInPercentIfMult(d10, mode.isMultiplicative());
             d10.set(d10.getTsData().fittoDomain(domain));
             fixSize(d10aPane, d10.getTsData().getFrequency().intValue(), d10.getTsData().getDomain().getYearsCount());
-            
+
             d10Grid.getTsCollection().replace(d10);
             d10Grid.setSelection(d10Grid.getTsCollection().toArray());
-            
+
             Ts savedD10 = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
             if (savedD10 != null && savedD10.getTsData() != null && savedD10.getTsData().getFrequency().intValue() != d10.getTsData().getFrequency().intValue()) {
                 savedD10.setInvalidDataCause("Frequency mismatch");
@@ -150,22 +149,22 @@ public class JPanelCCA extends JPanel implements IDisposable {
             d10Grid.getTsCollection().clear();
             d10SavedGrid.getTsCollection().clear();
         }
-        
+
     }
-    
+
     private void fixSize(JSplitPane pane, int periods, int years) {
         int widthcomplete = periods * ROW_WIDTH + 2 * ROW_WIDTH;
         int heightcomplete = (years + 1) * ROW_HEIGHT + 16;
         pane.setMaximumSize(new Dimension(widthcomplete, heightcomplete));
         pane.setMinimumSize(new Dimension(widthcomplete, heightcomplete));
         pane.setPreferredSize(new Dimension(widthcomplete, heightcomplete));
-        
+
     }
-    
+
     private Ts getMainSeries(String str) {
         return DocumentManager.instance.getTs(doc, str);
     }
-    
+
     @Override
     public void dispose() {
         doc = null;

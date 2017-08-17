@@ -7,8 +7,6 @@ package de.bbk.outputpdf.html;
 
 //import de.bbk.outputcustomized.util.TsData_MetaDataConverter;
 import de.bbk.outputcustomized.util.SIViewSaved;
-import de.bbk.outputcustomized.view.SIRatioView;
-import de.bbk.outputpdf.SVGJComponent;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
@@ -26,13 +24,11 @@ import javax.swing.JPanel;
  */
 public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElement {
 
-    private X13Document x13doc;
+    private final X13Document x13doc;
     private static final int WIDTH = 2 * 450, HEIGHT = 450;
-    private SVGJComponent bBKSIRATioview;
 
     public HTMLBBKSIRatioView(X13Document x13doc) {
         this.x13doc = x13doc;
-
     }
 
     @Override
@@ -56,15 +52,9 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElem
         Charts.writeChartAsSVG(os, sIViewSaved.getJFreeChart(), WIDTH, HEIGHT);
 
         stream.write(os.toString()).newLine();
-        stream.write(" <p style='text-align:center; '>");
-        stream.write("Dots - D8, red – current D10, blue – D10");
+        stream.write("<p style='text-align:center; '>");
+        stream.write("Dots - D8, red - current D10, blue - D10");
         stream.write("</p>");
         stream.newLine();
-    }
-
-    public void dispose() {
-        this.bBKSIRATioview.dispose();
-        this.x13doc = null;
-
     }
 }

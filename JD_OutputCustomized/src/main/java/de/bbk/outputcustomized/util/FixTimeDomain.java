@@ -16,27 +16,30 @@ import ec.tstoolkit.timeseries.simplets.TsDomain;
 public class FixTimeDomain {
 
     private final TsDomain domMax5years;
-   /**
-    * 
-    * @param ts  timeSeries to get the last 5 years form
-    */
-    
-    public FixTimeDomain(Ts ts){
-    this.domMax5years=domLastFiveYears(ts);}
-     
+
     /**
-     * 
-     * @param ts
-     * @return a new timesereis with the domain set in the Constructor 
+     *
+     * @param ts timeSeries to get the last 5 years form
      */
-    public Ts getTsWithDomain(Ts ts){
-    Ts t= TsFactory.instance.createTs(ts.getName(), null,ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));
-  return t;
+    public FixTimeDomain(Ts ts) {
+        this.domMax5years = domLastFiveYears(ts);
     }
-    
+
+    /**
+     *
+     * @param ts
+     *
+     * @return a new timesereis with the domain set in the Constructor
+     */
+    public Ts getTsWithDomain(Ts ts) {
+        Ts t = TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));
+        return t;
+    }
+
     /**
      *
      * @param ts ts to get the domain from
+     *
      * @return reduce the domain to the min of the last 5 years or all
      */
     public static TsDomain domLastFiveYears(Ts ts) {
@@ -48,8 +51,10 @@ public class FixTimeDomain {
         return domCharMax5years;
 
     }
-    public static TsDomain domLastYear(TsDomain dom){
-    int int1Year=dom.getFrequency().intValue();
-            return new TsDomain(dom.getEnd().minus(int1Year),int1Year);}
+
+    public static TsDomain domLastYear(TsDomain dom) {
+        int int1Year = dom.getFrequency().intValue();
+        return new TsDomain(dom.getEnd().minus(int1Year), int1Year);
+    }
 
 }

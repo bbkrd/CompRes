@@ -32,8 +32,6 @@ import org.openide.util.NbBundle.Messages;
 @Messages("CTL_Pdf=Create HTML")
 public final class Pdf extends AbstractViewAction<SaBatchUI> {
 
-  
-
     public Pdf() {
         super(SaBatchUI.class);
         putValue(NAME, Bundle.CTL_Pdf());
@@ -47,10 +45,8 @@ public final class Pdf extends AbstractViewAction<SaBatchUI> {
     @Override
     protected void process(SaBatchUI cur) {
         SaItem[] selection = cur.getSelection();
-        Processing p =new Processing();
-        p.start(selection,cur.getName());
+        Processing p = new Processing();
+        p.start(selection, cur.getName());
     }
-
-   
 
 }
