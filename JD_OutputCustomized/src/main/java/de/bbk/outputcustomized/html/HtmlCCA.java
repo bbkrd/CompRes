@@ -59,6 +59,7 @@ public class HtmlCCA extends AbstractHtmlElement {
                 writeMovingSeasonalityRatios(stream);
             }
             writeICRatio(stream);
+            stream.newLine();
         }
 
         if (decomposition != null) {
@@ -74,7 +75,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     }
 
     private void writeFinalFilters(HtmlStream stream) throws IOException {
-        stream.write(HtmlTag.HEADER2, h2, "Final filters").newLine();
+        stream.write(HtmlTag.HEADER2, h2, "Final filters");
         stream.write("Seasonal filters:");
         if (decomposition.getFinalSeasonalFilterComposit() != null) {
 
@@ -94,7 +95,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     }
 
     private void writeSpecification(HtmlStream stream) throws IOException {
-        stream.write(HtmlTag.HEADER2, h2, "Specifications").newLine();
+        stream.write(HtmlTag.HEADER2, h2, "Specifications");
         //<editor-fold defaultstate="collapsed" desc="Sigmalimit">
         stream.write("Sigmalimit: ")
                 .write(spec.getX11Specification().getLowerSigma())

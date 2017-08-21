@@ -52,7 +52,7 @@ public class SeasonalView extends JComponent implements IDisposable {
             Ts tsd10 = DocumentManager.instance.getTs(doc, DECOMPOSITION_D10_D10A, false);
             tsd10.rename(NAME_SEASONAL_FACTOR);
             tsd10 = convertTsInPercentIfMult(tsd10, mode.isMultiplicative());
-
+            tsd10.rename(SavedTables.NAME_SEASONAL_FACTOR);
             chartContent.add(tsd10);
 
             Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);

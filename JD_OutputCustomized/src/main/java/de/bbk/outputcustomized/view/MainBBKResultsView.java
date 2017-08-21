@@ -72,11 +72,11 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
         HtmlBBKSummary summary = new HtmlBBKSummary(MultiLineNameUtil.join(doc.getInput().getName()), doc);
         Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
 
-        td = new FixTimeDomain(getMainSeries(COMPOSITE_RESULTS_SERIES_WITH_FORECAST));
+        td = new FixTimeDomain(getMainSeries(COMPOSITE_RESULTS_SERIES));
         List<Ts> list = Arrays.asList(
-                getMainSeriesLast5Years(COMPOSITE_RESULTS_SERIES_WITH_FORECAST),
-                getMainSeriesLast5Years(COMPOSITE_RESULTS_TREND_WITH_FORECAST),
-                getMainSeriesLast5Years(COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST));
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_SERIES),
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_TREND),
+                getMainSeriesLast5Years(COMPOSITE_RESULTS_SEASONALLY_ADJUSTED));
         chart.getTsCollection().replace(list);
 
         Ts savedSA = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);

@@ -31,7 +31,7 @@ public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement implements
         this.x13doc = x13doc;
         this.partial = partial;
         this.acv = new BbkAutoCorrelationsView();
-
+    
     }
 
     @Override

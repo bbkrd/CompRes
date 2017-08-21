@@ -73,29 +73,8 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
                 item.setMetaData(meta);
             }
             if (results != null) {
-                //  TsData cal = results.getData(ModellingDictionary.CAL, TsData.class).update(results.getData(ModellingDictionary.CAL + SeriesInfo.F_SUFFIX, TsData.class));
-                // this is only available for x13
-                TsData a6 = results.getData("decomposition.a-tables.a6", TsData.class);
-                TsData a7 = results.getData("decomposition.a-tables.a7", TsData.class);
-
-                TsData cal = null;
-                if (a6 == null && a7 != null) {
-                    cal = a7;
-                }
-                if (a7 == null && a6 != null) {
-                    cal = a6;
-                }
-
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
-
-                if (a6 != null && a7 != null) {
-                    if (mode.isMultiplicative()) {
-                        cal = a6.times(a7);
-                    } else {
-                        cal = a6.plus(a7);
-                    }
-                }
-
+                TsData cal = calcCalendarFactor(results, mode);
                 if (cal != null) {
                     cal = convertTsDataInPercentIfMult(cal, mode.isMultiplicative());
                     TsData_MetaDataConverter.convertTsToMetaData(cal, meta, SavedTables.CALENDARFACTOR);
@@ -109,6 +88,28 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
         }
         cur.setSelection(new SaItem[0]);
         cur.setSelection(selection);
+    }
+
+    public static TsData calcCalendarFactor(CompositeResults results, DecompositionMode mode) {
+        TsData a6 = results.getData("decomposition.a-tables.a6", TsData.class);
+        TsData a7 = results.getData("decomposition.a-tables.a7", TsData.class);
+
+        TsData cal = null;
+        if (a6 == null && a7 != null) {
+            cal = a7;
+        }
+        if (a7 == null && a6 != null) {
+            cal = a6;
+        }
+
+        if (a6 != null && a7 != null) {
+            if (mode.isMultiplicative()) {
+                cal = a6.times(a7);
+            } else {
+                cal = a6.plus(a7);
+            }
+        }
+        return cal;
     }
 
 }

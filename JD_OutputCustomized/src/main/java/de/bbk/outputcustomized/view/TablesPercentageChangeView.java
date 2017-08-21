@@ -80,10 +80,9 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
         savedSeasonalFactors = percentageChange(savedSeasonalFactors.rename(NAME_SEASONAL_FACTOR_SAVED));
         percentageChangeGridContent.add(savedSeasonalFactors);
 
-        TsData a6 = results.getData("a-tables.a6", TsData.class);
-        Ts a6ts = TsFactory.instance.createTs("a6");
-        a6ts.set(a6);
-        percentageChangeGridContent.add(percentageChange(a6ts));
+
+        Ts a6_7ts = TablesSeriesView.calcA6_7(results, doc.getDecompositionPart().getSeriesDecomposition().getMode());
+        percentageChangeGridContent.add(percentageChange(a6_7ts));
 
         Ts savedCalenderfactorFactors = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR);
         savedCalenderfactorFactors = percentageChange(savedCalenderfactorFactors.rename(NAME_CALENDAR_FACTOR_SAVED));

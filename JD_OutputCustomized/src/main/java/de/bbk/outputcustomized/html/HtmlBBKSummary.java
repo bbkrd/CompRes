@@ -80,11 +80,11 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         CombinedSeasonalityTest test = new CombinedSeasonalityTest(decomposition.getData(X11Kernel.D8, TsData.class),
                                                                    decomposition.getSeriesDecomposition().getMode().isMultiplicative());
 
-        stream.write(HtmlTag.HEADER2, h2, "F-Test for stable seasonality").newLine();
+        stream.write(HtmlTag.HEADER2, h2, "F-Test for stable seasonality");
         stream.write("Stable Value: " + df4.format(test.getStableSeasonality().getValue())).newLine();
         stream.write("Stable PValue: " + df4.format(test.getStableSeasonality().getPValue())).newLines(2);
 
-        stream.write(HtmlTag.HEADER2, h2, "F-Test for moving seasonality").newLine();
+        stream.write(HtmlTag.HEADER2, h2, "F-Test for moving seasonality");
         stream.write("Evolutive Value: " + df4.format(test.getEvolutiveSeasonality().getValue())).newLine();
         stream.write("Evolutive PValue: " + df4.format(test.getEvolutiveSeasonality().getPValue())).newLines(2);
     }

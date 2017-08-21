@@ -5,6 +5,7 @@
  */
 package de.bbk.outputpdf.html;
 
+import de.bbk.outputcustomized.util.SavedTables;
 import de.bbk.outputcustomized.util.SeasonallyAdjusted_Saved;
 import de.bbk.outputpdf.BBKMainChart;
 import ec.tss.*;
@@ -36,11 +37,11 @@ public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElemen
     public void write(HtmlStream stream) throws IOException {
         TsCollection tc = TsFactory.instance.createTsCollection();
         TsData tsYData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y).getTsData();
-        Ts tsY = TsFactory.instance.createTs(ModellingDictionary.Y, null, tsYData.fittoDomain(domMax5));
+        Ts tsY = TsFactory.instance.createTs(SavedTables.NAME_SERIES, null, tsYData.fittoDomain(domMax5));
         tc.add(tsY);
 
         TsData tsSAData = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA).getTsData();
-        Ts tsSA = TsFactory.instance.createTs(ModellingDictionary.SA, null, tsSAData.fittoDomain(domMax5));
+        Ts tsSA = TsFactory.instance.createTs(SavedTables.NAME_SEASONALLY_ADJUSTED, null, tsSAData.fittoDomain(domMax5));
         tc.add(tsSA);
 
         Ts tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(x13doc);

@@ -10,6 +10,7 @@ import de.bbk.outputcustomized.util.FixTimeDomain;
 import de.bbk.outputcustomized.view.TablesPercentageChangeView;
 import de.bbk.outputpdf.files.HTMLFiles;
 import de.bbk.outputpdf.html.*;
+import de.bbk.outputpdf.util.Frozen;
 import de.bbk.outputpdf.util.Pagebreak;
 import ec.satoolkit.ISaSpecification;
 import ec.tss.Ts;
@@ -94,7 +95,7 @@ public class Processing {
                 //   int index = cur.getCurrentProcessing().indexOf(selection[i]);
                 SaDocument<ISaSpecification> doc = item.toDocument();
                 TsDocument t = item.toDocument();
-                String str = item.getRawName()
+                String str = Frozen.removeFrozen(item.getName())
                         + "in Multi-doc " + this.saProcessingName;
                 str = str.replace("\n", "-");
                 if (t.getClass() == X13Document.class) {
@@ -164,8 +165,6 @@ public class Processing {
                         sIRatioView.write(stream);
 
                         stream.newLine();
-
-                        headerbbk.write(stream);
 
                         HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
                         htmlCCA.writeTextForHTML(stream);

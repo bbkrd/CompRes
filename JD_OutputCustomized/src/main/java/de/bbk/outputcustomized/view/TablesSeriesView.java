@@ -5,6 +5,7 @@
  */
 package de.bbk.outputcustomized.view;
 
+import de.bbk.outputcustomized.actions.SelectionSaveCalendarfactorToWorkspace;
 import de.bbk.outputcustomized.util.InPercent;
 import de.bbk.outputcustomized.util.SavedTables;
 import static de.bbk.outputcustomized.util.SavedTables.*;
@@ -75,15 +76,24 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         Ts savedSeasonalFactors = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
         seriesGridContent.add(savedSeasonalFactors.rename(NAME_SEASONAL_FACTOR_SAVED));
 
-        TsData a6 = results.getData("a-tables.a6", TsData.class); //forecast is included
-        Ts a6ts = TsFactory.instance.createTs("a6");
-        if (a6 != null) {
-            a6ts.set(InPercent.convertTsDataInPercentIfMult(a6, mode.isMultiplicative()));
-        }
-        seriesGridContent.add(a6ts.rename(NAME_CALENDAR_FACTOR));
+        Ts a6_7ts = calcA6_7(results, mode);
+
+        seriesGridContent.add(a6_7ts);
 
         Ts savedCalendarFactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR);
         seriesGridContent.add(savedCalendarFactor.rename(NAME_CALENDAR_FACTOR_SAVED));
+
+    }
+
+    public static Ts calcA6_7(CompositeResults results, DecompositionMode mode) {
+
+        TsData a6_7 = SelectionSaveCalendarfactorToWorkspace.calcCalendarFactor(results, mode);
+        Ts a6_7ts = TsFactory.instance.createTs("a6_7");
+        if (a6_7 != null) {
+            a6_7ts.set(InPercent.convertTsDataInPercentIfMult(a6_7, mode.isMultiplicative()));
+        }
+
+        return a6_7ts.rename(NAME_CALENDAR_FACTOR);
 
     }
 

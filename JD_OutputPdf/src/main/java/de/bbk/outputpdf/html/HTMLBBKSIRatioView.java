@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElement {
 
     private final X13Document x13doc;
-    private static final int WIDTH = 2 * 450, HEIGHT = 450;
+    private static final int WIDTH = 2 * 450, HEIGHT = 250;
 
     public HTMLBBKSIRatioView(X13Document x13doc) {
         this.x13doc = x13doc;

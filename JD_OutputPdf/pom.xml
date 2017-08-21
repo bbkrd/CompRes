@@ -4,13 +4,13 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>outputcustomized-parent</artifactId>
-        <version>0.5.4</version>
+        <version>0.5.5</version>
     </parent>  
 
 
     <groupId>de.bbk</groupId>
     <artifactId>OutputPdf</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>nbm</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>OutputCustomized</artifactId>
-            <version>0.5.4</version>
+            <version>0.5.5</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>

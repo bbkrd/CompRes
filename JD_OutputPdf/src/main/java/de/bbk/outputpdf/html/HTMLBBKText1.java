@@ -13,9 +13,11 @@ import ec.tss.html.IHtmlElement;
 import ec.tss.html.implementation.HtmlRegArima;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
+import ec.tstoolkit.modelling.arima.x13.MovingHolidaySpec;
 import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
 import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
 import ec.tstoolkit.modelling.arima.x13.SingleOutlierSpec;
+import ec.tstoolkit.timeseries.calendars.TradingDaysType;
 import ec.tstoolkit.timeseries.regression.OutlierDefinition;
 import java.io.IOException;
 
@@ -51,14 +53,33 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
             stream.write("Outliers critical value is: " + criticalValue).newLine();
 
             if (regSpec.getRegression().getTradingDays().isUsed()) {
-                stream.write("Regression variables: Trading days").newLine();
+
+                stream.write("Regression variable: Trading days").newLine();
+
+//                if (regSpec.getRegression().getTradingDays().getTradingDaysType() != TradingDaysType.None) {
+//                    stream.write("Trading days td: " + regSpec.getRegression().getTradingDays().getTradingDaysType().name()).newLine(); //td
+//                }
+                if (regSpec.getRegression().getTradingDays().getUserVariables() != null && regSpec.getRegression().getTradingDays().getUserVariables().length > 0) {
+                    for (String userVariable : regSpec.getRegression().getTradingDays().getUserVariables()) {
+                        stream.write("Trading days user-defined variable: " + userVariable).newLine();
+                    }
+                }
+                if (regSpec.getRegression().getTradingDays().isStockTradingDays()) {
+                    stream.write("Trading days: stock trading days").newLine();
+                }
+
             }
+
+            if (regSpec.getRegression().getEaster() != null) {
+                stream.write("Regression variable: " + regSpec.getRegression().getEaster().getType()).newLine();
+            }
+
             for (OutlierDefinition variable : regSpec.getRegression().getOutliers()) {
                 stream.write("Regression variable: " + variable.toString()).newLine();
             }
 
             if (regSpec.isUsingAutoModel()) {
-                stream.write("ARIMA model: auto");
+                stream.write("ARIMA model: auto").newLine();
             } else {
                 stream.write("ARIMA model: (" + regSpec.getArima().getP());
                 stream.write(" " + regSpec.getArima().getD());
@@ -77,7 +98,12 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
             stream.write("Seasonal filters:" + x11Spec.getSeasonalFilters()[0].name() + ",");
             for (int i = 1; i < x11Spec.getSeasonalFilters().length - 1; i++) {
                 stream.write(x11Spec.getSeasonalFilters()[i].name() + ",");
+                if (i == 5) {
+                    stream.newLine();
+                    stream.write("Seasonal filters:");
+                }
             }
+
             if (x11Spec.getSeasonalFilters().length > 1) {
                 stream.write(x11Spec.getSeasonalFilters()[x11Spec.getSeasonalFilters().length - 1].name()).newLine();
             }

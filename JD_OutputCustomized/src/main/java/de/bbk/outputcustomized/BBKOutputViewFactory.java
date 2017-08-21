@@ -5,6 +5,7 @@
  */
 package de.bbk.outputcustomized;
 
+import de.bbk.outputcustomized.util.SavedTables;
 import de.bbk.outputcustomized.view.*;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.documents.DocumentManager;
@@ -74,13 +75,13 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
-            y.append(DocumentManager.COMPOSITE).append("Series=,").append(ModellingDictionary.Y)
+            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES+"=,").append(ModellingDictionary.Y)
                     .append(',').append(ModellingDictionary.Y).append(SeriesInfo.F_SUFFIX);
             StringBuilder t = new StringBuilder();
-            t.append(DocumentManager.COMPOSITE).append("Trend=,").append(ModellingDictionary.T)
+            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND+"=,").append(ModellingDictionary.T)
                     .append(',').append(ModellingDictionary.T).append(SeriesInfo.F_SUFFIX);
             StringBuilder sa = new StringBuilder();
-            sa.append(DocumentManager.COMPOSITE).append("Seasonally adjusted=,").append(ModellingDictionary.SA)
+            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED+"=,").append(ModellingDictionary.SA)
                     .append(',').append(ModellingDictionary.SA).append(SeriesInfo.F_SUFFIX);
             StringBuilder saOld = new StringBuilder();
             saOld.append(OLD).append(ModellingDictionary.SA);
@@ -108,12 +109,15 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
-            y.append(DocumentManager.COMPOSITE).append("Series=,").append(ModellingDictionary.Y)
+            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES+"=,").append(ModellingDictionary.Y)
                     .append(',').append(ModellingDictionary.Y).append(SeriesInfo.F_SUFFIX);
             StringBuilder sa = new StringBuilder();
-            sa.append(DocumentManager.COMPOSITE).append("Seasonally adjusted=,").append(ModellingDictionary.SA)
+            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED+"=,").append(ModellingDictionary.SA)
                     .append(',').append(ModellingDictionary.SA).append(SeriesInfo.F_SUFFIX);
-            return new String[]{y.toString(), sa.toString()};
+                  StringBuilder t = new StringBuilder();
+            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND+"=,").append(ModellingDictionary.T)
+                    .append(',').append(ModellingDictionary.T).append(SeriesInfo.F_SUFFIX);
+            return new String[]{y.toString(), sa.toString(),t.toString()};
         }
 
         public ChartOnlySAFactory() {
