@@ -62,7 +62,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
 
         d8Pane.setEnabled(false);
         d8Pane.setDividerSize(0);
-        JLabel lblD10a = new JLabel(SavedTables.SEASONALFACTOR, JLabel.CENTER);
+        JLabel lblD10a = new JLabel(SavedTables.NAME_SEASONAL_FACTOR, JLabel.CENTER);
         d10aPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD10a, d10Grid);
 
         d10aPane.setEnabled(false);
