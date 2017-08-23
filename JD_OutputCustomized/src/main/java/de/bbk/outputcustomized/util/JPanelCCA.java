@@ -85,11 +85,11 @@ public class JPanelCCA extends JPanel implements IDisposable {
         JPanel jPanel = new JPanel();
         jPanel.add(this);
         int width = d8Pane.getMaximumSize().width;
-        int hight = d8Pane.getMaximumSize().height + d10aPane.getMaximumSize().height + d10aOldPane.getMaximumSize().height;
-        jPanel.setSize(width, hight);
-        jPanel.setMaximumSize(new Dimension(width, hight));
-        jPanel.setMinimumSize(new Dimension(width, hight));
-        jPanel.setPreferredSize(new Dimension(width, hight));
+        int height = d8Pane.getMaximumSize().height + d10aPane.getMaximumSize().height * 2;
+        jPanel.setSize(width, height);
+        jPanel.setMaximumSize(new Dimension(width, height));
+        jPanel.setMinimumSize(new Dimension(width, height));
+        jPanel.setPreferredSize(new Dimension(width, height));
         return jPanel;
     }
 
