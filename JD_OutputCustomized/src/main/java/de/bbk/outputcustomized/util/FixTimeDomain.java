@@ -32,8 +32,12 @@ public class FixTimeDomain {
      * @return a new timesereis with the domain set in the Constructor
      */
     public Ts getTsWithDomain(Ts ts) {
-        Ts t = TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));
-        return t;
+        if (ts.getTsData() == null || ts.getTsData().isEmpty()) {
+            return ts;
+        } else {
+            Ts t = TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));
+            return t;
+        }
     }
 
     /**
