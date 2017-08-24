@@ -5,6 +5,7 @@
  */
 package de.bbk.outputpdf.html;
 
+import ec.satoolkit.x11.SeasonalFilterOption;
 import ec.satoolkit.x11.X11Specification;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
@@ -13,13 +14,12 @@ import ec.tss.html.IHtmlElement;
 import ec.tss.html.implementation.HtmlRegArima;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
-import ec.tstoolkit.modelling.arima.x13.MovingHolidaySpec;
 import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
 import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
 import ec.tstoolkit.modelling.arima.x13.SingleOutlierSpec;
-import ec.tstoolkit.timeseries.calendars.TradingDaysType;
 import ec.tstoolkit.timeseries.regression.OutlierDefinition;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  *
@@ -42,15 +42,21 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
             RegArimaSpecification regSpec = x13Document.getSpecification().getRegArimaSpecification();
             stream.write("Transform: ");
             stream.write(regSpec.getTransform().getFunction().toString()).newLine();
-//Outlier
-            for (SingleOutlierSpec type : regSpec.getOutliers().getTypes()) {
-                stream.write("Outlier detection: " + type.getType().name()).newLine();
+
+            //Outliers
+            if (regSpec.getOutliers().isUsed()) {
+                stream.write("Outlier detection: ");
+                for (SingleOutlierSpec type : regSpec.getOutliers().getTypes()) {
+                    stream.write(type.getType().name() + " ");
+                }
+                stream.newLine();
+
+                double criticalValue = regSpec.getOutliers().getDefaultCriticalValue();
+                if (criticalValue == 0) {
+                    criticalValue = DEF_VA;
+                }
+                stream.write("Outliers critical value: " + criticalValue).newLine();
             }
-            double criticalValue = regSpec.getOutliers().getDefaultCriticalValue();
-            if (criticalValue == 0) {
-                criticalValue = DEF_VA;
-            }
-            stream.write("Outliers critical value is: " + criticalValue).newLine();
 
             if (regSpec.getRegression().getTradingDays().isUsed()) {
 
@@ -95,17 +101,25 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
         stream.write("Sigmalimit: [" + x11Spec.getLowerSigma() + ";" + x11Spec.getUpperSigma() + "]").newLine();
 
         if (x11Spec.isSeasonal() && x11Spec.getSeasonalFilters() != null) {
-            stream.write("Seasonal filters:" + x11Spec.getSeasonalFilters()[0].name() + ",");
-            for (int i = 1; i < x11Spec.getSeasonalFilters().length - 1; i++) {
-                stream.write(x11Spec.getSeasonalFilters()[i].name() + ",");
-                if (i == 5) {
-                    stream.newLine();
-                    stream.write("Seasonal filters:");
-                }
-            }
+            SeasonalFilterOption first = x11Spec.getSeasonalFilters()[0];
+            boolean isSameSeasonalFilter = Arrays.stream(x11Spec.getSeasonalFilters()).allMatch(x -> x.equals(first));
 
-            if (x11Spec.getSeasonalFilters().length > 1) {
-                stream.write(x11Spec.getSeasonalFilters()[x11Spec.getSeasonalFilters().length - 1].name()).newLine();
+            if (isSameSeasonalFilter) {
+                stream.write("Seasonal filters:" + first.name()).newLine();
+            } else {
+
+                stream.write("Seasonal filters:" + x11Spec.getSeasonalFilters()[0].name() + ",");
+                for (int i = 1; i < x11Spec.getSeasonalFilters().length - 1; i++) {
+                    stream.write(x11Spec.getSeasonalFilters()[i].name() + ",");
+                    if (i == 5) {
+                        stream.newLine();
+                        stream.write("Seasonal filters:");
+                    }
+                }
+
+                if (x11Spec.getSeasonalFilters().length > 1) {
+                    stream.write(x11Spec.getSeasonalFilters()[x11Spec.getSeasonalFilters().length - 1].name()).newLine();
+                }
             }
         } else {
             stream.write("Seasonal filters: Msr").newLine();

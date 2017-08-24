@@ -5,16 +5,13 @@
  */
 package de.bbk.outputcustomized.html;
 
-import ec.satoolkit.x11.DefaultSeasonalFilteringStrategy;
-import ec.satoolkit.x11.MsrTable;
-import ec.satoolkit.x11.Mstatistics;
-import ec.satoolkit.x11.SeasonalFilterOption;
-import ec.satoolkit.x11.X11Results;
+import ec.satoolkit.x11.*;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.html.*;
 import ec.tss.sa.documents.X13Document;
 import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  *
@@ -95,24 +92,32 @@ public class HtmlCCA extends AbstractHtmlElement {
     }
 
     private void writeSpecification(HtmlStream stream) throws IOException {
+        X11Specification x11Spec = spec.getX11Specification();
+
         stream.write(HtmlTag.HEADER2, h2, "Specifications");
         //<editor-fold defaultstate="collapsed" desc="Sigmalimit">
         stream.write("Sigmalimit: ")
-                .write(spec.getX11Specification().getLowerSigma())
+                .write(x11Spec.getLowerSigma())
                 .write("; ")
-                .write(spec.getX11Specification().getUpperSigma())
+                .write(x11Spec.getUpperSigma())
                 .newLine();
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="Seasonalfilters">
         {
             stream.write("Seasonalfilters:");
-            if (spec.getX11Specification().getSeasonalFilters() != null) {
+            if (x11Spec.getSeasonalFilters() != null) {
+                SeasonalFilterOption first = x11Spec.getSeasonalFilters()[0];
+                boolean isSameSeasonalFilter = Arrays.stream(x11Spec.getSeasonalFilters()).allMatch(x -> x.equals(first));
 
-                for (SeasonalFilterOption sfo : spec.getX11Specification().getSeasonalFilters()) {
-                    stream.write(" ").write(sfo.toString());
+                if (isSameSeasonalFilter) {
+                    stream.write("Seasonal filters:" + first.name()).newLine();
+                } else {
+                    for (SeasonalFilterOption sfo : x11Spec.getSeasonalFilters()) {
+                        stream.write(" ").write(sfo.toString());
+                    }
+
                 }
-
             } else {
                 stream.write(" ").write(SeasonalFilterOption.Msr.toString());
             }
@@ -123,18 +128,20 @@ public class HtmlCCA extends AbstractHtmlElement {
         //<editor-fold defaultstate="collapsed" desc="Outlier critical value">
         {
             //Strange behavior in Outlier spec || 0 means Default
-            double criticalValue = spec.getRegArimaSpecification().getOutliers().getDefaultCriticalValue();
-            stream.write("Outliers critical value: ");
-            if (criticalValue != 0) {
-                stream.write(criticalValue);
-            } else {
-                stream.write(DEF_VA);
+            if (spec.getRegArimaSpecification().getOutliers().isUsed()) {
+                double criticalValue = spec.getRegArimaSpecification().getOutliers().getDefaultCriticalValue();
+                stream.write("Outliers critical value: ");
+                if (criticalValue != 0) {
+                    stream.write(criticalValue);
+                } else {
+                    stream.write(DEF_VA);
+                }
+                stream.newLine();
             }
-            stream.newLine();
         }
         //</editor-fold>
 
-        stream.write("Calendarsigma: ").write(spec.getX11Specification().getCalendarSigma().toString()).newLine();
+        stream.write("Calendarsigma: ").write(x11Spec.getCalendarSigma().toString()).newLine();
         stream.newLine();
 
     }

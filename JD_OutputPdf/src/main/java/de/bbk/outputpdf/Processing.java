@@ -113,9 +113,9 @@ public class Processing {
                         //Open the stream
                         stream = new HtmlStream(writer);
                         stream.open();
-                     
+
                         stream.write(HTMLStyle.STYLE);
-                  
+
                         final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
                         headerbbk.write(stream);
                         stream.newLine();
@@ -207,12 +207,11 @@ public class Processing {
     }
 
     private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
-        TsData tsDataDom = new TsData(dom);
+        dom = FixTimeDomain.domLastYear(dom);
         if (tsData != null) {
-            dom = FixTimeDomain.domLastYear(dom);
-            tsDataDom = tsData.fittoDomain(dom);
+            return tsData.fittoDomain(dom);
         }
-        return tsDataDom;
+        return new TsData(dom);
 
     }
 

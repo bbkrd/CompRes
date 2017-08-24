@@ -27,7 +27,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
 
     public static final String BBK = "Customized Output";
-    public static final String CCA = "CCA (multiplicative in pct.)";
+    public static final String CCA = "CCA (if multiplicative then in pct.)";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
     public static final String OLD = "Old";
@@ -75,13 +75,13 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
-            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES+"=,").append(ModellingDictionary.Y)
+            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES + "=,").append(ModellingDictionary.Y)
                     .append(',').append(ModellingDictionary.Y).append(SeriesInfo.F_SUFFIX);
             StringBuilder t = new StringBuilder();
-            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND+"=,").append(ModellingDictionary.T)
+            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND + "=,").append(ModellingDictionary.T)
                     .append(',').append(ModellingDictionary.T).append(SeriesInfo.F_SUFFIX);
             StringBuilder sa = new StringBuilder();
-            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED+"=,").append(ModellingDictionary.SA)
+            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED + "=,").append(ModellingDictionary.SA)
                     .append(',').append(ModellingDictionary.SA).append(SeriesInfo.F_SUFFIX);
             StringBuilder saOld = new StringBuilder();
             saOld.append(OLD).append(ModellingDictionary.SA);
@@ -109,15 +109,15 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
-            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES+"=,").append(ModellingDictionary.Y)
+            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES + "=,").append(ModellingDictionary.Y)
                     .append(',').append(ModellingDictionary.Y).append(SeriesInfo.F_SUFFIX);
             StringBuilder sa = new StringBuilder();
-            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED+"=,").append(ModellingDictionary.SA)
+            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED + "=,").append(ModellingDictionary.SA)
                     .append(',').append(ModellingDictionary.SA).append(SeriesInfo.F_SUFFIX);
-                  StringBuilder t = new StringBuilder();
-            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND+"=,").append(ModellingDictionary.T)
+            StringBuilder t = new StringBuilder();
+            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND + "=,").append(ModellingDictionary.T)
                     .append(',').append(ModellingDictionary.T).append(SeriesInfo.F_SUFFIX);
-            return new String[]{y.toString(), sa.toString(),t.toString()};
+            return new String[]{y.toString(), sa.toString(), t.toString()};
         }
 
         public ChartOnlySAFactory() {
@@ -234,7 +234,7 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     //</editor-fold>
     private static class ItemFactory<I> extends ComposedProcDocumentItemFactory<X13Document, I> {
 
-        public ItemFactory(Id itemId, InformationExtractor<? super X13Document, I> informationExtractor, ItemUI<? extends IProcDocumentView<X13Document>, I> itemUI) {
+        ItemFactory(Id itemId, InformationExtractor<? super X13Document, I> informationExtractor, ItemUI<? extends IProcDocumentView<X13Document>, I> itemUI) {
             super(X13Document.class, itemId, informationExtractor, itemUI);
         }
     }

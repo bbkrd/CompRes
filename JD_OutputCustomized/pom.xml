@@ -10,7 +10,7 @@
 
     <groupId>de.bbk</groupId>
     <artifactId>OutputCustomized</artifactId>
-    <version>0.5.5.1</version>
+    <version>0.5.5.2</version>
     <packaging>nbm</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
