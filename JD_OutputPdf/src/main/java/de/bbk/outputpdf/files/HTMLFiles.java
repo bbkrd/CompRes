@@ -95,7 +95,7 @@ public class HTMLFiles {
             }
             if (file != null) {
                 Files.write(html, file, Charset.defaultCharset());
-                Desktop.getDesktop().open(file);
+                //Desktop.getDesktop().open(file);
             }//ToDo löschen
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());

@@ -9,6 +9,7 @@ import static de.bbk.outputcustomized.util.InPercent.convertTsInPercentIfMult;
 import de.bbk.outputcustomized.util.SavedTables;
 import static de.bbk.outputcustomized.util.SavedTables.DECOMPOSITION_D10_D10A;
 import static de.bbk.outputcustomized.util.SavedTables.NAME_SEASONAL_FACTOR;
+import static de.bbk.outputcustomized.util.SavedTables.NAME_SEASONAL_FACTOR_SAVED;
 import de.bbk.outputcustomized.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.x11.X11Results;
@@ -50,13 +51,12 @@ public class SeasonalView extends JComponent implements IDisposable {
             chartContent.clear();
 
             Ts tsd10 = DocumentManager.instance.getTs(doc, DECOMPOSITION_D10_D10A, false);
-            tsd10.rename(NAME_SEASONAL_FACTOR);
             tsd10 = convertTsInPercentIfMult(tsd10, mode.isMultiplicative());
-            tsd10.rename(SavedTables.NAME_SEASONAL_FACTOR);
+            tsd10 = tsd10.rename(SavedTables.NAME_SEASONAL_FACTOR);
             chartContent.add(tsd10);
 
             Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
-
+            seasonalfactor = seasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
             chartContent.add(seasonalfactor);
 
         } else {
