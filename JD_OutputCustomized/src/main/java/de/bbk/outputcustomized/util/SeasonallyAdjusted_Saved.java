@@ -35,16 +35,7 @@ public class SeasonallyAdjusted_Saved {
 
     }
 
-    public static final Ts calcSeasonallyAdjusted(MetaData meta, DecompositionMode mode) {
-
-        Ts tsSeasonsalFactor = TsData_Saved.convertMetaDataToTs(meta, SavedTables.SEASONALFACTOR);
-        Ts tsCalendarFactor = TsData_Saved.convertMetaDataToTs(meta, SavedTables.CALENDARFACTOR);
-        Ts TsSeriesWithForecast = TsData_Saved.convertMetaDataToTs(meta, SavedTables.FORECAST);
-        TsData tsdSeasonsalFactor = tsSeasonsalFactor.getTsData();
-        TsData tsdCalendarFactor = tsCalendarFactor.getTsData();
-        TsData tsdSeriesWithForecast = TsSeriesWithForecast.getTsData();
-        return calcSeasonallyAdjusted(tsdSeasonsalFactor, tsdCalendarFactor, tsdSeriesWithForecast, mode);
-    }
+   
 
     private static Ts calcSeasonallyAdjusted(TsData tsDataSeasonsalFactor, TsData tsDataCalendarFactor, TsData tsDataSeriesWithForecast, DecompositionMode mode) {
         //if Timeseries is saved in Percent then multiply if exits with 100
