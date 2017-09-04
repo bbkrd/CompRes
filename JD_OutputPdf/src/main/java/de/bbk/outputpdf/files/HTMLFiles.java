@@ -5,15 +5,18 @@
  */
 package de.bbk.outputpdf.files;
 
-import com.google.common.io.Files;
 import de.bbk.outputpdf.util.Frozen;
 import ec.nbdemetra.ws.Workspace;
 import ec.nbdemetra.ws.WorkspaceFactory;
 import java.awt.Desktop;
+import java.awt.JobAttributes;
 import java.io.File;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.AccessController;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -27,7 +30,8 @@ import org.slf4j.LoggerFactory;
 public class HTMLFiles {
 
     private String currentDir;
-
+    private String fileName = "";
+    private String errorMessage = "";
     private static HTMLFiles hTMLFiles;
 
     public static HTMLFiles getInstance() {
@@ -43,6 +47,7 @@ public class HTMLFiles {
     }
 
     public boolean selectFolder() {
+        errorMessage = "";
         JFileChooser fileChooser;
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -52,6 +57,11 @@ public class HTMLFiles {
         }
         if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             currentDir = fileChooser.getSelectedFile().getAbsolutePath();
+
+            if (!Files.isWritable(fileChooser.getSelectedFile().toPath())) {
+                errorMessage = "You have not the right to write in " + fileChooser.getSelectedFile().getAbsolutePath();
+                return false;
+            }
             fileChooser.setCurrentDirectory(new File(currentDir));
             return true;
         }
@@ -66,10 +76,16 @@ public class HTMLFiles {
         fileChooser.addChoosableFileFilter(defaultFilter);
         fileChooser.setDialogTitle("The file " + file.getName() + " already exists.");
         fileChooser.setCurrentDirectory(file);
-        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile();
+        switch (fileChooser.showSaveDialog(null)) {
+            case JFileChooser.APPROVE_OPTION:
+                fileName = fileChooser.getSelectedFile().toString();
+                return fileChooser.getSelectedFile();
+            case JFileChooser.CANCEL_OPTION:
+                errorMessage = "No file name selected";
+                return null;
+            default:
+                return null;
         }
-        return null;
     }
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -80,7 +96,9 @@ public class HTMLFiles {
      * @param html
      * @param saItemName
      */
-    public void creatHTMLFile(String html, String saItemName) {
+    public boolean creatHTMLFile(String html, String saItemName) {
+        errorMessage = "";
+        boolean saved = false;
         try {
             saItemName = removeCharacters(saItemName);
 
@@ -94,12 +112,19 @@ public class HTMLFiles {
                 file = selectFileName(file);
             }
             if (file != null) {
-                Files.write(html, file, Charset.defaultCharset());
+
+                com.google.common.io.Files.write(html, file, Charset.defaultCharset());
+                saved = true;
                 //Desktop.getDesktop().open(file);
             }//ToDo löschen
         } catch (IOException ex) {
+            errorMessage = ex.getMessage();
             LOGGER.error(ex.getMessage());
+
+        } finally {
+            return saved;
         }
+
     }
 
     /**
@@ -110,7 +135,7 @@ public class HTMLFiles {
      * @param saItemName
      */
     public void creatHTMLFile(String html, String multiName, String saItemName) {
-
+        errorMessage = "";
         try {
             Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
             String wsName = workspace.getName();
@@ -127,8 +152,8 @@ public class HTMLFiles {
             fileName.append(".html");
             File pic = new File(fileName.toString());
 
-            Files.write(html, pic, Charset.defaultCharset());
-            Desktop.getDesktop().open(pic);
+            com.google.common.io.Files.write(html, pic, Charset.defaultCharset());
+            //   Desktop.getDesktop().open(pic);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -138,7 +163,7 @@ public class HTMLFiles {
 
         try {
             File pic = File.createTempFile("Test", ".html");
-            Files.write(html, pic, Charset.defaultCharset());
+            com.google.common.io.Files.write(html, pic, Charset.defaultCharset());
             Desktop.getDesktop().open(pic);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
@@ -178,5 +203,19 @@ public class HTMLFiles {
             }
         }
         return path;
+    }
+
+    /**
+     * @return the errorMessage
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * @return the fileName
+     */
+    public String getFileName() {
+        return fileName;
     }
 }

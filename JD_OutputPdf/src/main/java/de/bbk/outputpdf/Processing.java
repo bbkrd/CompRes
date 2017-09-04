@@ -26,12 +26,15 @@ import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,29 +47,34 @@ public class Processing {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
     private HTMLFiles htmlf;
 
-    public void start(SaItem[] selection, String name) {
+    private boolean makeHtmlf() {
         htmlf = HTMLFiles.getInstance();
+        boolean checkHtmlf = false;
         if (htmlf.selectFolder()) {
-            startWithOutFileSelection(selection, name);
+            checkHtmlf = true;
+        } else if ("" != htmlf.getErrorMessage()) {
+            JOptionPane.showMessageDialog(null, htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
+        }
+        return checkHtmlf;
+    }
+
+    public void start(SaItem[] selection, String name) {
+        if (makeHtmlf()) {
+            startWithOutFileSelection(selection, name);
         }
 
     }
 
     public void start(Map<String, List<SaItem>> map) {
-
-        htmlf = HTMLFiles.getInstance();
-        if (htmlf.selectFolder()) {
+        if (makeHtmlf()) {
             Set<String> keySet = map.keySet();
             keySet.stream().forEach((singleKey) -> {
                 SaItem[] selection = (SaItem[]) map.get(singleKey).toArray();
                 startWithOutFileSelection(selection, singleKey);
             });
-        } else {
-            JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
         }
-
     }
 
     private void startWithOutFileSelection(SaItem[] selection, String name) {
@@ -176,9 +184,17 @@ public class Processing {
                         String corrected = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
                         output = output.replace(old, corrected);
                         output = output.replace("<hr />", "");
-                        htmlf.creatHTMLFile(output, item.getName());
+                        if (!htmlf.creatHTMLFile(output, item.getName())) {
+                            sbError.append(str);
+                            sbError.append(":");
+                            sbError.append("\n");
+                            sbError.append("- It is not possible to create the file: \n");
+                            sbError.append(htmlf.getFileName());
+                            sbError.append(" \n because ");
+                            sbError.append(htmlf.getErrorMessage());
+                            sbError.append("\n");
+                        };
 
-                        // hTMLBBKTableD8B.dispose();
                     } catch (IOException ex) {
                         LOGGER.error(ex.getMessage());
                     }
@@ -188,14 +204,25 @@ public class Processing {
                 } else {
 
                     sbError.append(str);
+                    sbError.append(":");
+                    sbError.append("\n");
+                    sbError.append("- Is is not possible to create the output ");
+                    sbError.append("because ");
+                    sbError.append("it is not a X13 specification");
                     sbError.append("\n");
 
                 }
             }
             if (!sbError.toString().isEmpty()) {
-                String str = "These documents are not X13: \n";
-                sbError.insert(0, str);
-                JOptionPane.showMessageDialog(null, sbError.toString(), "This output is not available ", JOptionPane.ERROR_MESSAGE);
+                JTextArea jta = new JTextArea(sbError.toString());
+                JScrollPane jsp = new JScrollPane(jta) {
+                    @Override
+                    public Dimension getPreferredSize() {
+                        return new Dimension(480, 120);
+                    }
+                };
+                JOptionPane.showMessageDialog(null, jsp, "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
             if (!sbSuccessful.toString().isEmpty()) {
