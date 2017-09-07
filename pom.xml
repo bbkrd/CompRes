@@ -231,8 +231,8 @@
 
 
     <modules>
-        <module>JD_OutputCustomized</module>
-        <module>JD_OutputPdf</module>
+        <module>JD_ConCur</module>
+        <module>JD_ConCurReport</module>
     </modules>
 
   
