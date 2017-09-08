@@ -12,6 +12,12 @@
     <artifactId>ConCur</artifactId>
     <version>0.5.5.4</version>
     <packaging>nbm</packaging>
+
+    <organization>
+        <name>Deutsche Bundesbank</name>
+        <url>www.bundesbank.de</url>
+    </organization>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide/>

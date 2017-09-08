@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-   
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.bundesbank</groupId>
     <artifactId>outputcustomized-parent</artifactId>
     <version>0.5.5</version>
     <packaging>pom</packaging>
     <name>OutputCustomized - Parent</name>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
@@ -26,8 +26,8 @@
         <nbm-maven-plugin.version>3.14</nbm-maven-plugin.version>
         <!-- < plugins versions -->
     </properties>
-   
-    <dependencyManagement> 
+
+    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>${jdemetra.groupid}</groupId>
@@ -81,7 +81,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-        
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -91,7 +91,7 @@
         </dependency>
     </dependencies>
 
-   <build>
+    <build>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -168,6 +168,8 @@
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
+                        <licenseName>EUPL, Version 1.1</licenseName>
+                        <licenseFile>licence.txt</licenseFile>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -235,5 +237,5 @@
         <module>JD_ConCurReport</module>
     </modules>
 
-  
+
 </project>
