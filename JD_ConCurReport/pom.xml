@@ -27,6 +27,15 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+   <repository>
+            <id>atlassian</id>
+            <name>Repository hosting atlassian third party modules</name>
+            <url>	https://maven.atlassian.com/3rdparty/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>     
+        
     </repositories>
 
 
