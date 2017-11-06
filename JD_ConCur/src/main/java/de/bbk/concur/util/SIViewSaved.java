@@ -48,6 +48,9 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -91,6 +94,34 @@ public class SIViewSaved extends ATsView {
 
     public JFreeChart getJFreeChart() {
         return masterChart;
+    }
+
+   /**
+    * 
+    * @param period starts with 0
+    * @return 
+    */
+    public JFreeChart getDetailChart(int period) {
+        // Sortieren, so dass man mit int periode das richtige Intervall erwischt
+        TreeMap<Double, Bornes> map = new TreeMap<>();
+        graphs_.keySet().stream().forEach((b) -> {
+            map.put(b.min_, b);
+        });
+        int i = 0;
+        double dd=0;
+        for (Double d : map.keySet()) {
+            if (i >= period) {
+                dd = d;
+                break;
+            }
+            i = i + 1;
+        }
+        Bornes bperiod = map.get(dd);
+        
+        Graphs g = graphs_.get(bperiod);
+        showDetail(g, bperiod);
+
+        return detailChart;
     }
     private final JFreeChart detailChart;
     private final DecimalFormat format = new DecimalFormat("0");
@@ -387,8 +418,8 @@ public class SIViewSaved extends ATsView {
     /**
      * This method needs a saved D10 else the wrong class is used
      *
-     * @param seas       D10
-     * @param irr        D8
+     * @param seas D10
+     * @param irr D8
      * @param seas_saved D10_saved
      */
     public void setData(TsData seas, TsData irr, TsData seas_saved) {

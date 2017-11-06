@@ -45,11 +45,12 @@ import javax.swing.JComponent;
 public class SeasonalView extends JComponent implements IDisposable {
 
     private final TsCollection chartContent;
+    private final JTsChart chart;
 
     public SeasonalView() {
         setLayout(new BorderLayout());
 
-        JTsChart chart = new JTsChart();
+        chart = new JTsChart();
         chart.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         chartContent = chart.getTsCollection();
         add(chart, BorderLayout.CENTER);
@@ -73,6 +74,8 @@ public class SeasonalView extends JComponent implements IDisposable {
             Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
             seasonalfactor = seasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
             chartContent.add(seasonalfactor);
+
+            chart.setTitle(doc.getTs().getRawName());
 
         } else {
             chartContent.clear();

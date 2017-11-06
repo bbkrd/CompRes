@@ -119,6 +119,10 @@ public class JPanelCCA extends JPanel implements IDisposable {
             Ts d8 = getMainSeries("decomposition.d-tables.d8");
             d8 = InPercent.convertTsInPercentIfMult(d8, mode.isMultiplicative());
             TsData d8Data = d8.getTsData();
+            if (d8Data.getDomain().getYearsCount() > 10) {
+                TsDomain domMax10years = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue()*10), d8Data.getFrequency().intValue()*10);
+                d8Data = d8Data.fittoDomain(domMax10years);
+            }
             TsDomain domain = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue()), d8Data.getFrequency().intValue());
             d8.set(d8Data);
             d8Grid.getTsCollection().replace(d8);

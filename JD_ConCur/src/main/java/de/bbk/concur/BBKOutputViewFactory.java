@@ -31,6 +31,7 @@ import de.bbk.concur.view.SIRatioView;
 import de.bbk.concur.util.SavedTables;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.documents.DocumentManager;
+import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.modelling.SeriesInfo;
@@ -92,7 +93,43 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="REGISTER CHARTS">
-    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
+//    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
+//    public static class ChartSAFactory extends ItemFactory<X13Document> {
+//
+//        private static String[] generateItems() {
+//            StringBuilder y = new StringBuilder();
+//            y.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SERIES + "=,").append(ModellingDictionary.Y)
+//                    .append(',').append(ModellingDictionary.Y).append(SeriesInfo.F_SUFFIX);
+//            StringBuilder t = new StringBuilder();
+//            t.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_TREND + "=,").append(ModellingDictionary.T)
+//                    .append(',').append(ModellingDictionary.T).append(SeriesInfo.F_SUFFIX);
+//            StringBuilder sa = new StringBuilder();
+//            sa.append(DocumentManager.COMPOSITE).append(SavedTables.NAME_SEASONALLY_ADJUSTED + "=,").append(ModellingDictionary.SA)
+//                    .append(',').append(ModellingDictionary.SA).append(SeriesInfo.F_SUFFIX);
+//            StringBuilder saOld = new StringBuilder();
+//            saOld.append(OLD).append(ModellingDictionary.SA);
+//            return new String[]{y.toString(), t.toString(), sa.toString(), saOld.toString()};
+//        }
+//
+//        public ChartSAFactory() {
+//            super(BBK_CHARTS_SA, new DefaultInformationExtractor<X13Document, X13Document>() {
+//              @Override
+//              public X13Document retrieve(X13Document source) {
+//                  return source;
+//              }
+//          }, new PooledItemUI<View, X13Document, SAView>(SAView.class) {
+//              @Override
+//              protected void init(SAView c, View host, X13Document information) {
+//                  c.setNames(generateItems());
+//                  c.set(information);
+//              }
+//          });
+//        }
+//    }
+
+    
+    
+      @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
     public static class ChartSAFactory extends ItemFactory<X13Document> {
 
         private static String[] generateItems() {

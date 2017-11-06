@@ -78,7 +78,8 @@ public class SAView extends JComponent implements IDisposable {
             chart.getTsCollection().clear();
             TsCollection items = DocumentManager.create(names, doc);
             chart.getTsCollection().append(items);
-            
+            chart.setTitle( doc.getTs().getRawName());
+           
             MetaData metadata = doc.getMetaData();
             if (metadata != null) {
                 Ts savedSA = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);

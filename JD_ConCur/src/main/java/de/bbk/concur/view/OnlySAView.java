@@ -86,7 +86,7 @@ public class OnlySAView extends JComponent implements IDisposable {
 
             Ts onlySA = TsFactory.instance.createTs(NAME_ONLY_SEASONALLY_ADJUSTED, null, onlySAData);
             chart.getTsCollection().add(onlySA);
-
+            chart.setTitle(doc.getTs().getRawName());
         } else {
             chart.getTsCollection().clear();
         }
