@@ -20,27 +20,24 @@
  */
 package de.bbk.concurreport;
 
-import ec.ui.view.AutoCorrelationsView;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.title.TextTitle;
+import ec.ui.view.AutoRegressiveSpectrumView;
+import org.jfree.chart.ChartPanel;
 
 /**
  *
- * @author s4504ch
+ * @author Christiane Hofer
  */
-public class BbkAutoCorrelationsView extends AutoCorrelationsView {
+public class BbkAutoRegressiveSpectrumView extends  AutoRegressiveSpectrumView {
     
-    public BbkAutoCorrelationsView() {
+    public BbkAutoRegressiveSpectrumView() {
         super();
     }
-    
-    public JFreeChart getChart() {
-        return chartPanel.getChart();
+
+    public ChartPanel getChartPanel() {
+        return chartPanel;
     }
+
     
-    public void extendTitle(String text) {
-        String title = this.chartPanel.getChart().getTitle().getText() + text;
-        this.chartPanel.getChart().getTitle().setText(title);
-    }
+    
     
 }

@@ -20,13 +20,14 @@
  */
 package de.bbk.concurreport.html;
 
-
 import de.bbk.concur.util.SIViewSaved;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
+import ec.tstoolkit.timeseries.simplets.TsDomain;
+import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import ec.util.chart.swing.Charts;
 import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
@@ -40,10 +41,22 @@ import javax.swing.JPanel;
 public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElement {
 
     private final X13Document x13doc;
-    private static final int WIDTH = 2 * 450, HEIGHT = 250;
+    private static final int WIDTH = 450, HEIGHT = 250;
+    int lastPeriod = 0;
+    int periodbeforLastPeriod = 0;
 
     public HTMLBBKSIRatioView(X13Document x13doc) {
         this.x13doc = x13doc;
+        lastPeriod = x13doc.getSeries().getDomain().getLast().getPosition();
+        if (lastPeriod == 0) {
+            if (x13doc.getSeries().getDomain().getFrequency() == TsFrequency.Monthly) {
+                periodbeforLastPeriod = 11;
+            } else if (x13doc.getSeries().getDomain().getFrequency() == TsFrequency.Monthly) {
+                periodbeforLastPeriod = 3;
+            }
+        } else {
+            periodbeforLastPeriod = lastPeriod - 1;
+        }
     }
 
     @Override
@@ -63,10 +76,19 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElem
         jPanel.setSize(WIDTH, HEIGHT);
         stream.write(HtmlTag.HEADER2, h2, "S-I-Ratio");
         sIViewSaved.doLayout();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Charts.writeChartAsSVG(os, sIViewSaved.getJFreeChart(), WIDTH, HEIGHT);
+        ByteArrayOutputStream os_last = new ByteArrayOutputStream();
+        //      Charts.writeChartAsSVG(os, sIViewSaved.getJFreeChart(), WIDTH, HEIGHT);
+        Charts.writeChartAsSVG(os_last, sIViewSaved.getDetailChart(lastPeriod), WIDTH, HEIGHT);
+        ByteArrayOutputStream os_beforlast = new ByteArrayOutputStream();
+        //      Charts.writeChartAsSVG(os, sIViewSaved.getJFreeChart(), WIDTH, HEIGHT);
+        Charts.writeChartAsSVG(os_beforlast, sIViewSaved.getDetailChart(periodbeforLastPeriod), WIDTH, HEIGHT);
 
-        stream.write(os.toString()).newLine();
+        HTMLByteArrayOutputStream lastArrayOutputStream = new HTMLByteArrayOutputStream(os_last);
+        HTMLByteArrayOutputStream beforlastArrayOutputStream = new HTMLByteArrayOutputStream(os_beforlast);
+
+        HTML2Div div = new HTML2Div(beforlastArrayOutputStream, lastArrayOutputStream);
+        div.write(stream);
+
         stream.write("<p style='text-align:center; '>");
         stream.write("Dots - D8, red - current D10, blue - D10");
         stream.write("</p>");

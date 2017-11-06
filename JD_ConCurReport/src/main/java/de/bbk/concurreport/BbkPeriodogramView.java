@@ -25,7 +25,7 @@ import org.jfree.chart.ChartPanel;
 
 /**
  *
- * @author s4504ch
+ * @author Christiane Hofer
  */
 public class BbkPeriodogramView extends PeriodogramView {
     

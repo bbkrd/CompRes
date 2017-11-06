@@ -20,14 +20,15 @@
  */
 package de.bbk.concurreport.html;
 
+import de.bbk.concurreport.BbkAutoRegressiveSpectrumView;
 import de.bbk.concurreport.BbkPeriodogramView;
-import ec.tss.Ts;
-import ec.tss.documents.DocumentManager;
+import ec.satoolkit.ISeriesDecomposition;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.modelling.ModellingDictionary;
+import ec.tstoolkit.modelling.ComponentInformation;
+import ec.tstoolkit.modelling.ComponentType;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.util.chart.swing.Charts;
 import java.awt.Dimension;
@@ -39,32 +40,35 @@ import org.jfree.chart.JFreeChart;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKPeriodogram extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKAutoRegressiveSpectrumView extends AbstractHtmlElement implements IHtmlElement {
 
-    private final TsData tsData;
+    private final X13Document x13doc;
     private final int width = 450;
     private final int height = 220; //450
-
 
     /**
      *
      * @param tsData the time series is differenced in the write
      */
-    public HTMLBBKPeriodogram(X13Document x13doc) {
-        Ts ts = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA);
-        this.tsData = ts.getTsData();
-      
+    public HTMLBBKAutoRegressiveSpectrumView(X13Document x13doc) {
 
+        this.x13doc = x13doc;
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
 
-        BbkPeriodogramView pView = new BbkPeriodogramView();
-        int freq = this.tsData.getFrequency().intValue();
-        pView.setLimitVisible(false);
+        ISeriesDecomposition finals = x13doc.getFinalDecomposition();
+        if (finals == null) {
+            return;
+        }
+
+        TsData tsData = finals.getSeries(ComponentType.Series, ComponentInformation.Value);
+
+        BbkAutoRegressiveSpectrumView pView = new BbkAutoRegressiveSpectrumView();
+        int freq = tsData.getFrequency().intValue();
         pView.setDifferencingOrder(1);
-        pView.setData("Periodogram (Seasonally Adjusted stationary)" , freq, tsData);
+        pView.setData("Auto-regressive spectrum ("+ComponentType.Series+ " stationary)", freq, tsData);
         pView.setSize(width, height);
 
         pView.setMaximumSize(new Dimension(width, height));

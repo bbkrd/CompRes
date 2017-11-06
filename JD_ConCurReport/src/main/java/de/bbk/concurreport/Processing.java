@@ -32,8 +32,12 @@ import de.bbk.concurreport.html.HTMLStyle;
 import de.bbk.concurreport.html.HTML2Div;
 
 import de.bbk.concur.util.FixTimeDomain;
+import de.bbk.concur.util.SavedTables;
+import de.bbk.concur.util.TsData_Saved;
 import de.bbk.concur.view.TablesPercentageChangeView;
 import de.bbk.concurreport.files.HTMLFiles;
+import de.bbk.concurreport.html.HTMLBBKAutoRegressiveSpectrumView;
+import de.bbk.concurreport.html.HTMLBBKPeriodogram;
 import de.bbk.concurreport.util.Frozen;
 import de.bbk.concurreport.util.Pagebreak;
 import ec.satoolkit.ISaSpecification;
@@ -155,15 +159,20 @@ public class Processing {
                         HTMLBBKChartMain chartMain = new HTMLBBKChartMain(x13doc, domCharMax5years);
                         final HTMLBBKText1 bBKText1 = new HTMLBBKText1(x13doc);
 
-                        AbstractHtmlElement[] htmlElements = new AbstractHtmlElement[3];
+                        AbstractHtmlElement[] htmlElements = new AbstractHtmlElement[4];
                         htmlElements[0] = chartMain;
                         final HTMLBBKBox bBKBox = new HTMLBBKBox(htmlElements);
 
                         HTMLBBKChartAutocorrelations autocorrelation = new HTMLBBKChartAutocorrelations(x13doc, false);
                         htmlElements[1] = autocorrelation;
 
-                        HTMLBBKChartAutocorrelations partialautocorrelation = new HTMLBBKChartAutocorrelations(x13doc, true);
-                        htmlElements[2] = partialautocorrelation;
+//                        HTMLBBKChartAutocorrelations partialautocorrelation = new HTMLBBKChartAutocorrelations(x13doc, true);
+//                        htmlElements[2] = partialautocorrelation;
+                        HTMLBBKAutoRegressiveSpectrumView autoRegressiveSpectrumView = new HTMLBBKAutoRegressiveSpectrumView(x13doc);
+                        htmlElements[2] = autoRegressiveSpectrumView;
+
+                        HTMLBBKPeriodogram bBKPeriodogram = new HTMLBBKPeriodogram(x13doc);
+                        htmlElements[3] = bBKPeriodogram;
 
                         final HTML2Div hTML2Div = new HTML2Div(bBKText1, bBKBox);
                         hTML2Div.write(stream);
@@ -178,6 +187,10 @@ public class Processing {
 
                         final HTMLBBKTableD8A hTMLBBKTableD8B = new HTMLBBKTableD8A(x13doc);
                         hTMLBBKTableD8B.write(stream);
+
+                        stream.newLine();
+                        TsDomain savedD10dom = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR).getTsData().getDomain();
+                        stream.write("Last available forecast for the" + SavedTables.NAME_SEASONAL_FACTOR_SAVED + " is " + savedD10dom.getLast() + " .");
                         stream.newLine();
 
                         TablesPercentageChangeView tpcv = new TablesPercentageChangeView();

@@ -62,11 +62,12 @@ public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement implements
             if (partial) {
                 acv.setKind(AutoCorrelationsView.ACKind.Partial);
             }
-            x13doc.getPreprocessingPart().getFullResiduals();
+
 
             acv.setSize(WIDTH, HEIGHT);
             acv.doLayout();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
+            acv.extendTitle(" (Full Residuals)");
             Charts.writeChartAsSVG(os, acv.getChart(), WIDTH, HEIGHT);
             stream.write(os.toString());
         }
