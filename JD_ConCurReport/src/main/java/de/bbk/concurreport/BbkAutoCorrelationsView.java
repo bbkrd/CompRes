@@ -22,7 +22,6 @@ package de.bbk.concurreport;
 
 import ec.ui.view.AutoCorrelationsView;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.title.TextTitle;
 
 /**
  *

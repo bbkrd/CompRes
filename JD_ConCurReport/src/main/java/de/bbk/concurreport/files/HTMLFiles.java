@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -24,14 +24,11 @@ import de.bbk.concurreport.util.Frozen;
 import ec.nbdemetra.ws.Workspace;
 import ec.nbdemetra.ws.WorkspaceFactory;
 import java.awt.Desktop;
-import java.awt.JobAttributes;
 import java.io.File;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.AccessController;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -111,7 +108,7 @@ public class HTMLFiles {
      * @param html
      * @param saItemName
      */
-    public boolean creatHTMLFile(String html, String saItemName) {
+    public boolean createHTMLFile(String html, String saItemName) {
         errorMessage = "";
         boolean saved = false;
         try {
@@ -149,7 +146,7 @@ public class HTMLFiles {
      * @param multiName
      * @param saItemName
      */
-    public void creatHTMLFile(String html, String multiName, String saItemName) {
+    public void createHTMLFile(String html, String multiName, String saItemName) {
         errorMessage = "";
         try {
             Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
@@ -204,17 +201,16 @@ public class HTMLFiles {
 
     private StringBuilder NumberForFile(StringBuilder path) {
         int counter = 0;
-        while (java.nio.file.Files.exists(Paths.get(path.toString() + ".html"))) {
+        int startindex = path.length();
+        while (Files.exists(Paths.get(path.toString() + ".html"))) {
             counter++;
 
             if (counter == 1) {
                 path.append(" (1) ");
             } else {
                 //befor this all spaces are removed
-                int startindex;
-                String strToReplace = " (" + String.valueOf(counter - 1) + ") ";
-                startindex = path.indexOf(strToReplace);
-                path.replace(startindex, startindex + strToReplace.length(), " (" + String.valueOf(counter) + ") ");
+                String strToReplace = " (" + (counter - 1) + ") ";
+                path.replace(startindex, startindex + strToReplace.length(), " (" + counter + ") ");
             }
         }
         return path;

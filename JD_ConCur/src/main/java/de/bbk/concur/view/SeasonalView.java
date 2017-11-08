@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -21,10 +21,7 @@
 package de.bbk.concur.view;
 
 import static de.bbk.concur.util.InPercent.convertTsInPercentIfMult;
-import de.bbk.concur.util.SavedTables;
-import static de.bbk.concur.util.SavedTables.DECOMPOSITION_D10_D10A;
-import static de.bbk.concur.util.SavedTables.NAME_SEASONAL_FACTOR;
-import static de.bbk.concur.util.SavedTables.NAME_SEASONAL_FACTOR_SAVED;
+import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.x11.X11Results;
@@ -68,14 +65,14 @@ public class SeasonalView extends JComponent implements IDisposable {
 
             Ts tsd10 = DocumentManager.instance.getTs(doc, DECOMPOSITION_D10_D10A, false);
             tsd10 = convertTsInPercentIfMult(tsd10, mode.isMultiplicative());
-            tsd10 = tsd10.rename(SavedTables.NAME_SEASONAL_FACTOR);
+            tsd10 = tsd10.rename(NAME_SEASONAL_FACTOR);
             chartContent.add(tsd10);
 
-            Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
+            Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SEASONALFACTOR);
             seasonalfactor = seasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
             chartContent.add(seasonalfactor);
 
-            chart.setTitle(doc.getTs().getRawName());
+            chart.setTitle(doc.getInput().getRawName());
 
         } else {
             chartContent.clear();

@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -48,9 +48,7 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -96,11 +94,12 @@ public class SIViewSaved extends ATsView {
         return masterChart;
     }
 
-   /**
-    * 
-    * @param period starts with 0
-    * @return 
-    */
+    /**
+     *
+     * @param period starts with 0
+     *
+     * @return
+     */
     public JFreeChart getDetailChart(int period) {
         // Sortieren, so dass man mit int periode das richtige Intervall erwischt
         TreeMap<Double, Bornes> map = new TreeMap<>();
@@ -108,7 +107,7 @@ public class SIViewSaved extends ATsView {
             map.put(b.min_, b);
         });
         int i = 0;
-        double dd=0;
+        double dd = 0;
         for (Double d : map.keySet()) {
             if (i >= period) {
                 dd = d;
@@ -117,7 +116,7 @@ public class SIViewSaved extends ATsView {
             i = i + 1;
         }
         Bornes bperiod = map.get(dd);
-        
+
         Graphs g = graphs_.get(bperiod);
         showDetail(g, bperiod);
 
@@ -418,8 +417,8 @@ public class SIViewSaved extends ATsView {
     /**
      * This method needs a saved D10 else the wrong class is used
      *
-     * @param seas D10
-     * @param irr D8
+     * @param seas       D10
+     * @param irr        D8
      * @param seas_saved D10_saved
      */
     public void setData(TsData seas, TsData irr, TsData seas_saved) {

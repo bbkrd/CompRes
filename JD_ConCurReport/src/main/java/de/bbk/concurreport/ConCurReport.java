@@ -20,7 +20,6 @@
  */
 package de.bbk.concurreport;
 
-import de.bbk.concurreport.Bundle;
 import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;

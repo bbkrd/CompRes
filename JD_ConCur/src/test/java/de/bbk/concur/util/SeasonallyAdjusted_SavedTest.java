@@ -20,9 +20,7 @@
  */
 package de.bbk.concur.util;
 
-import de.bbk.concur.util.SavedTables;
 import static de.bbk.concur.util.SeasonallyAdjusted_Saved.calcSeasonallyAdjusted;
-import de.bbk.concur.util.TsData_MetaDataConverter;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.DefaultSeriesDecomposition;
 import ec.satoolkit.algorithm.implementation.X13ProcessingFactory;
@@ -42,7 +40,6 @@ import ec.tstoolkit.timeseries.regression.OutlierType;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**

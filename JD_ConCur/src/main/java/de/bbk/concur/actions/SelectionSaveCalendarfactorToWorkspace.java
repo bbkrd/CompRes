@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -55,7 +55,8 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "CTL_SelectionSaveCalendarfactorToWorkspace=Calendar Factor",
     "CTL_ConfirmSaveCalendarfactorToWorkspace=Are you sure you want to remember the new Calendar factor? (This will delete the old Calendar factor)",
-    "CTL_NoSaveCalendarfactorToWorkspace=There is no Calendar factor(A6,A7) to save!"})
+    "# {0} - SaItemName",
+    "CTL_NoSaveCalendarfactorToWorkspace=There is no Calendar factor(A6, A7) for {0} to save!"})
 
 public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<SaBatchUI> {
 
@@ -72,11 +73,9 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
 
     @Override
     protected void process(SaBatchUI cur) {
-        {
-            NotifyDescriptor nd = new NotifyDescriptor.Confirmation(Bundle.CTL_ConfirmSaveCalendarfactorToWorkspace(), NotifyDescriptor.OK_CANCEL_OPTION);
-            if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
-                return;
-            }
+        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(Bundle.CTL_ConfirmSaveCalendarfactorToWorkspace(), NotifyDescriptor.OK_CANCEL_OPTION);
+        if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
+            return;
         }
 
         SaItem[] selection = cur.getSelection();
@@ -94,7 +93,8 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
                     cal = convertTsDataInPercentIfMult(cal, mode.isMultiplicative());
                     TsData_MetaDataConverter.convertTsToMetaData(cal, meta, SavedTables.CALENDARFACTOR);
                 } else {
-                    NotifyDescriptor nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveCalendarfactorToWorkspace(), NotifyDescriptor.ERROR_MESSAGE);
+                    nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveCalendarfactorToWorkspace(item.getName()), NotifyDescriptor.ERROR_MESSAGE);
+                    //TODO Rollback? No Return?
                     if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
                         return;
                     }
@@ -109,22 +109,14 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
         TsData a6 = results.getData("decomposition.a-tables.a6", TsData.class);
         TsData a7 = results.getData("decomposition.a-tables.a7", TsData.class);
 
-        TsData cal = null;
-        if (a6 == null && a7 != null) {
-            cal = a7;
+        if (a6 == null) {
+            return a7;
         }
-        if (a7 == null && a6 != null) {
-            cal = a6;
+        if (mode.isMultiplicative()) {
+            return a6.times(a7);
+        } else {
+            return a6.plus(a7);
         }
-
-        if (a6 != null && a7 != null) {
-            if (mode.isMultiplicative()) {
-                cal = a6.times(a7);
-            } else {
-                cal = a6.plus(a7);
-            }
-        }
-        return cal;
     }
 
 }

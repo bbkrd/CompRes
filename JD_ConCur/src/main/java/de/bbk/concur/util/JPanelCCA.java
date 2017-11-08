@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -35,7 +35,6 @@ import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
 import ec.ui.interfaces.ITsGrid;
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -120,7 +119,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
             d8 = InPercent.convertTsInPercentIfMult(d8, mode.isMultiplicative());
             TsData d8Data = d8.getTsData();
             if (d8Data.getDomain().getYearsCount() > 10) {
-                TsDomain domMax10years = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue()*10), d8Data.getFrequency().intValue()*10);
+                TsDomain domMax10years = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue() * 10), d8Data.getFrequency().intValue() * 10);
                 d8Data = d8Data.fittoDomain(domMax10years);
             }
             TsDomain domain = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue()), d8Data.getFrequency().intValue());
@@ -131,10 +130,10 @@ public class JPanelCCA extends JPanel implements IDisposable {
             if (doc.getPreprocessingPart() != null) {
                 OutlierEstimation[] prespecified = doc.getPreprocessingPart().outliersEstimation(true, true);
                 OutlierEstimation[] estimations = doc.getPreprocessingPart().outliersEstimation(true, false);
-                ArrayList<OutlierEstimation> list = new ArrayList<>();
-                list.addAll(Arrays.asList(prespecified));
-                list.addAll(Arrays.asList(estimations));
-                d8Grid.setOutliers(list.toArray(new OutlierEstimation[list.size()]));
+
+                OutlierEstimation[] both = Arrays.copyOf(prespecified, prespecified.length + estimations.length);
+                System.arraycopy(estimations, 0, both, prespecified.length, estimations.length);
+                d8Grid.setOutliers(both);
             }
 
             Ts d9 = getMainSeries("decomposition.d-tables.d9");
@@ -161,7 +160,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
                 d10SavedGrid.setSelection(d10SavedGrid.getTsCollection().toArray());
                 fixSize(d10aOldPane, domain.getFrequency().intValue(), domain.getYearsCount());
             } else {
-                d10SavedGrid.getTsCollection().clear();
+                d10SavedGrid.getTsCollection().replace(savedD10);
             }
         } else {
             d8Grid.getTsCollection().clear();

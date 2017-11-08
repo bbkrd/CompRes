@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -25,7 +25,6 @@ import ec.tss.Ts;
 import ec.tss.TsFactory;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.MetaData;
-import ec.tstoolkit.maths.linearfilters.SymmetricFilter;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
 
@@ -50,8 +49,6 @@ public class SeasonallyAdjusted_Saved {
 
     }
 
-   
-
     private static Ts calcSeasonallyAdjusted(TsData tsDataSeasonsalFactor, TsData tsDataCalendarFactor, TsData tsDataSeriesWithForecast, DecompositionMode mode) {
         //if Timeseries is saved in Percent then multiply if exits with 100
         Ts tsSeasonallyAdjusted = TsFactory.instance.createTs(SavedTables.NAME_SEASONALLY_ADJUSTED_SAVED);
@@ -64,26 +61,26 @@ public class SeasonallyAdjusted_Saved {
             return tsSeasonallyAdjusted;
         }
 
-        TsFrequency frequency= tsDataSeriesWithForecast.getDomain().getFrequency();
-        if(!frequency.equals(tsDataSeasonsalFactor.getDomain().getFrequency())){
-           tsSeasonallyAdjusted.setInvalidDataCause("The frequency of the Series("+ frequency + ") differs from the frequency of the seasonal factor("+ tsDataSeasonsalFactor.getDomain().getFrequency() +").");
+        TsFrequency frequency = tsDataSeriesWithForecast.getDomain().getFrequency();
+        if (!frequency.equals(tsDataSeasonsalFactor.getDomain().getFrequency())) {
+            tsSeasonallyAdjusted.setInvalidDataCause("The frequency of the Series(" + frequency + ") differs from the frequency of the seasonal factor(" + tsDataSeasonsalFactor.getDomain().getFrequency() + ").");
             return tsSeasonallyAdjusted;
         }
-        
-           if(tsDataCalendarFactor!=null && !frequency.equals(tsDataSeasonsalFactor.getDomain().getFrequency())){
-           tsSeasonallyAdjusted.setInvalidDataCause("The frequency of the Series("+ frequency + ") differs from the frequency of the calendar factor("+ tsDataCalendarFactor.getDomain().getFrequency() +").");
+
+        if (tsDataCalendarFactor != null && !frequency.equals(tsDataSeasonsalFactor.getDomain().getFrequency())) {
+            tsSeasonallyAdjusted.setInvalidDataCause("The frequency of the Series(" + frequency + ") differs from the frequency of the calendar factor(" + tsDataCalendarFactor.getDomain().getFrequency() + ").");
             return tsSeasonallyAdjusted;
         }
-        
+
         boolean isMult = mode.isMultiplicative();
         if (isMult) {
             if (tsDataCalendarFactor != null) {
                 tsDataCalendarFactor = tsDataCalendarFactor.div(100);
             }
-                tsDataSeasonsalFactor = tsDataSeasonsalFactor.div(100);
+            tsDataSeasonsalFactor = tsDataSeasonsalFactor.div(100);
         }
 
-        if (tsDataSeasonsalFactor != null ) {
+        if (tsDataSeasonsalFactor != null) {
             TsData tsDataSeasonallyAdjusted;
             switch (mode) {
                 case Additive:

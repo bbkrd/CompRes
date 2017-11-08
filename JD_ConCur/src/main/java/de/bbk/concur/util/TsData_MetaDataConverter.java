@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -70,18 +70,22 @@ public class TsData_MetaDataConverter {
             ts.setInvalidDataCause("No Data for " + tableName + " " + "via Workspace");
             return ts;
         }
+        try {
+            TsFrequency freq = TsFrequency.valueOf(Integer.parseInt(meta.get(prefix + FREQUENCY)));
+            int startYear = Integer.parseInt(meta.get(prefix + STARTYEAR));
+            int startPeriod = Integer.parseInt(meta.get(prefix + STARTPERIOD));
 
-        TsFrequency freq = TsFrequency.valueOf(Integer.parseInt(meta.get(prefix + FREQUENCY)));
-        int startYear = Integer.parseInt(meta.get(prefix + STARTYEAR));
-        int startPeriod = Integer.parseInt(meta.get(prefix + STARTPERIOD));
-
-        String[] valuesAsString = meta.get(prefix + VALUES).split(" ");
-        double[] data = new double[valuesAsString.length];
-        for (int i = 0; i < valuesAsString.length; i++) {
-            data[i] = Double.parseDouble(valuesAsString[i]);
+            String[] valuesAsString = meta.get(prefix + VALUES).split(" ");
+            double[] data = new double[valuesAsString.length];
+            for (int i = 0; i < valuesAsString.length; i++) {
+                data[i] = Double.parseDouble(valuesAsString[i]);
+            }
+            TsData tsData = new TsData(new TsPeriod(freq, startYear, startPeriod), data, false);
+            ts.set(tsData);
+            return ts;
+        } catch (NumberFormatException ex) {
+            ts.setInvalidDataCause("Error reading Data for " + tableName + ".(NFE)");
+            return ts;
         }
-        TsData tsData = new TsData(new TsPeriod(freq, startYear, startPeriod), data, false);
-        ts.set(tsData);
-        return ts;
     }
 }

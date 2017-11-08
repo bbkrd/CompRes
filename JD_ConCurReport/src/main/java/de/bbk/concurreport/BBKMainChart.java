@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -40,14 +40,14 @@ import org.jfree.data.xy.IntervalXYDataset;
  */
 public class BBKMainChart extends JTsChart implements IDisposable {
 
-    private static final int WIDTH = 450, HEIGHT = 450;
+    private static final int DEFAULT_WIDTH = 450, DEFAULT_HEIGHT = 450;
 
     public void writeChart(TsCollectionInformation col, HtmlStream stream) throws IOException {
 
         JTimeSeriesChart chart = new JTimeSeriesChart();
         applyContent(chart, col);
 
-        chart.setSize(WIDTH, HEIGHT); //muss gemacht werden sonst exception
+        chart.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT); //muss gemacht werden sonst exception
         chart.doLayout();
         ByteArrayOutputStream os;
         os = new ByteArrayOutputStream();

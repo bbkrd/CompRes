@@ -29,12 +29,9 @@ import ec.tss.html.IHtmlElement;
 import ec.tss.html.implementation.HtmlRegArima;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
-import ec.tstoolkit.modelling.arima.diagnostics.OneStepAheadForecastingTest;
 import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
 import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
 import ec.tstoolkit.modelling.arima.x13.SingleOutlierSpec;
-import ec.tstoolkit.timeseries.regression.OutlierDefinition;
-import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import java.io.IOException;
 import java.util.Arrays;
 

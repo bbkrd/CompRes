@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -21,29 +21,16 @@
 package de.bbk.concurreport;
 
 import de.bbk.concur.html.HtmlCCA;
-import de.bbk.concurreport.html.HTMLBBKSIRatioView;
-import de.bbk.concurreport.html.HTMLBBKTableD8A;
-import de.bbk.concurreport.html.HTMLBBKBox;
-import de.bbk.concurreport.html.HTMLBBKChartAutocorrelations;
-import de.bbk.concurreport.html.HTMLBBKText1;
-import de.bbk.concurreport.html.HTMLBBkHeader;
-import de.bbk.concurreport.html.HTMLBBKChartMain;
-import de.bbk.concurreport.html.HTMLStyle;
-import de.bbk.concurreport.html.HTML2Div;
-
 import de.bbk.concur.util.FixTimeDomain;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.util.TsData_Saved;
 import de.bbk.concur.view.TablesPercentageChangeView;
 import de.bbk.concurreport.files.HTMLFiles;
-import de.bbk.concurreport.html.HTMLBBKAutoRegressiveSpectrumView;
-import de.bbk.concurreport.html.HTMLBBKPeriodogram;
+import de.bbk.concurreport.html.*;
 import de.bbk.concurreport.util.Frozen;
 import de.bbk.concurreport.util.Pagebreak;
-import ec.satoolkit.ISaSpecification;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
-import ec.tss.documents.TsDocument;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.implementation.HtmlSingleTsData;
@@ -80,7 +67,7 @@ public class Processing {
         boolean checkHtmlf = false;
         if (htmlf.selectFolder()) {
             checkHtmlf = true;
-        } else if ("" != htmlf.getErrorMessage()) {
+        } else if (!"".equals(htmlf.getErrorMessage())) {
             JOptionPane.showMessageDialog(null, htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
@@ -128,14 +115,12 @@ public class Processing {
             for (SaItem item : items) {
 
                 item.getTs().getName();// Name SAItem
-                //   int index = cur.getCurrentProcessing().indexOf(selection[i]);
-                SaDocument<ISaSpecification> doc = item.toDocument();
-                TsDocument t = item.toDocument();
+                SaDocument<?> doc = item.toDocument();
                 String str = Frozen.removeFrozen(item.getName())
                         + "in Multi-doc " + this.saProcessingName;
                 str = str.replace("\n", "-");
-                if (t.getClass() == X13Document.class) {
-                    X13Document x13doc = (X13Document) t;
+                if (doc instanceof X13Document) {
+                    X13Document x13doc = (X13Document) doc;
                     //   CompositeResults results = doc.getResults();
 
                     TsDomain domCharMax5years;
@@ -189,20 +174,23 @@ public class Processing {
                         hTMLBBKTableD8B.write(stream);
 
                         stream.newLine();
-                        TsDomain savedD10dom = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR).getTsData().getDomain();
-                        stream.write("Last available forecast for the" + SavedTables.NAME_SEASONAL_FACTOR_SAVED + " is " + savedD10dom.getLast() + " .");
-                        stream.newLine();
+                        Ts savedD10 = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
+                        if (savedD10 != null && savedD10.getTsData() != null) {
+                            TsDomain savedD10dom = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR).getTsData().getDomain();
+                            stream.write("Last available forecast for the " + SavedTables.NAME_SEASONAL_FACTOR_SAVED + " is " + savedD10dom.getLast() + " .");
+                            stream.newLine();
+                        }
 
                         TablesPercentageChangeView tpcv = new TablesPercentageChangeView();
                         tpcv.set(x13doc);
                         TsDomain domain = x13doc.getSeries().getDomain();
-                        Ts SeasonallyadjustedPercentageChange = tpcv.GetSeasonallyadjustedPercentageChange();
+                        Ts SeasonallyadjustedPercentageChange = tpcv.getSeasonallyAdjustedPercentageChange();
 
                         HtmlSingleTsData htmlSingleTsData = new HtmlSingleTsData(
                                 lastYearOfSeries(domain, SeasonallyadjustedPercentageChange.getTsData()), SeasonallyadjustedPercentageChange.getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
-                        htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.GetSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.GetSavedSeasonallyAdjustedPercentageChange().getName());
+                        htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.getSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.getSavedSeasonallyAdjustedPercentageChange().getName());
                         htmlSingleTsData.write(stream);
                         stream.newLine();
 
@@ -221,50 +209,40 @@ public class Processing {
                         String corrected = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
                         output = output.replace(old, corrected);
                         output = output.replace("<hr />", "");
-                        if (!htmlf.creatHTMLFile(output, item.getName())) {
-                            sbError.append(str);
-                            sbError.append(":");
-                            sbError.append("\n");
-                            sbError.append("- It is not possible to create the file: \n");
-                            sbError.append(htmlf.getFileName());
-                            sbError.append(" \n because ");
-                            sbError.append(htmlf.getErrorMessage());
-                            sbError.append("\n");
-                        };
+                        if (!htmlf.createHTMLFile(output, item.getName())) {
+                            sbError.append(str)
+                                    .append(":\n")
+                                    .append("- It is not possible to create the file:\n")
+                                    .append(htmlf.getFileName())
+                                    .append("\n because ")
+                                    .append(htmlf.getErrorMessage())
+                                    .append("\n");
+                        }
 
                     } catch (IOException ex) {
                         LOGGER.error(ex.getMessage());
                     }
 
-                    sbSuccessful.append(str);
-                    sbSuccessful.append("\n");
+                    sbSuccessful.append(str)
+                            .append("\n");
                 } else {
 
-                    sbError.append(str);
-                    sbError.append(":");
-                    sbError.append("\n");
-                    sbError.append("- Is is not possible to create the output ");
-                    sbError.append("because ");
-                    sbError.append("it is not a X13 specification");
-                    sbError.append("\n");
+                    sbError.append(str)
+                            .append(":\n")
+                            .append("- Is is not possible to create the output ")
+                            .append("because it is not a X13 specification\n");
 
                 }
             }
             if (!sbError.toString().isEmpty()) {
                 JTextArea jta = new JTextArea(sbError.toString());
-                JScrollPane jsp = new JScrollPane(jta) {
-                    @Override
-                    public Dimension getPreferredSize() {
-                        return new Dimension(480, 120);
-                    }
-                };
-                JOptionPane.showMessageDialog(null, jsp, "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JScrollPane jsp = new JScrollPane(jta);
+                jsp.setPreferredSize(new Dimension(480, 120));
+                JOptionPane.showMessageDialog(null, jsp, "Error", JOptionPane.ERROR_MESSAGE);
             }
 
             if (!sbSuccessful.toString().isEmpty()) {
-
-                JOptionPane.showMessageDialog(null, sbSuccessful.toString(), "This output is available for: ", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, sbSuccessful.toString(), "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
             }
         }
 

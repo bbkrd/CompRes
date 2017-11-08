@@ -20,18 +20,10 @@
  */
 package de.bbk.concur;
 
-import de.bbk.concur.view.MainBBKResultsView;
-import de.bbk.concur.view.SeasonalView;
-import de.bbk.concur.view.SAView;
-import de.bbk.concur.view.TablesPercentageChangeView;
-import de.bbk.concur.view.TablesSeriesView;
-import de.bbk.concur.view.OnlySAView;
-import de.bbk.concur.view.CCAView;
-import de.bbk.concur.view.SIRatioView;
 import de.bbk.concur.util.SavedTables;
+import de.bbk.concur.view.*;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.modelling.SeriesInfo;

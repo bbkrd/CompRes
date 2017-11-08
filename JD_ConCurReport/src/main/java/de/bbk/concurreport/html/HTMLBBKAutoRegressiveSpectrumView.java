@@ -21,7 +21,6 @@
 package de.bbk.concurreport.html;
 
 import de.bbk.concurreport.BbkAutoRegressiveSpectrumView;
-import de.bbk.concurreport.BbkPeriodogramView;
 import ec.satoolkit.ISeriesDecomposition;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;

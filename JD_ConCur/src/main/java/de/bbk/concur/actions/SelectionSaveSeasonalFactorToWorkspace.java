@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -55,7 +55,8 @@ import org.openide.util.NbBundle.Messages;
 @Messages({
     "CTL_SelectionSaveSeasonalFactorToWorkspace=Seasonal Factor",
     "CTL_ConfirmSaveSeasonalFactorToWorkspace=Are you sure you want to remember the new Seasonal Factor? (This will delete the old Seasonal Factor)",
-    "CTL_NoSaveSeasonalFactorToWorkspace=There is no Seasonal Factor (D10 and D10a) to remember!"})
+    "# {0} - SaItemName",
+    "CTL_NoSaveSeasonalFactorToWorkspace=There is no Seasonal Factor (D10 and D10a) for {0} to remember!"})
 public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<SaBatchUI> {
 
     public SelectionSaveSeasonalFactorToWorkspace() {
@@ -71,11 +72,9 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
 
     @Override
     protected void process(SaBatchUI cur) {
-        {
-            NotifyDescriptor nd = new NotifyDescriptor.Confirmation(Bundle.CTL_ConfirmSaveSeasonalFactorToWorkspace(), NotifyDescriptor.OK_CANCEL_OPTION);
-            if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
-                return;
-            }
+        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(Bundle.CTL_ConfirmSaveSeasonalFactorToWorkspace(), NotifyDescriptor.OK_CANCEL_OPTION);
+        if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
+            return;
         }
 
         SaItem[] selection = cur.getSelection();
@@ -96,7 +95,8 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
                     d10AndD10a = convertTsDataInPercentIfMult(d10AndD10a, mode.isMultiplicative());
                     TsData_MetaDataConverter.convertTsToMetaData(d10AndD10a, meta, SavedTables.SEASONALFACTOR);
                 } else {
-                    NotifyDescriptor nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveSeasonalFactorToWorkspace(), NotifyDescriptor.ERROR_MESSAGE);
+                    nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveSeasonalFactorToWorkspace(item.getName()), NotifyDescriptor.ERROR_MESSAGE);
+                    //TODO Rollback? No Return?
                     if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
                         return;
                     }

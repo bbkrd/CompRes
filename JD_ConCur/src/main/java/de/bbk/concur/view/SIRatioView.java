@@ -20,15 +20,8 @@
  */
 package de.bbk.concur.view;
 
-import static de.bbk.concur.util.InPercent.convertTsDataInPercentIfMult;
 import de.bbk.concur.util.SIViewSaved;
-import de.bbk.concur.util.SavedTables;
-import de.bbk.concur.util.TsData_Saved;
-import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Results;
-import ec.tss.Ts;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.interfaces.IDisposable;
 import java.awt.BorderLayout;
 import javax.swing.JComponent;

@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -24,7 +24,6 @@ import de.bbk.concur.util.SavedTables;
 import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import de.bbk.concur.util.TsData_Saved;
-import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.TsFactory;
@@ -95,7 +94,6 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
         savedSeasonalFactors = percentageChange(savedSeasonalFactors.rename(NAME_SEASONAL_FACTOR_SAVED));
         percentageChangeGridContent.add(savedSeasonalFactors);
 
-
         Ts a6_7ts = TablesSeriesView.calcA6_7(results, doc.getDecompositionPart().getSeriesDecomposition().getMode());
         percentageChangeGridContent.add(percentageChange(a6_7ts));
 
@@ -112,7 +110,7 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
     private Ts percentageChange(Ts ts) {
         TsData tsData = ts.getTsData();
         tsData = percentageChange(tsData);
-        Ts tsPercentageChange = TsFactory.instance.createTs(ts.getName()+" (PtP GR)");
+        Ts tsPercentageChange = TsFactory.instance.createTs(ts.getName() + " (PtP GR)");
         tsPercentageChange.set(tsData);
         return tsPercentageChange;
     }
@@ -124,11 +122,11 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
         return tsData.pctVariation(1);
     }
 
-    public Ts GetSavedSeasonallyAdjustedPercentageChange() {
+    public Ts getSavedSeasonallyAdjustedPercentageChange() {
         return savedSeasonallyAdjusted;
     }
 
-    public Ts GetSeasonallyadjustedPercentageChange() {
+    public Ts getSeasonallyAdjustedPercentageChange() {
         return seasonallyadjusted;
     }
 

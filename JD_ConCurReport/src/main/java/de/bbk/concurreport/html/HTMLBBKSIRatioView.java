@@ -26,7 +26,6 @@ import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import ec.util.chart.swing.Charts;
 import java.awt.Dimension;

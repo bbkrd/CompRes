@@ -20,7 +20,6 @@
  */
 package de.bbk.concurreport;
 
-import de.bbk.concurreport.Bundle;
 import ec.nbdemetra.sa.MultiProcessingDocument;
 import ec.nbdemetra.ws.WorkspaceItem;
 import ec.nbdemetra.ws.nodes.ItemWsNode;
