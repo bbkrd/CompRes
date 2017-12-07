@@ -20,28 +20,44 @@
  */
 package de.bbk.concurreport.html;
 
+import de.bbk.concurreport.util.Pagebreak;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
+import ec.tss.sa.documents.X13Document;
+import ec.tstoolkit.MetaData;
 import java.io.IOException;
 
 /**
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKBox extends AbstractHtmlElement implements IHtmlElement {
+public class HtmlComments extends AbstractHtmlElement {
 
-    private final AbstractHtmlElement[] htmlElements;
+    private final MetaData metaData;
+    private final HTMLBBkHeader headerbbk;
 
-    public HTMLBBKBox(AbstractHtmlElement[] htmlElements) {
-        this.htmlElements = htmlElements;
+    public HtmlComments(X13Document doc, HTMLBBkHeader headerbbk) {
+        this.headerbbk = headerbbk;
+        this.metaData = doc.getMetaData();
+
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        for (AbstractHtmlElement htmlElement : htmlElements) {
-            htmlElement.write(stream);
+
+        if (metaData == null || !metaData.containsKey("comment")) {
+
+        } else {
+            Pagebreak p = new Pagebreak();
+            p.write(stream);
+            headerbbk.write(stream);
+
+            stream.write("Comment:").newLine();
+            String comment = metaData.get("comment");
+
+            stream.write(comment.replaceAll("\n", "<br/>")).newLine();
         }
+
     }
 
 }

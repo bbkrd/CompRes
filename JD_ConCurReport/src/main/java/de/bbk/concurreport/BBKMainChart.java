@@ -20,6 +20,7 @@
  */
 package de.bbk.concurreport;
 
+import ec.nbdemetra.ui.DemetraUI;
 import ec.tss.TsCollectionInformation;
 import ec.tss.TsInformation;
 import ec.tss.html.HtmlStream;
@@ -27,6 +28,7 @@ import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.chart.TsXYDatasets;
 import ec.ui.interfaces.IDisposable;
+import ec.util.chart.ColorScheme;
 import ec.util.chart.ObsFunction;
 import ec.util.chart.SeriesFunction;
 import ec.util.chart.swing.JTimeSeriesChart;
@@ -46,7 +48,9 @@ public class BBKMainChart extends JTsChart implements IDisposable {
 
         JTimeSeriesChart chart = new JTimeSeriesChart();
         applyContent(chart, col);
-
+        ColorScheme colorScheme = DemetraUI.getDefault().getColorScheme();
+        themeSupport.setLocalColorScheme(colorScheme);
+        chart.setColorSchemeSupport(themeSupport);
         chart.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT); //muss gemacht werden sonst exception
         chart.doLayout();
         ByteArrayOutputStream os;

@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -28,7 +28,7 @@ public class HTMLStyle {
 
     public static final String STYLE
             = "<style>body{"
-            +"font: normal 12px Arial,sans-serif;\n"
+            + "font: normal 12px Arial,sans-serif;\n"
             + "text-align: left;\n"
             + "width:1000px; \n"
             + "max-width:1000px;}\n"
@@ -43,7 +43,7 @@ public class HTMLStyle {
             + "h3 {	font-size:100%;\n"
             + "	line-height: 1.0;\n"
             + "	text-decoration:underline;}\n"
-            + "h4 {font-size:100%;\n"
+            + "h4 {font-size:10%;\n"
             + "	line-height: 1.0;\n"
             + "	page-break-after:always;\n"
             + "        color:white}\n"
@@ -69,5 +69,5 @@ public class HTMLStyle {
             + "	vertical-align:top;   	\n"
             + "	display: inline-block;}\n"
             + "\n"
-            +"</style>";
+            + "</style>";
 }

@@ -47,9 +47,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,8 +73,30 @@ public class Processing {
         return checkHtmlf;
     }
 
+    private boolean checkLookAndFeel() {
+        LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
+        if (lookAndFeel.getName() != "Windows") {
+            int n = JOptionPane.showConfirmDialog(
+                    null, "You have selected the LookAndFeel Option " + lookAndFeel.getName() + ".\nTherefore the ConCur Report is"
+                    + " not optimized. \nThis might couse problems. \nWould you like to continue anyway?",
+                    "Warning",
+                    JOptionPane.YES_NO_OPTION);
+            switch (n) {
+                case JOptionPane.YES_OPTION:
+                    return true;
+                case JOptionPane.NO_OPTION:
+                    return false;
+                default:
+                    return false;
+            }
+
+        }
+        return true;
+    }
+
     public void start(SaItem[] selection, String name) {
-        if (makeHtmlf()) {
+
+        if (checkLookAndFeel() && makeHtmlf()) {
             startWithOutFileSelection(selection, name);
         }
 
@@ -201,6 +221,9 @@ public class Processing {
 
                         HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
                         htmlCCA.writeTextForHTML(stream);
+
+                        HtmlComments htmlComments = new HtmlComments(x13doc, headerbbk);
+                        htmlComments.write(stream);
 
                         stream.close();
 
