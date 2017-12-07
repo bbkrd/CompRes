@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -24,7 +24,6 @@ import ec.satoolkit.x11.*;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.html.*;
 import ec.tss.sa.documents.X13Document;
-import static ec.tstoolkit.modelling.arima.x13.OutlierSpec.DEF_VA;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -149,7 +148,7 @@ public class HtmlCCA extends AbstractHtmlElement {
                 if (criticalValue != 0) {
                     stream.write(criticalValue);
                 } else {
-                    stream.write(DEF_VA);
+                    stream.write("auto");
                 }
                 stream.newLine();
             }
@@ -208,7 +207,7 @@ public class HtmlCCA extends AbstractHtmlElement {
 
         stream.close(HtmlTag.TABLE);
 
-        stream.newLines(2);
+        stream.newLines(1);
     }
 
     private void writeCochranResult(HtmlStream stream) throws IOException {
