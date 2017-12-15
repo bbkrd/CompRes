@@ -10,7 +10,7 @@
 
     <groupId>de.bbk</groupId>
     <artifactId>ConCur</artifactId>
-    <version>0.5.5.6</version>
+    <version>0.5.5.7</version>
     <packaging>nbm</packaging>
 
     <organization>

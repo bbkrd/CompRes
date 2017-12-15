@@ -24,6 +24,7 @@ import ec.nbdemetra.ui.NbComponents;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
+import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.algorithm.CompositeResults;
@@ -155,8 +156,8 @@ public class JPanelCCA extends JPanel implements IDisposable {
 
             //TODO Möglicher Grund für große NoData-Area
             if (savedD10 != null && savedD10.getTsData() != null) {
-                savedD10.set(savedD10.getTsData().fittoDomain(domain));
-                d10SavedGrid.getTsCollection().replace(savedD10);
+                Ts newSavedD10 = TsFactory.instance.createTs(savedD10.getName(), savedD10.getMetaData(), savedD10.getTsData().fittoDomain(domain));
+                d10SavedGrid.getTsCollection().replace(newSavedD10);
                 d10SavedGrid.setSelection(d10SavedGrid.getTsCollection().toArray());
                 fixSize(d10aOldPane, domain.getFrequency().intValue(), domain.getYearsCount());
             } else {
