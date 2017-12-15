@@ -10,7 +10,7 @@
 
     <groupId>de.bbk</groupId>
     <artifactId>ConCurReport</artifactId>
-    <version>0.5.5.6</version>
+    <version>0.5.5.7</version>
     <packaging>nbm</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,6 +27,16 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>atlassian</id>
+            <name>Repository hosting atlassian third party modules</name>
+            <url>	https://maven.atlassian.com/3rdparty/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+
     </repositories>
 
 
@@ -93,7 +103,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ConCur</artifactId>
-            <version>0.5.5.6</version>
+            <version>0.5.5.7</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>
