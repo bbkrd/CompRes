@@ -90,7 +90,8 @@ public final class CreateSelectedMultidoc extends NodeAction {
         }
 
         Processing p = new Processing();
-        p.start(map);
+//        p.start(map);
+        p.process(map);
 
     }
 }

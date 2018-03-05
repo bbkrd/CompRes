@@ -170,6 +170,34 @@ public class HTMLFiles {
             LOGGER.error(ex.getMessage());
         }
     }
+    
+    public boolean createHTML(String html, String fileString){
+        errorMessage = "";
+        try {
+            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
+            String wsName = workspace.getName();
+
+            fileString = removeCharacters(fileString);
+//            saItemName = removeCharacters(saItemName);
+
+            StringBuilder fileName = new StringBuilder();
+            fileName.append(currentDir).append("\\").append(wsName);
+
+            java.nio.file.Files.createDirectories(Paths.get(fileName.toString()));
+            fileName.append("\\").append(fileString);
+            fileName = NumberForFile(fileName);
+            fileName.append(".html");
+            File pic = new File(fileName.toString());
+
+            com.google.common.io.Files.write(html, pic, Charset.defaultCharset());
+            //   Desktop.getDesktop().open(pic);
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+            return false;
+        }
+        
+        return true;
+    }
 
     public void createHTMLTempFiles(String html) {
 

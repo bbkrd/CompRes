@@ -50,7 +50,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionReference(path = "Menu/Tools", position = 2000)
 @Messages("CTL_CreateAllMultidocs=Create HTML for all multi-documents")
 public final class CreateAllMultidocs implements ActionListener {
-
+    
     @Messages({
         "CTL_Message=Do you really want to create the HTML for all multi-documents?"
     })
@@ -60,7 +60,7 @@ public final class CreateAllMultidocs implements ActionListener {
         if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
             return;
         }
-
+        
         Map<String, List<SaItem>> map = new TreeMap<>();
         Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
         IWorkspaceItemManager mgr = WorkspaceFactory.getInstance().getManager(MultiProcessingManager.ID);
@@ -71,8 +71,9 @@ public final class CreateAllMultidocs implements ActionListener {
                 map.put(item.getDisplayName(), saProcessing);
             });
             Processing p = new Processing();
-            p.start(map);
-
+//            p.start(map);
+            p.process(map);
+            
         }
     }
 }
