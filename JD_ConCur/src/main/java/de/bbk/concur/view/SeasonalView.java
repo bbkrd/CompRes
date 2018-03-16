@@ -82,6 +82,7 @@ public class SeasonalView extends JComponent implements IDisposable {
 
     @Override
     public void dispose() {
+        chart.dispose();
     }
 
 }

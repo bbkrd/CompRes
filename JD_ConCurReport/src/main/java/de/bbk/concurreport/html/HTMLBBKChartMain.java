@@ -68,7 +68,7 @@ public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElemen
         TsCollectionInformation collectionInformation = new TsCollectionInformation(tc, TsInformationType.Data);
         BBKMainChart tschart = new BBKMainChart();
         tschart.writeChart(collectionInformation, stream);
-
+        tschart.dispose();
     }
 
 }

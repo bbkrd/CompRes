@@ -47,10 +47,11 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
     private final TsCollection percentageChangeGridContent;
     private Ts savedSeasonallyAdjusted;
     private Ts seasonallyadjusted;
+    private final JTsGrid percentageChangeGrid;
 
     public TablesPercentageChangeView() {
         setLayout(new BorderLayout());
-        JTsGrid percentageChangeGrid = new JTsGrid();
+        percentageChangeGrid = new JTsGrid();
         percentageChangeGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         percentageChangeGrid.setMode(ITsGrid.Mode.MULTIPLETS);
         percentageChangeGridContent = percentageChangeGrid.getTsCollection();
@@ -105,6 +106,7 @@ public class TablesPercentageChangeView extends JComponent implements IDisposabl
 
     @Override
     public void dispose() {
+        percentageChangeGrid.dispose();
     }
 
     private Ts percentageChange(Ts ts) {

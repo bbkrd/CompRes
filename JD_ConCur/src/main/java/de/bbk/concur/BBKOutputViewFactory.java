@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -20,6 +20,7 @@
  */
 package de.bbk.concur;
 
+import de.bbk.concur.util.SIViewSaved;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.view.*;
 import ec.satoolkit.x13.X13Specification;
@@ -118,10 +119,7 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 //          });
 //        }
 //    }
-
-    
-    
-      @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
+    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
     public static class ChartSAFactory extends ItemFactory<X13Document> {
 
         private static String[] generateItems() {
@@ -196,10 +194,10 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
               public X13Document retrieve(X13Document source) {
                   return source;
               }
-          }, new PooledItemUI<View, X13Document, SIRatioView>(SIRatioView.class) {
+          }, new PooledItemUI<View, X13Document, SIViewSaved>(SIViewSaved.class) {
               @Override
-              protected void init(SIRatioView c, View host, X13Document information) {
-                  c.set(information);
+              protected void init(SIViewSaved c, View host, X13Document information) {
+                  c.setDoc(information);
               }
           });
         }

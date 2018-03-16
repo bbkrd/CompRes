@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -50,7 +50,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionReference(path = "Menu/Tools", position = 2000)
 @Messages("CTL_CreateAllMultidocs=Create HTML for all multi-documents")
 public final class CreateAllMultidocs implements ActionListener {
-    
+
     @Messages({
         "CTL_Message=Do you really want to create the HTML for all multi-documents?"
     })
@@ -60,20 +60,20 @@ public final class CreateAllMultidocs implements ActionListener {
         if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
             return;
         }
-        
-        Map<String, List<SaItem>> map = new TreeMap<>();
-        Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
-        IWorkspaceItemManager mgr = WorkspaceFactory.getInstance().getManager(MultiProcessingManager.ID);
-        if (mgr != null) {
-            List<WorkspaceItem<MultiProcessingDocument>> list = workspace.searchDocuments(mgr.getItemClass());
-            list.stream().forEach((item) -> {
-                SaProcessing saProcessing = item.getElement().getCurrent();
-                map.put(item.getDisplayName(), saProcessing);
-            });
-            Processing p = new Processing();
-//            p.start(map);
-            p.process(map);
-            
-        }
+        new Thread(() -> {
+            Map<String, List<SaItem>> map = new TreeMap<>();
+            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
+            IWorkspaceItemManager mgr = WorkspaceFactory.getInstance().getManager(MultiProcessingManager.ID);
+            if (mgr != null) {
+                List<WorkspaceItem<MultiProcessingDocument>> list = workspace.searchDocuments(mgr.getItemClass());
+                list.stream().forEach((item) -> {
+                    SaProcessing saProcessing = item.getElement().getCurrent();
+                    map.put(item.getDisplayName(), saProcessing);
+                });
+                Processing p = new Processing();
+                p.process(map);
+
+            }
+        }).start();
     }
 }

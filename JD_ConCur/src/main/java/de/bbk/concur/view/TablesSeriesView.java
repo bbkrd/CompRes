@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -48,10 +48,11 @@ import javax.swing.JComponent;
 public class TablesSeriesView extends JComponent implements IDisposable {
 
     private final TsCollection seriesGridContent;
+    private final JTsGrid seriesGrid;
 
     public TablesSeriesView() {
         setLayout(new BorderLayout());
-        JTsGrid seriesGrid = new JTsGrid();
+        seriesGrid = new JTsGrid();
         seriesGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         seriesGrid.setMode(ITsGrid.Mode.MULTIPLETS);
         seriesGridContent = seriesGrid.getTsCollection();
@@ -114,6 +115,7 @@ public class TablesSeriesView extends JComponent implements IDisposable {
 
     @Override
     public void dispose() {
+        seriesGrid.dispose();
     }
 
 }

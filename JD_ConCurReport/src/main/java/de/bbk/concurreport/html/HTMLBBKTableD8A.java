@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -20,9 +20,7 @@
  */
 package de.bbk.concurreport.html;
 
-//import de.bbk.concur.util.TsData_MetaDataConverter;
 import de.bbk.concur.util.JPanelCCA;
-import de.bbk.concurreport.SVGJComponent;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
@@ -46,9 +44,8 @@ public class HTMLBBKTableD8A extends AbstractHtmlElement implements IHtmlElement
 
         JPanelCCA jpcca = new JPanelCCA();
         jpcca.set(x13doc);
-
-        SVGJComponent bBKTableD8B = new SVGJComponent(jpcca.getCCAPanel());
-        bBKTableD8B.write(stream);
+        jpcca.getTablesAsHtml(stream);
+        jpcca.dispose();
 
         stream.newLine();
     }

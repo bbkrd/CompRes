@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -92,5 +92,7 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElem
         stream.write("Dots - D8, red - current D10, blue - D10");
         stream.write("</p>");
         stream.newLine();
+        sIViewSaved.dispose();
+        jPanel.removeAll();
     }
 }

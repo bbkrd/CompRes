@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -67,7 +67,7 @@ public class HTMLBBKAutoRegressiveSpectrumView extends AbstractHtmlElement imple
         BbkAutoRegressiveSpectrumView pView = new BbkAutoRegressiveSpectrumView();
         int freq = tsData.getFrequency().intValue();
         pView.setDifferencingOrder(1);
-        pView.setData("Auto-regressive spectrum ("+ComponentType.Series+ " stationary)", freq, tsData);
+        pView.setData("Auto-regressive spectrum (" + ComponentType.Series + " stationary)", freq, tsData);
         pView.setSize(width, height);
 
         pView.setMaximumSize(new Dimension(width, height));
@@ -82,6 +82,7 @@ public class HTMLBBKAutoRegressiveSpectrumView extends AbstractHtmlElement imple
         JFreeChart jfc = pView.getChartPanel().getChart();
         Charts.writeChartAsSVG(os, jfc, width, height);
         stream.write(os.toString());
+        pView.dispose();
 
     }
 }

@@ -21,22 +21,31 @@
 package de.bbk.concur.util;
 
 import ec.nbdemetra.ui.NbComponents;
+import ec.nbdemetra.ui.properties.l2fprod.ColorChooser;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
+import ec.tss.html.CssProperty;
+import ec.tss.html.CssStyle;
+import ec.tss.html.HtmlStream;
+import ec.tss.html.HtmlTag;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.algorithm.CompositeResults;
 import ec.tstoolkit.timeseries.regression.OutlierEstimation;
-import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
+import ec.tstoolkit.timeseries.simplets.*;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
 import ec.ui.interfaces.ITsGrid;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Formatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,6 +57,7 @@ import javax.swing.JSplitPane;
  */
 public class JPanelCCA extends JPanel implements IDisposable {
 
+    private final static String FMT = "%.3f";
     private final JTsOutlierGrid d8Grid;
     private final JTsGrid d10Grid, d10SavedGrid;
     private final JSplitPane d8Pane;
@@ -57,6 +67,10 @@ public class JPanelCCA extends JPanel implements IDisposable {
     private static final int ROW_HEIGHT = 19;
     private static final int ROW_WIDTH = 70; //70 war mal gut, es muss ausrichend breit sein,
     // keine Ahnugn woraus man das erreichen muss
+    private int freq;
+    private Ts d8, d10, savedD10;
+    private TsData d9;
+    private OutlierEstimation[] both;
 
     public JPanelCCA() {
 
@@ -93,7 +107,6 @@ public class JPanelCCA extends JPanel implements IDisposable {
         this.add(d8Pane);
         this.add(d10aPane);
         this.add(d10aOldPane);
-
     }
 
     public JPanel getCCAPanel() {
@@ -108,15 +121,55 @@ public class JPanelCCA extends JPanel implements IDisposable {
         return jPanel;
     }
 
+    public void getTablesAsHtml(HtmlStream stream) {
+        try {
+            stream.open(HtmlTag.TABLE);
+            stream.open(HtmlTag.TABLEROW);
+            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
+            stream.write("D8B");
+            stream.close(HtmlTag.TABLEHEADER);
+            stream.close(HtmlTag.TABLEROW);
+            d8b(stream);
+
+            stream.open(HtmlTag.TABLEROW);
+            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
+            stream.write("Seasonal Factor");
+            stream.close(HtmlTag.TABLEHEADER);
+            stream.close(HtmlTag.TABLEROW);
+            singleTsToHtml(stream, d10);
+
+            stream.open(HtmlTag.TABLEROW);
+            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
+            stream.write("Seasonal Factor (current)");
+            if (doc.getMetaData() != null) {
+                String savedID = doc.getMetaData().get("prodebene.seasonalfactor.loadid");
+                if (savedID != null) {
+                    stream.write(" | ");
+                    stream.write(savedID);
+                }
+            }
+            stream.close(HtmlTag.TABLEHEADER);
+            stream.close(HtmlTag.TABLEROW);
+            singleTsToHtml(stream, savedD10);
+
+            stream.close(HtmlTag.TABLE);
+        } catch (IOException ex) {
+            Logger.getLogger(JPanelCCA.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void set(X13Document doc) {
         this.doc = doc;
+        if (doc.getSeries() != null) {
+            this.freq = doc.getSeries().getFrequency().intValue();
+        }
         X11Results x11 = doc.getDecompositionPart();
         CompositeResults results = doc.getResults();
 
         //  boolean isLog = doc.getResults().getData("log", Boolean.class);
         DecompositionMode mode = results.getData("mode", DecompositionMode.class);
         if (x11 != null) {
-            Ts d8 = getMainSeries("decomposition.d-tables.d8");
+            d8 = getMainSeries("decomposition.d-tables.d8");
             d8 = InPercent.convertTsInPercentIfMult(d8, mode.isMultiplicative());
             TsData d8Data = d8.getTsData();
             if (d8Data.getDomain().getYearsCount() > 10) {
@@ -132,16 +185,17 @@ public class JPanelCCA extends JPanel implements IDisposable {
                 OutlierEstimation[] prespecified = doc.getPreprocessingPart().outliersEstimation(true, true);
                 OutlierEstimation[] estimations = doc.getPreprocessingPart().outliersEstimation(true, false);
 
-                OutlierEstimation[] both = Arrays.copyOf(prespecified, prespecified.length + estimations.length);
+                both = Arrays.copyOf(prespecified, prespecified.length + estimations.length);
                 System.arraycopy(estimations, 0, both, prespecified.length, estimations.length);
                 d8Grid.setOutliers(both);
             }
 
-            Ts d9 = getMainSeries("decomposition.d-tables.d9");
-            d9 = InPercent.convertTsInPercentIfMult(d9, mode.isMultiplicative());
-            d8Grid.setD9(d9.getTsData());
+            Ts d9Ts = getMainSeries("decomposition.d-tables.d9");
+            d9Ts = InPercent.convertTsInPercentIfMult(d9Ts, mode.isMultiplicative());
+            d9 = d9Ts.getTsData();
+            d8Grid.setD9(d9);
 
-            Ts d10 = getMainSeries("decomposition.d-tables.d10");
+            d10 = getMainSeries("decomposition.d-tables.d10");
             d10 = InPercent.convertTsInPercentIfMult(d10, mode.isMultiplicative());
             d10.set(d10.getTsData().fittoDomain(domain));
             fixSize(d10aPane, d10.getTsData().getFrequency().intValue(), d10.getTsData().getDomain().getYearsCount());
@@ -149,20 +203,18 @@ public class JPanelCCA extends JPanel implements IDisposable {
             d10Grid.getTsCollection().replace(d10);
             d10Grid.setSelection(d10Grid.getTsCollection().toArray());
 
-            Ts savedD10 = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
+            savedD10 = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
             if (savedD10 != null && savedD10.getTsData() != null && savedD10.getTsData().getFrequency().intValue() != d10.getTsData().getFrequency().intValue()) {
+                savedD10 = TsFactory.instance.createTs(savedD10.getName());
                 savedD10.setInvalidDataCause("Frequency mismatch");
-            }
-
-            //TODO Möglicher Grund für große NoData-Area
-            if (savedD10 != null && savedD10.getTsData() != null) {
-                Ts newSavedD10 = TsFactory.instance.createTs(savedD10.getName(), savedD10.getMetaData(), savedD10.getTsData().fittoDomain(domain));
-                d10SavedGrid.getTsCollection().replace(newSavedD10);
-                d10SavedGrid.setSelection(d10SavedGrid.getTsCollection().toArray());
+            } else if (savedD10 != null && savedD10.getTsData() != null) {
+                TsDomain intersectionDomain = savedD10.getTsData().getDomain().intersection(domain);
+                savedD10 = TsFactory.instance.createTs(savedD10.getName(), savedD10.getMetaData(), savedD10.getTsData().fittoDomain(intersectionDomain));
                 fixSize(d10aOldPane, domain.getFrequency().intValue(), domain.getYearsCount());
-            } else {
-                d10SavedGrid.getTsCollection().replace(savedD10);
             }
+            d10SavedGrid.getTsCollection().replace(savedD10);
+            d10SavedGrid.setSelection(d10SavedGrid.getTsCollection().toArray());
+
         } else {
             d8Grid.getTsCollection().clear();
             d10Grid.getTsCollection().clear();
@@ -190,5 +242,129 @@ public class JPanelCCA extends JPanel implements IDisposable {
         d8Grid.dispose();
         d10Grid.dispose();
         d10SavedGrid.dispose();
+        removeAll();
+        setLayout(null);
+    }
+
+    private void singleTsToHtml(HtmlStream stream, Ts ts) throws IOException {
+        TsData data = ts.getTsData();
+        if (data == null) {
+            return;
+        }
+
+        stream.open(HtmlTag.TABLEROW);
+        stream.write(HtmlTag.TABLEHEADER);
+        for (int i = 0; i < data.getFrequency().intValue(); ++i) {
+            stream.write(HtmlTag.TABLEHEADER, TsPeriod.formatShortPeriod(data.getFrequency(), i));
+        }
+        stream.close(HtmlTag.TABLEROW);
+
+        int nfreq = data.getFrequency().intValue();
+        YearIterator iter = new YearIterator(data);
+        while (iter.hasMoreElements()) {
+            stream.open(HtmlTag.TABLEROW);
+            TsDataBlock block = iter.nextElement();
+            stream.write(HtmlTag.TABLEHEADER,
+                         Integer.toString(block.start.getYear()));
+            int start = block.start.getPosition();
+            int n = block.data.getLength();
+            for (int i = 0; i < start; ++i) {
+                stream.write(HtmlTag.TABLECELL);
+            }
+            for (int i = 0; i < n; ++i) {
+                if (Double.isFinite(block.data.get(i))) {
+                    Formatter formatter = new Formatter();
+                    formatter.format(FMT, block.data.get(i));
+                    stream.write(HtmlTag.TABLECELL, formatter.toString());
+                } else {
+                    stream.write(HtmlTag.TABLECELL, ".");
+                }
+            }
+
+            for (int i = start + n; i < nfreq; ++i) {
+                stream.write(HtmlTag.TABLECELL);
+            }
+            stream.close(HtmlTag.TABLEROW);
+        }
+    }
+
+    private void d8b(HtmlStream stream) throws IOException {
+        TsData data = d8.getTsData();
+        if (data == null) {
+            return;
+        }
+
+        stream.open(HtmlTag.TABLEROW);
+        stream.write(HtmlTag.TABLEHEADER);
+        for (int i = 0; i < data.getFrequency().intValue(); ++i) {
+            stream.write(HtmlTag.TABLEHEADER, TsPeriod.formatShortPeriod(data.getFrequency(), i));
+        }
+        stream.close(HtmlTag.TABLEROW);
+
+        int nfreq = data.getFrequency().intValue();
+        YearIterator iter = new YearIterator(data);
+        while (iter.hasMoreElements()) {
+            stream.open(HtmlTag.TABLEROW);
+            TsDataBlock block = iter.nextElement();
+            stream.write(HtmlTag.TABLEHEADER,
+                         Integer.toString(block.start.getYear()));
+            int start = block.start.getPosition();
+            int n = block.data.getLength();
+            for (int i = 0; i < start; ++i) {
+                stream.write(HtmlTag.TABLECELL);
+            }
+            for (int i = 0; i < n; ++i) {
+                if (Double.isFinite(block.data.get(i))) {
+                    Formatter formatter = new Formatter();
+                    formatter.format(FMT, block.data.get(i));
+
+                    CssStyle outlierColor = new CssStyle();
+                    if (both != null) {
+                        boolean found = false;
+                        int j = 0;
+                        OutlierEstimation outlier = null;
+                        while (!found && j < both.length) {
+                            if (both[j].getPosition().equals(block.start.plus(i))) {
+                                found = true;
+                                outlier = both[j];
+                            }
+                            ++j;
+                        }
+
+                        if (found && outlier != null) {
+                            Color bgColor = ColorChooser.getColor(outlier.getCode());
+                            String bgColorString = new StringBuilder().append("rgb(")
+                                    .append(bgColor.getRed()).append(",")
+                                    .append(bgColor.getGreen()).append(",")
+                                    .append(bgColor.getBlue()).append(")").toString();
+                            outlierColor.add(CssProperty.BACKGROUND_COLOR, bgColorString);
+
+                            Color textColor = ColorChooser.getForeColor(outlier.getCode());
+                            String textColorString = new StringBuilder().append("rgb(")
+                                    .append(textColor.getRed()).append(",")
+                                    .append(textColor.getGreen()).append(",")
+                                    .append(textColor.getBlue()).append(")").toString();
+                            outlierColor.add(CssProperty.COLOR, textColorString);
+
+                        }
+                    }
+
+                    stream.open(HtmlTag.TABLECELL);
+                    if (d9 != null && d9.getFrequency() == block.start.getFrequency() && Double.isFinite(d9.get(block.start.plus(i)))) {
+                        stream.write("*");
+                    }
+                    stream.write(formatter.toString());
+                    stream.close(HtmlTag.TABLECELL);
+                } else {
+                    stream.write(HtmlTag.TABLECELL, ".");
+                }
+            }
+
+            for (int i = start + n; i < nfreq; ++i) {
+                stream.write(HtmlTag.TABLECELL);
+            }
+            stream.close(HtmlTag.TABLEROW);
+        }
+
     }
 }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>outputcustomized-parent</artifactId>
-        <version>1.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <groupId>de.bbk</groupId>
@@ -86,8 +86,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ConCur</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>
@@ -125,25 +124,16 @@
             <artifactId>org-openide-util-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>batik</groupId>
-            <artifactId>batik-all</artifactId>
-            <version>1.6</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE82</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-options-api</artifactId>
-            <version>RELEASE82</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
-            <version>RELEASE82</version>
         </dependency>
     </dependencies>
 </project>

@@ -21,7 +21,6 @@
 package de.bbk.concurreport.files;
 
 import de.bbk.concurreport.util.Frozen;
-import ec.nbdemetra.ws.Workspace;
 import ec.nbdemetra.ws.WorkspaceFactory;
 import java.awt.Desktop;
 import java.io.File;
@@ -108,7 +107,7 @@ public class HTMLFiles {
      * @param html
      * @param saItemName
      */
-    public boolean createHTMLFile(String html, String saItemName) {
+    public boolean writeHTMLFile(String html, String saItemName) {
         errorMessage = "";
         boolean saved = false;
         try {
@@ -146,23 +145,14 @@ public class HTMLFiles {
      * @param multiName
      * @param saItemName
      */
-    public void createHTMLFile(String html, String multiName, String saItemName) {
+    public void writeHTMLFile(String html, String multiName, String saItemName) {
         errorMessage = "";
         try {
-            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
-            String wsName = workspace.getName();
-
+            String wsName = WorkspaceFactory.getInstance().getActiveWorkspace().getName();
             multiName = removeCharacters(multiName);
             saItemName = removeCharacters(saItemName);
 
-            StringBuilder fileName = new StringBuilder();
-            fileName.append(currentDir).append("\\").append(wsName).append("\\").append(multiName);
-
-            java.nio.file.Files.createDirectories(Paths.get(fileName.toString()));
-            fileName.append("\\").append(saItemName);
-            fileName = NumberForFile(fileName);
-            fileName.append(".html");
-            File pic = new File(fileName.toString());
+            File pic = createHtmlFile(saItemName, wsName + "\\" + multiName);
 
             com.google.common.io.Files.write(html, pic, Charset.defaultCharset());
             //   Desktop.getDesktop().open(pic);
@@ -170,33 +160,40 @@ public class HTMLFiles {
             LOGGER.error(ex.getMessage());
         }
     }
-    
-    public boolean createHTML(String html, String fileString){
+
+    public boolean createHTML(String html, String fileString) {
         errorMessage = "";
         try {
-            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
-            String wsName = workspace.getName();
-
+            String wsName = WorkspaceFactory.getInstance().getActiveWorkspace().getName();
             fileString = removeCharacters(fileString);
-//            saItemName = removeCharacters(saItemName);
 
-            StringBuilder fileName = new StringBuilder();
-            fileName.append(currentDir).append("\\").append(wsName);
+            File file = createHtmlFile(fileString, wsName);
 
-            java.nio.file.Files.createDirectories(Paths.get(fileName.toString()));
-            fileName.append("\\").append(fileString);
-            fileName = NumberForFile(fileName);
-            fileName.append(".html");
-            File pic = new File(fileName.toString());
-
-            com.google.common.io.Files.write(html, pic, Charset.defaultCharset());
-            //   Desktop.getDesktop().open(pic);
+            com.google.common.io.Files.write(html, file, Charset.defaultCharset());
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
             return false;
         }
-        
+
         return true;
+    }
+
+    public File createHtmlFile(String fileName) throws IOException {
+        return createHtmlFile(fileName, "");
+    }
+
+    public File createHtmlFile(String fileName, String directory) throws IOException {
+        StringBuilder filePath = new StringBuilder();
+        filePath.append(currentDir);
+        if (!directory.isEmpty()) {
+            filePath.append("\\").append(directory);
+        }
+
+        java.nio.file.Files.createDirectories(Paths.get(filePath.toString()));
+        filePath.append("\\").append(fileName);
+        filePath = NumberForFile(filePath);
+        filePath.append(".html");
+        return new File(filePath.toString());
     }
 
     public void createHTMLTempFiles(String html) {
