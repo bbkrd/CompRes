@@ -53,12 +53,11 @@ public class HTMLStyle {
             + "	table{\n"
             + "		width:100%;\n"
             + "		font-size:100%;\n"
-            + "		table-layout:fixed;\n"
+            + "		table-layout:auto;\n"
             + "		border-collapse:collapse;}\n"
             + "	th, td{\n"
             + "		padding:3px 5px;\n"
             + "		border:.1px solid #000;\n"
-            + "		white-space:nowrap;\n"
             + "		vertical-align:top;}\n"
             + "	td{\n"
             + "		text-align:right;}\n"
@@ -72,5 +71,7 @@ public class HTMLStyle {
             + "		max-width:450px;\n"
             + "		vertical-align:top;\n"
             + "		display: inline-block;}\n"
+            + "	tr:hover{\n"
+            + "		background-color: #f5f5f5;}\n"
             + "</style>";
 }

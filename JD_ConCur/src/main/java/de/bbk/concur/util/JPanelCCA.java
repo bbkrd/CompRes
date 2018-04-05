@@ -57,7 +57,7 @@ import javax.swing.JSplitPane;
  */
 public class JPanelCCA extends JPanel implements IDisposable {
 
-    private final static String FMT = "%.3f";
+    private final static String FMT = "%.2f";
     private final JTsOutlierGrid d8Grid;
     private final JTsGrid d10Grid, d10SavedGrid;
     private final JSplitPane d8Pane;
@@ -123,35 +123,48 @@ public class JPanelCCA extends JPanel implements IDisposable {
 
     public void getTablesAsHtml(HtmlStream stream) {
         try {
-            stream.open(HtmlTag.TABLE);
+            stream.write("<table style=\"table-layout:fixed\"");
             stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
-            stream.write("D8B");
+            stream.write("<th colspan=\"")
+                    .write(String.valueOf(freq + 1))
+                    .write("\">")
+                    .write("D8B");
             stream.close(HtmlTag.TABLEHEADER);
             stream.close(HtmlTag.TABLEROW);
             d8b(stream);
 
             stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
-            stream.write("Seasonal Factor");
+            stream.write("<th colspan=\"")
+                    .write(String.valueOf(freq + 1))
+                    .write("\" style=\"text-align:left\">")
+                    .write("new");
             stream.close(HtmlTag.TABLEHEADER);
             stream.close(HtmlTag.TABLEROW);
             singleTsToHtml(stream, d10);
 
             stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"" + String.valueOf(freq + 1) + "\">");
-            stream.write("Seasonal Factor (current)");
-            if (doc.getMetaData() != null) {
-                String savedID = doc.getMetaData().get("prodebene.seasonalfactor.loadid");
-                if (savedID != null) {
-                    stream.write(" | ");
-                    stream.write(savedID);
-                }
-            }
+            stream.write("<th colspan=\"")
+                    .write(String.valueOf(freq + 1))
+                    .write("\" style=\"text-align:left\">")
+                    .write("current");
+
             stream.close(HtmlTag.TABLEHEADER);
             stream.close(HtmlTag.TABLEROW);
             singleTsToHtml(stream, savedD10);
 
+            if (doc.getMetaData() != null) {
+                String savedID = doc.getMetaData().get("prodebene.seasonalfactor.loadid");
+                if (savedID != null) {
+                    stream.open(HtmlTag.TABLEROW);
+                    stream.write("<th colspan=\"")
+                            .write(String.valueOf(freq + 1))
+                            .write("\">")
+                            .write("Loaded from ")
+                            .write(savedID);
+                    stream.close(HtmlTag.TABLEHEADER);
+                    stream.close(HtmlTag.TABLEROW);
+                }
+            }
             stream.close(HtmlTag.TABLE);
         } catch (IOException ex) {
             Logger.getLogger(JPanelCCA.class.getName()).log(Level.SEVERE, null, ex);
@@ -252,13 +265,6 @@ public class JPanelCCA extends JPanel implements IDisposable {
             return;
         }
 
-        stream.open(HtmlTag.TABLEROW);
-        stream.write(HtmlTag.TABLEHEADER);
-        for (int i = 0; i < data.getFrequency().intValue(); ++i) {
-            stream.write(HtmlTag.TABLEHEADER, TsPeriod.formatShortPeriod(data.getFrequency(), i));
-        }
-        stream.close(HtmlTag.TABLEROW);
-
         int nfreq = data.getFrequency().intValue();
         YearIterator iter = new YearIterator(data);
         while (iter.hasMoreElements()) {
@@ -349,7 +355,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
                         }
                     }
 
-                    stream.open(HtmlTag.TABLECELL);
+                    stream.open(HtmlTag.TABLECELL, outlierColor);
                     if (d9 != null && d9.getFrequency() == block.start.getFrequency() && Double.isFinite(d9.get(block.start.plus(i)))) {
                         stream.write("*");
                     }
