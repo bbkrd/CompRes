@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>de.bundesbank</groupId>
-        <artifactId>outputcustomized-parent</artifactId>
-        <version>1.0.2</version>
+        <artifactId>concur-parent</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
 

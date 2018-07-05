@@ -20,26 +20,31 @@
  */
 package de.bbk.concurreport.html;
 
-import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKBox extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKBox implements IHtmlElement {
 
-    private final AbstractHtmlElement[] htmlElements;
+    private final List<IHtmlElement> htmlElements;
 
-    public HTMLBBKBox(AbstractHtmlElement[] htmlElements) {
-        this.htmlElements = htmlElements;
+    public HTMLBBKBox() {
+        htmlElements = new ArrayList<>();
+    }
+
+    public boolean add(IHtmlElement htmlElement) {
+        return htmlElements.add(htmlElement);
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        for (AbstractHtmlElement htmlElement : htmlElements) {
+        for (IHtmlElement htmlElement : htmlElements) {
             htmlElement.write(stream);
         }
     }

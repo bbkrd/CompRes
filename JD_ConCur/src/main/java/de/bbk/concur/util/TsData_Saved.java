@@ -56,12 +56,12 @@ public class TsData_Saved {
                         .filter(x -> x.getClass().getName().equals(providerName))
                         .findFirst();
         if (optProvider.isPresent()) {
-            Ts providerTs = optProvider.get().convertMetaDataToTs(meta, tableName);
-            if (providerTs == null) {
+            Ts providedTs = optProvider.get().convertMetaDataToTs(meta, tableName);
+            if (providedTs == null) {
                 ts.setInvalidDataCause("Provider " + providerName + " had an unknown error.");
                 return ts;
             }
-            return optProvider.get().convertMetaDataToTs(meta, tableName);
+            return providedTs;
         }
         ts.setInvalidDataCause("Provider " + providerName + " not present.");
         return ts;

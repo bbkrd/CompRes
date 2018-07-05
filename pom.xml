@@ -3,17 +3,17 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.bundesbank</groupId>
-    <artifactId>outputcustomized-parent</artifactId>
-    <version>1.0.2</version>
+    <artifactId>concur-parent</artifactId>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>OutputCustomized - Parent</name>
+    <name>ConCur - Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
         <netbeans.version>RELEASE82</netbeans.version>
         <brandingToken>bundesbank</brandingToken>
-        <jdemetra.version>2.2.0</jdemetra.version>
+        <jdemetra.version>2.2.1</jdemetra.version>
         <jdemetra.groupid>eu.europa.ec.joinup.sat</jdemetra.groupid>
         <!-- plugins versions > -->
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>

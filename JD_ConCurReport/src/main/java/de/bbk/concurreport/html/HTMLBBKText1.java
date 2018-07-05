@@ -25,7 +25,6 @@ import ec.satoolkit.x11.X11Specification;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
-import ec.tss.html.IHtmlElement;
 import ec.tss.html.implementation.HtmlRegArima;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
@@ -38,7 +37,7 @@ import java.util.Arrays;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKText1 extends AbstractHtmlElement {
 
     private final X13Document x13Document;
     private final PreprocessingModel model;
@@ -50,7 +49,7 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        stream.write(HtmlTag.HEADER2, h2, "Specification");
+        stream.write(HtmlTag.HEADER2, "Specification");
         if (model != null) {
             RegArimaSpecification regSpec = x13Document.getSpecification().getRegArimaSpecification();
             stream.write("Transform: ");
@@ -149,15 +148,14 @@ public class HTMLBBKText1 extends AbstractHtmlElement implements IHtmlElement {
 
         if (model != null) {
 
-            HtmlRegArima htmlRegArimaSummary = new HtmlRegArima(model, true);
-            stream.write(htmlRegArimaSummary).newLine(); //H1 muss hier auf 100 gesetzt werden, sonst copy and paste
+            HtmlRegArima htmlRegArima = new HtmlRegArima(model, true);
+            stream.write(htmlRegArima).newLine(); //H1 muss hier auf 100 gesetzt werden, sonst copy and paste
             //Arima Model
-            HtmlRegArima htmlRegArima = new HtmlRegArima(model, false);
 
-            stream.write(HtmlTag.HEADER2, h2, "Regression model:");
-            htmlRegArima.writeRegression(stream, true);
+            stream.write(HtmlTag.HEADER2, "Regression model:");
+            new HTMLRegressionModel(model).write(stream);
             stream.newLines(1);
-            stream.write(HtmlTag.HEADER2, h2, "Arima model: ");
+            stream.write(HtmlTag.HEADER2, "Arima model: ");
             htmlRegArima.writeArima(stream);
             stream.newLines(1);
 

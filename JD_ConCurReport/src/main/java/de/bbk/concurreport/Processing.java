@@ -21,6 +21,7 @@
 package de.bbk.concurreport;
 
 import de.bbk.concur.html.HtmlCCA;
+import de.bbk.concur.html.HtmlTsData;
 import de.bbk.concur.util.FixTimeDomain;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.util.TsData_Saved;
@@ -32,9 +33,8 @@ import de.bbk.concurreport.util.Frozen;
 import de.bbk.concurreport.util.Pagebreak;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
-import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.implementation.HtmlSingleTsData;
+import ec.tss.html.HtmlTag;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
@@ -118,21 +118,13 @@ public class Processing {
             headerbbk.write(stream);
             stream.newLine();
 
-            HTMLBBKChartMain chartMain = new HTMLBBKChartMain(x13doc, domCharMax5years);
             final HTMLBBKText1 bBKText1 = new HTMLBBKText1(x13doc);
+            final HTMLBBKBox bBKBox = new HTMLBBKBox();
 
-            AbstractHtmlElement[] htmlElements = new AbstractHtmlElement[4];
-            htmlElements[0] = chartMain;
-            final HTMLBBKBox bBKBox = new HTMLBBKBox(htmlElements);
-
-            HTMLBBKChartAutocorrelations autocorrelation = new HTMLBBKChartAutocorrelations(x13doc, false);
-            htmlElements[1] = autocorrelation;
-
-            HTMLBBKAutoRegressiveSpectrumView autoRegressiveSpectrumView = new HTMLBBKAutoRegressiveSpectrumView(x13doc);
-            htmlElements[2] = autoRegressiveSpectrumView;
-
-            HTMLBBKPeriodogram bBKPeriodogram = new HTMLBBKPeriodogram(x13doc);
-            htmlElements[3] = bBKPeriodogram;
+            bBKBox.add(new HTMLBBKChartMain(x13doc, domCharMax5years));
+            bBKBox.add(new HTMLBBKChartAutocorrelations(x13doc, false));
+            bBKBox.add(new HTMLBBKAutoRegressiveSpectrumView(x13doc));
+            bBKBox.add(new HTMLBBKPeriodogram(x13doc));
 
             final HTML2Div hTML2Div = new HTML2Div(bBKText1, bBKBox);
             hTML2Div.write(stream);
@@ -160,13 +152,18 @@ public class Processing {
             TsDomain domain = x13doc.getSeries().getDomain();
             Ts SeasonallyadjustedPercentageChange = tpcv.getSeasonallyAdjustedPercentageChange();
 
-            HtmlSingleTsData htmlSingleTsData = new HtmlSingleTsData(
-                    lastYearOfSeries(domain, SeasonallyadjustedPercentageChange.getTsData()), SeasonallyadjustedPercentageChange.getName());
-            htmlSingleTsData.write(stream);
+            stream.write(HtmlTag.HEADER3, SeasonallyadjustedPercentageChange.getName());
+            HtmlTsData.builder()
+                    .data(lastYearOfSeries(domain, SeasonallyadjustedPercentageChange.getTsData()))
+                    .build()
+                    .write(stream);
             stream.newLine();
 
-            htmlSingleTsData = new HtmlSingleTsData(lastYearOfSeries(domain, tpcv.getSavedSeasonallyAdjustedPercentageChange().getTsData()), tpcv.getSavedSeasonallyAdjustedPercentageChange().getName());
-            htmlSingleTsData.write(stream);
+            stream.write(HtmlTag.HEADER3, tpcv.getSavedSeasonallyAdjustedPercentageChange().getName());
+            HtmlTsData.builder()
+                    .data(lastYearOfSeries(domain, tpcv.getSavedSeasonallyAdjustedPercentageChange().getTsData()))
+                    .build()
+                    .write(stream);
             stream.newLine();
 
             HTMLBBKSIRatioView sIRatioView = new HTMLBBKSIRatioView(x13doc);

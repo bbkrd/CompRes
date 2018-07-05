@@ -20,6 +20,7 @@
  */
 package de.bbk.concur.util;
 
+import de.bbk.concur.html.HtmlTsData;
 import ec.nbdemetra.ui.NbComponents;
 import ec.nbdemetra.ui.properties.l2fprod.ColorChooser;
 import ec.satoolkit.DecompositionMode;
@@ -55,7 +56,7 @@ import javax.swing.JSplitPane;
  *
  * @author Christiane Hofer
  */
-public class JPanelCCA extends JPanel implements IDisposable {
+public final class JPanelCCA extends JPanel implements IDisposable {
 
     private final static String FMT = "%.2f";
     private final JTsOutlierGrid d8Grid;
@@ -140,7 +141,12 @@ public class JPanelCCA extends JPanel implements IDisposable {
                     .write("new");
             stream.close(HtmlTag.TABLEHEADER);
             stream.close(HtmlTag.TABLEROW);
-            singleTsToHtml(stream, d10);
+            stream.write(HtmlTsData.builder()
+                    .data(d10.getTsData())
+                    .includeHeader(false)
+                    .includeTableTags(false)
+                    .numberFormat(FMT)
+                    .build());
 
             stream.open(HtmlTag.TABLEROW);
             stream.write("<th colspan=\"")
@@ -150,7 +156,12 @@ public class JPanelCCA extends JPanel implements IDisposable {
 
             stream.close(HtmlTag.TABLEHEADER);
             stream.close(HtmlTag.TABLEROW);
-            singleTsToHtml(stream, savedD10);
+            stream.write(HtmlTsData.builder()
+                    .data(savedD10.getTsData())
+                    .includeHeader(false)
+                    .includeTableTags(false)
+                    .numberFormat(FMT)
+                    .build());
 
             if (doc.getMetaData() != null) {
                 String savedID = doc.getMetaData().get("prodebene.seasonalfactor.loadid");
@@ -259,41 +270,6 @@ public class JPanelCCA extends JPanel implements IDisposable {
         setLayout(null);
     }
 
-    private void singleTsToHtml(HtmlStream stream, Ts ts) throws IOException {
-        TsData data = ts.getTsData();
-        if (data == null) {
-            return;
-        }
-
-        int nfreq = data.getFrequency().intValue();
-        YearIterator iter = new YearIterator(data);
-        while (iter.hasMoreElements()) {
-            stream.open(HtmlTag.TABLEROW);
-            TsDataBlock block = iter.nextElement();
-            stream.write(HtmlTag.TABLEHEADER,
-                         Integer.toString(block.start.getYear()));
-            int start = block.start.getPosition();
-            int n = block.data.getLength();
-            for (int i = 0; i < start; ++i) {
-                stream.write(HtmlTag.TABLECELL);
-            }
-            for (int i = 0; i < n; ++i) {
-                if (Double.isFinite(block.data.get(i))) {
-                    Formatter formatter = new Formatter();
-                    formatter.format(FMT, block.data.get(i));
-                    stream.write(HtmlTag.TABLECELL, formatter.toString());
-                } else {
-                    stream.write(HtmlTag.TABLECELL, ".");
-                }
-            }
-
-            for (int i = start + n; i < nfreq; ++i) {
-                stream.write(HtmlTag.TABLECELL);
-            }
-            stream.close(HtmlTag.TABLEROW);
-        }
-    }
-
     private void d8b(HtmlStream stream) throws IOException {
         TsData data = d8.getTsData();
         if (data == null) {
@@ -313,7 +289,7 @@ public class JPanelCCA extends JPanel implements IDisposable {
             stream.open(HtmlTag.TABLEROW);
             TsDataBlock block = iter.nextElement();
             stream.write(HtmlTag.TABLEHEADER,
-                         Integer.toString(block.start.getYear()));
+                    Integer.toString(block.start.getYear()));
             int start = block.start.getPosition();
             int n = block.data.getLength();
             for (int i = 0; i < start; ++i) {

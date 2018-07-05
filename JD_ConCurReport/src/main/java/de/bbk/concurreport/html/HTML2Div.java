@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -20,7 +20,6 @@
  */
 package de.bbk.concurreport.html;
 
-import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.IHtmlElement;
 import java.io.IOException;
@@ -29,11 +28,11 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTML2Div extends AbstractHtmlElement implements IHtmlElement {
+public class HTML2Div implements IHtmlElement {
 
-    private final AbstractHtmlElement leftHtmlElement, rightHtmlElement;
+    private final IHtmlElement leftHtmlElement, rightHtmlElement;
 
-    public HTML2Div(AbstractHtmlElement leftHtmlElement, AbstractHtmlElement rightHtmlElement) {
+    public HTML2Div(IHtmlElement leftHtmlElement, IHtmlElement rightHtmlElement) {
         this.leftHtmlElement = leftHtmlElement;
         this.rightHtmlElement = rightHtmlElement;
     }
