@@ -7,7 +7,6 @@ package de.bbk.concurreport.html;
 
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -15,7 +14,7 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTMLByteArrayOutputStream extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLByteArrayOutputStream extends AbstractHtmlElement {
 
     private final ByteArrayOutputStream os;
 

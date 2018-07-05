@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -23,7 +23,6 @@ package de.bbk.concurreport.html;
 import de.bbk.concurreport.BbkAutoCorrelationsView;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.view.AutoCorrelationsView;
@@ -35,7 +34,7 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement {
 
     private final X13Document x13doc;
     private final boolean partial;
@@ -46,7 +45,7 @@ public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement implements
         this.x13doc = x13doc;
         this.partial = partial;
         this.acv = new BbkAutoCorrelationsView();
-    
+
     }
 
     @Override
@@ -62,7 +61,6 @@ public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement implements
             if (partial) {
                 acv.setKind(AutoCorrelationsView.ACKind.Partial);
             }
-
 
             acv.setSize(WIDTH, HEIGHT);
             acv.doLayout();

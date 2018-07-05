@@ -191,7 +191,7 @@ public class HTMLFiles {
 
         java.nio.file.Files.createDirectories(Paths.get(filePath.toString()));
         filePath.append("\\").append(fileName);
-        filePath = NumberForFile(filePath);
+        filePath = numberForFile(filePath);
         filePath.append(".html");
         return new File(filePath.toString());
     }
@@ -224,7 +224,7 @@ public class HTMLFiles {
 
     }
 
-    private StringBuilder NumberForFile(StringBuilder path) {
+    private StringBuilder numberForFile(StringBuilder path) {
         int counter = 0;
         int startindex = path.length();
         while (Files.exists(Paths.get(path.toString() + ".html"))) {

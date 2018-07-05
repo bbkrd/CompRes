@@ -417,8 +417,8 @@ public class SIViewSaved extends ATsView {
     /**
      * This method needs a saved D10 else the wrong class is used
      *
-     * @param seas       D10
-     * @param irr        D8
+     * @param seas D10
+     * @param irr D8
      * @param seas_saved D10_saved
      */
     public void setData(TsData seas, TsData irr, TsData seas_saved) {

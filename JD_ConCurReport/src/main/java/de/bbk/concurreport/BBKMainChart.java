@@ -27,7 +27,6 @@ import ec.tss.html.HtmlStream;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.chart.TsXYDatasets;
-import ec.ui.interfaces.IDisposable;
 import ec.util.chart.ColorScheme;
 import ec.util.chart.ObsFunction;
 import ec.util.chart.SeriesFunction;
@@ -40,7 +39,7 @@ import org.jfree.data.xy.IntervalXYDataset;
  *
  * @author Christiane Hofer
  */
-public class BBKMainChart extends JTsChart implements IDisposable {
+public class BBKMainChart extends JTsChart {
 
     private static final int DEFAULT_WIDTH = 450, DEFAULT_HEIGHT = 450;
 

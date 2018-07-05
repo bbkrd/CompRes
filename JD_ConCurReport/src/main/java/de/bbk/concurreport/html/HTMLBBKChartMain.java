@@ -27,7 +27,6 @@ import ec.tss.*;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -38,7 +37,7 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKChartMain extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKChartMain extends AbstractHtmlElement {
 
     private final X13Document x13doc;
     private final TsDomain domMax5;

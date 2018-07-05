@@ -24,7 +24,6 @@ import de.bbk.concur.util.SIViewSaved;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
-import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import ec.util.chart.swing.Charts;
@@ -37,7 +36,7 @@ import javax.swing.JPanel;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKSIRatioView extends AbstractHtmlElement {
 
     private final X13Document x13doc;
     private static final int WIDTH = 450, HEIGHT = 250;
@@ -73,7 +72,7 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement implements IHtmlElem
         jPanel.add(sIViewSaved);
 
         jPanel.setSize(WIDTH, HEIGHT);
-        stream.write(HtmlTag.HEADER2, h2, "S-I-Ratio");
+        stream.write(HtmlTag.HEADER2, "S-I-Ratio");
         sIViewSaved.doLayout();
         ByteArrayOutputStream os_last = new ByteArrayOutputStream();
         //      Charts.writeChartAsSVG(os, sIViewSaved.getJFreeChart(), WIDTH, HEIGHT);

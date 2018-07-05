@@ -25,7 +25,6 @@ import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -39,11 +38,11 @@ import org.jfree.chart.JFreeChart;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKPeriodogram extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKPeriodogram extends AbstractHtmlElement {
 
     private final TsData tsData;
-    private final int width = 450;
-    private final int height = 220; //450
+    private static final int WIDTH = 450;
+    private static final int HEIGHT = 220; //450
 
     /**
      *
@@ -62,19 +61,19 @@ public class HTMLBBKPeriodogram extends AbstractHtmlElement implements IHtmlElem
         pView.setLimitVisible(false);
         pView.setDifferencingOrder(1);
         pView.setData("Periodogram (Seasonally Adjusted stationary)", freq, tsData);
-        pView.setSize(width, height);
+        pView.setSize(WIDTH, HEIGHT);
 
-        pView.setMaximumSize(new Dimension(width, height));
-        pView.setMinimumSize(new Dimension(width, height));
-        pView.setMaximumSize(new Dimension(width, height));
-        pView.setPreferredSize(new Dimension(width, height));
+        pView.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+        pView.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        pView.setMaximumSize(new Dimension(WIDTH, HEIGHT));
+        pView.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         pView.doLayout();
 
         ByteArrayOutputStream os;
         os = new ByteArrayOutputStream();
 
         JFreeChart jfc = pView.getChartPanel().getChart();
-        Charts.writeChartAsSVG(os, jfc, width, height);
+        Charts.writeChartAsSVG(os, jfc, WIDTH, HEIGHT);
         stream.write(os.toString());
         pView.dispose();
     }

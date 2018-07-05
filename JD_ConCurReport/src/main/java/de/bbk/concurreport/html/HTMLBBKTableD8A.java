@@ -23,7 +23,6 @@ package de.bbk.concurreport.html;
 import de.bbk.concur.util.JPanelCCA;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.X13Document;
 import java.io.IOException;
 
@@ -31,7 +30,7 @@ import java.io.IOException;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKTableD8A extends AbstractHtmlElement implements IHtmlElement {
+public class HTMLBBKTableD8A extends AbstractHtmlElement {
 
     private final X13Document x13doc;
 

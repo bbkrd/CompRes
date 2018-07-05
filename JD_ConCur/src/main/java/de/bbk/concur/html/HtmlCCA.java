@@ -81,12 +81,12 @@ public class HtmlCCA extends AbstractHtmlElement {
 
     private void writeTitle(HtmlStream stream) throws IOException {
         if (title != null) {
-            stream.write(HtmlTag.HEADER1, h1, title).newLine();
+            stream.write(HtmlTag.HEADER1, title).newLine();
         }
     }
 
     private void writeFinalFilters(HtmlStream stream) throws IOException {
-        stream.write(HtmlTag.HEADER2, h2, "Final filters");
+        stream.write(HtmlTag.HEADER2, "Final filters");
         stream.write("Seasonal filters:");
         if (decomposition.getFinalSeasonalFilterComposit() != null) {
 
@@ -108,7 +108,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     private void writeSpecification(HtmlStream stream) throws IOException {
         X11Specification x11Spec = spec.getX11Specification();
 
-        stream.write(HtmlTag.HEADER2, h2, "Specifications");
+        stream.write(HtmlTag.HEADER2, "Specifications");
         //<editor-fold defaultstate="collapsed" desc="Sigmalimit">
         stream.write("Sigmalimit: ")
                 .write(x11Spec.getLowerSigma())
@@ -161,7 +161,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     }
 
     private void writeICRatio(HtmlStream stream) throws IOException {
-        stream.write(HtmlTag.HEADER2, h2, "I/C Ratio");
+        stream.write(HtmlTag.HEADER2, "I/C Ratio");
         if (Double.isFinite(stats.getIcr())) {
             stream.write(df4.format(stats.getIcr()));
         }
@@ -174,33 +174,33 @@ public class HtmlCCA extends AbstractHtmlElement {
 
         MsrTable msrTable = stats.getRms();
 
-        stream.write(HtmlTag.HEADER2, h2, header);
+        stream.write(HtmlTag.HEADER2, header);
         int len = msrTable.getMeanIrregularEvolutions().length;
-        double[] Q = new double[len];
+        double[] q = new double[len];
 
         for (int i = 0; i < len; ++i) {
-            Q[i] = msrTable.getRMS(i);
+            q[i] = msrTable.getRMS(i);
         }
 
         stream.open(
-                new HtmlTable(0, 50 * (len + 1)));
+                new HtmlTable());
 
         //Period row
         stream.open(HtmlTag.TABLEROW);
-        stream.write(new HtmlTableHeader(tableHeaders[0], 50));
+        stream.write(new HtmlTableHeader(tableHeaders[0]));
         for (int j = 1; j <= len; ++j) {
-            stream.write(new HtmlTableCell(String.valueOf(j), 50));
+            stream.write(new HtmlTableCell(String.valueOf(j)));
         }
         stream.close(HtmlTag.TABLEROW);
 
         //MSR row
         stream.open(HtmlTag.TABLEROW);
-        stream.write(new HtmlTableHeader(tableHeaders[1], 50));
+        stream.write(new HtmlTableHeader(tableHeaders[1]));
         for (int j = 0; j < len; ++j) {
-            if (Double.isFinite(Q[j])) {
-                stream.write(new HtmlTableCell(df4.format(Q[j]), 50));
+            if (Double.isFinite(q[j])) {
+                stream.write(new HtmlTableCell(df4.format(q[j])));
             } else {
-                stream.write(new HtmlTableCell(".", 50));
+                stream.write(new HtmlTableCell("."));
             }
         }
         stream.close(HtmlTag.TABLEROW);
@@ -215,23 +215,22 @@ public class HtmlCCA extends AbstractHtmlElement {
         String header = "Heteroskedasticity (Cochran test on equal variances within each period)";
         String[] tableHeaders = new String[]{"Test statistic", "Critical value (5% level)", "Decision"};
 
-        stream.write(HtmlTag.HEADER2, h2, header);
-        //  stream.write("Cochran Test Result:");
+        stream.write(HtmlTag.HEADER2, header);
         boolean testResultCochran = stats.getCochranResult();
-        stream.open(new HtmlTable(0, 30 + 120 * tableHeaders.length));
+        stream.open(new HtmlTable());
         stream.open(HtmlTag.TABLEROW);
         for (int j = 0; j < tableHeaders.length; ++j) {
-            stream.write(new HtmlTableCell(tableHeaders[j], 120));
+            stream.write(new HtmlTableCell(tableHeaders[j]));
         }
         stream.close(HtmlTag.TABLEROW);
         stream.open(HtmlTag.TABLEROW);
-        stream.write(new HtmlTableCell(Double.toString(Math.round(stats.getTestValue() * 10000d) / 10000d), 120));
-        stream.write(new HtmlTableCell(Double.toString(Math.round(stats.getCriticalValue() * 10000d) / 10000d), 120));
+        stream.write(new HtmlTableCell(Double.toString(Math.round(stats.getTestValue() * 10000d) / 10000d)));
+        stream.write(new HtmlTableCell(Double.toString(Math.round(stats.getCriticalValue() * 10000d) / 10000d)));
 
         if (testResultCochran) {
-            stream.write(new HtmlTableCell("Null hypothesis is not rejected.", 150));
+            stream.write(new HtmlTableCell("Null hypothesis is not rejected."));
         } else {
-            stream.write(new HtmlTableCell("Null hypothesis is rejected.", 150));
+            stream.write(new HtmlTableCell("Null hypothesis is rejected."));
         }
 
         stream.close(HtmlTag.TABLEROW);
