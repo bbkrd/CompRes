@@ -86,15 +86,7 @@ public class Processing {
                     + " not optimized. \nThis might couse problems. \nWould you like to continue anyway?",
                     "Warning",
                     JOptionPane.YES_NO_OPTION);
-            switch (n) {
-                case JOptionPane.YES_OPTION:
-                    return true;
-                case JOptionPane.NO_OPTION:
-                    return false;
-                default:
-                    return false;
-            }
-
+            return n == JOptionPane.YES_OPTION;
         }
         return true;
     }

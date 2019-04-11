@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,8 @@ public class HTMLFiles {
     private String errorMessage = "";
     private static HTMLFiles hTMLFiles;
 
+    private static final String LAST_FOLDER = "concurreport_lastfolder";
+
     public static HTMLFiles getInstance() {
         if (hTMLFiles == null) {
             hTMLFiles = new HTMLFiles();
@@ -55,6 +58,7 @@ public class HTMLFiles {
     }
 
     private HTMLFiles() {
+        currentDir = NbPreferences.forModule(HTMLFiles.class).get(LAST_FOLDER, null);
     }
 
     public boolean selectFolder() {
@@ -68,12 +72,12 @@ public class HTMLFiles {
         }
         if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             currentDir = fileChooser.getSelectedFile().getAbsolutePath();
-
+            fileChooser.setCurrentDirectory(new File(currentDir));
+            NbPreferences.forModule(HTMLFiles.class).put(LAST_FOLDER, currentDir);
             if (!Files.isWritable(fileChooser.getSelectedFile().toPath())) {
-                errorMessage = "You have not the right to write in " + fileChooser.getSelectedFile().getAbsolutePath();
+                errorMessage = "You have not the right to write in " + currentDir;
                 return false;
             }
-            fileChooser.setCurrentDirectory(new File(currentDir));
             return true;
         }
         return false;
