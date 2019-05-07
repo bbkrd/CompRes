@@ -43,8 +43,8 @@ public class HTMLBBkHeader extends AbstractHtmlElement {
 
     public HTMLBBkHeader(String nameSaItem, Ts ts) {
 
-        this.nameSAItem = Frozen.removeFrozen(nameSaItem);
-        this.nameSeries = ts.getRawName();
+        this.nameSAItem = Frozen.removeFrozen(nameSaItem).replace("▶", "&#9654;");
+        this.nameSeries = ts.getRawName().replace("▶", "&#9654;");
         this.tsData = ts.getTsData();
 
     }

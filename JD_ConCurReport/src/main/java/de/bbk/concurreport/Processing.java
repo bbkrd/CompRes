@@ -199,21 +199,25 @@ public class Processing {
                         SaDocument<?> doc = item.toDocument();
                         StringBuilder str = new StringBuilder();
                         str.append(Frozen.removeFrozen(item.getName()))
-                                .append("in Multi-doc ")
+                                .append(" in Multi-doc ")
                                 .append(saProcessingName);
                         String name = str.toString().replace("\n", "-");
 
                         if (doc instanceof X13Document) {
-                            String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE).replaceAll("<\\s*hr\\s*\\/\\s*>", "");
-                            item.compress();
-                            writer.append(output).append('\n');
-                            writer.flush();
-                            sbSuccessful.append(name).append("\n");
+                            if (item.getStatus() == SaItem.Status.Valid) {
+                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE).replaceAll("<\\s*hr\\s*\\/\\s*>", "");
+                                writer.append(output).append('\n');
+                                writer.flush();
+                                sbSuccessful.append(name).append("\n");
+                            } else {
+                                sbError.append(name)
+                                        .append(":\n- It is not possible to create the output because it is not valid\n");
+                            }
                         } else {
-                            item.compress();
                             sbError.append(name)
-                                    .append(":\n- Is is not possible to create the output because it is not a X13 specification\n");
+                                    .append(":\n- It is not possible to create the output because it is not a X13 specification\n");
                         }
+                        item.compress();
 
                     }
                 }
@@ -240,23 +244,28 @@ public class Processing {
                     str = str.replace("\n", "-");
 
                     if (doc instanceof X13Document) {
-                        String output = createOutput(item);
-                        output = output.replace(OLD_STYLE, NEW_STYLE);
-                        output = output.replaceAll("<\\s*hr\\s*\\/\\s*>", "");
-                        if (!htmlf.writeHTMLFile(output, item.getName())) {
-                            sbError.append(str)
-                                    .append(":\n")
-                                    .append("- It is not possible to create the file:\n")
-                                    .append(htmlf.getFileName())
-                                    .append("\n because ")
-                                    .append(htmlf.getErrorMessage())
-                                    .append("\n");
-                        }
+                        if (item.getStatus() == SaItem.Status.Valid) {
+                            String output = createOutput(item);
+                            output = output.replace(OLD_STYLE, NEW_STYLE);
+                            output = output.replaceAll("<\\s*hr\\s*\\/\\s*>", "");
+                            if (!htmlf.writeHTMLFile(output, item.getName())) {
+                                sbError.append(str)
+                                        .append(":\n")
+                                        .append("- It is not possible to create the file:\n")
+                                        .append(htmlf.getFileName())
+                                        .append("\n because ")
+                                        .append(htmlf.getErrorMessage())
+                                        .append("\n");
+                            }
 
-                        sbSuccessful.append(str).append("\n");
+                            sbSuccessful.append(str).append("\n");
+                        } else {
+                            sbError.append(str)
+                                    .append(":\n- It is not possible to create the output because it is not valid\n");
+                        }
                     } else {
                         sbError.append(str)
-                                .append(":\n- Is is not possible to create the output because it is not a X13 specification\n");
+                                .append(":\n- It is not possible to create the output because it is not a X13 specification\n");
                     }
                     item.compress();
                 }
