@@ -205,7 +205,9 @@ public class Processing {
 
                         if (doc instanceof X13Document) {
                             if (item.getStatus() == SaItem.Status.Valid) {
-                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE).replaceAll("<\\s*hr\\s*\\/\\s*>", "");
+                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
+                                        .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                        .replace("▶", "&#9654;");
                                 writer.append(output).append('\n');
                                 writer.flush();
                                 sbSuccessful.append(name).append("\n");
@@ -246,8 +248,9 @@ public class Processing {
                     if (doc instanceof X13Document) {
                         if (item.getStatus() == SaItem.Status.Valid) {
                             String output = createOutput(item);
-                            output = output.replace(OLD_STYLE, NEW_STYLE);
-                            output = output.replaceAll("<\\s*hr\\s*\\/\\s*>", "");
+                            output = output.replace(OLD_STYLE, NEW_STYLE)
+                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                    .replace("▶", "&#9654;");
                             if (!htmlf.writeHTMLFile(output, item.getName())) {
                                 sbError.append(str)
                                         .append(":\n")
