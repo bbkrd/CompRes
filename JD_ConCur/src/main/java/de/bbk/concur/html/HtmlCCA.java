@@ -91,7 +91,8 @@ public class HtmlCCA extends AbstractHtmlElement {
         if (decomposition.getFinalSeasonalFilterComposit() != null) {
 
             for (DefaultSeasonalFilteringStrategy dsfs : decomposition.getFinalSeasonalFilterComposit()) {
-                stream.write(" ").write(dsfs.getDescription());
+                String filter = dsfs == null ? "Stable" : dsfs.getDescription();
+                stream.write(" ").write(filter);
             }
 
         } else {
