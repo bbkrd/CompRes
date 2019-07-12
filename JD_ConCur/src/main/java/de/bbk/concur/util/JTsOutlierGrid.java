@@ -20,6 +20,7 @@
  */
 package de.bbk.concur.util;
 
+import de.bbk.concur.FixedOutlier;
 import ec.nbdemetra.ui.properties.l2fprod.ColorChooser;
 import ec.tss.tsproviders.utils.Formatters;
 import ec.tstoolkit.timeseries.regression.OutlierEstimation;
@@ -29,8 +30,6 @@ import ec.ui.grid.TsGridObs;
 import ec.util.grid.CellIndex;
 import ec.util.various.swing.StandardSwingColor;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JTable;
 import javax.swing.JToolTip;
 import static javax.swing.SwingConstants.TRAILING;
@@ -42,18 +41,29 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class JTsOutlierGrid extends JTsGrid {
 
-    private transient final List<OutlierEstimation[]> outliers;
+    private transient OutlierEstimation[] outliers;
+    private transient FixedOutlier[] fixedOutliers;
     private transient TsData d9;
 
     public JTsOutlierGrid() {
         super();
-        outliers = new ArrayList<>();
         setCellRenderer(new OutlierCellRenderer());
     }
 
     public void setOutliers(OutlierEstimation[] outliers) {
-        this.outliers.clear();
-        this.outliers.add(outliers);
+        if (outliers == null) {
+            this.outliers = null;
+        } else {
+            this.outliers = outliers.clone();
+        }
+    }
+
+    public void setFixedOutliers(FixedOutlier[] fixedOutliers) {
+        if (fixedOutliers == null) {
+            this.fixedOutliers = null;
+        } else {
+            this.fixedOutliers = fixedOutliers.clone();
+        }
     }
 
     public void setD9(TsData d9) {
@@ -130,20 +140,12 @@ public class JTsOutlierGrid extends JTsGrid {
                         tooltipText.append("<html>");
                         String valueText = valueFormatter.formatAsString(obs.getValue());
 
-                        if (outliers.size() > obs.getSeriesIndex() && outliers.get(obs.getSeriesIndex()) != null) {
-                            OutlierEstimation[] est = outliers.get(obs.getSeriesIndex());
-                            boolean found = false;
-                            int i = 0;
-                            OutlierEstimation outlier = null;
-                            while (!found && i < est.length) {
-                                if (est[i].getPosition().equals(obs.getPeriod())) {
-                                    found = true;
-                                    outlier = est[i];
-                                }
-                                i++;
+                        boolean found = false;
+                        for (OutlierEstimation outlier : outliers) {
+                            if (outlier == null) {
+                                continue;
                             }
-
-                            if (found && outlier != null) {
+                            if (outlier.getPosition().equals(obs.getPeriod())) {
                                 tooltipText.append("Outlier Value : ")
                                         .append(valueFormatter.formatAsString(outlier.getValue())).append("<br>")
                                         .append("TStat : ")
@@ -152,8 +154,29 @@ public class JTsOutlierGrid extends JTsGrid {
                                         .append(outlier.getCode()).append("<br>");
                                 setBackground(ColorChooser.getColor(outlier.getCode()));
                                 setForeground(ColorChooser.getForeColor(outlier.getCode()));
+                                found = true;
+                                break;
                             }
                         }
+
+                        if (!found) {
+                            for (FixedOutlier fixedOutlier : fixedOutliers) {
+                                if (fixedOutlier == null) {
+                                    continue;
+                                }
+                                if (fixedOutlier.getPosition().equals(obs.getPeriod())) {
+                                    tooltipText.append("Fixed Outlier Value : ")
+                                            .append(valueFormatter.formatAsString(fixedOutlier.getValue())).append("<br>")
+                                            .append("Outlier type : ")
+                                            .append(fixedOutlier.getCode()).append("<br>");
+                                    setBackground(ColorChooser.getColor(fixedOutlier.getCode()));
+                                    setForeground(ColorChooser.getForeColor(fixedOutlier.getCode()));
+                                }
+                                break;
+                            }
+
+                        }
+
                         if (d9 != null && d9.getFrequency() == obs.getPeriod().getFrequency() && Double.isFinite(d9.get(obs.getPeriod()))) {
                             tooltipText.append("Extreme Value Replacement : ")
                                     .append(valueFormatter.formatAsString(d9.get(obs.getPeriod()))).append("<br>");
