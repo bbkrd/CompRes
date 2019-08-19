@@ -67,7 +67,7 @@ public class Processing {
     private HTMLFiles htmlf;
 
     private boolean makeHtmlf() {
-        htmlf = HTMLFiles.getInstance();
+        htmlf = new HTMLFiles();
         if (htmlf.selectFolder()) {
             return true;
         } else if (!htmlf.getErrorMessage().isEmpty()) {
@@ -213,11 +213,11 @@ public class Processing {
                                 sbSuccessful.append(name).append("\n");
                             } else {
                                 sbError.append(name)
-                                        .append(":\n- It is not possible to create the output because it is not valid\n");
+                                        .append(":\nIt is not possible to create the output because it is not valid\n");
                             }
                         } else {
                             sbError.append(name)
-                                    .append(":\n- It is not possible to create the output because it is not a X13 specification\n");
+                                    .append(":\nIt is not possible to create the output because it is not a X13 specification\n");
                         }
                         item.compress();
 
@@ -254,21 +254,24 @@ public class Processing {
                             if (!htmlf.writeHTMLFile(output, item.getName())) {
                                 sbError.append(str)
                                         .append(":\n")
-                                        .append("- It is not possible to create the file:\n")
-                                        .append(htmlf.getFileName())
-                                        .append("\n because ")
+                                        .append("It is not possible to create the file\n");
+                                if (!htmlf.getFileName().isEmpty()) {
+                                    sbError.append(htmlf.getFileName())
+                                            .append("\n");
+                                }
+                                sbError.append("Reason: ")
                                         .append(htmlf.getErrorMessage())
                                         .append("\n");
+                            } else {
+                                sbSuccessful.append(str).append("\n");
                             }
-
-                            sbSuccessful.append(str).append("\n");
                         } else {
                             sbError.append(str)
-                                    .append(":\n- It is not possible to create the output because it is not valid\n");
+                                    .append(":\nIt is not possible to create the output because it is not valid\n");
                         }
                     } else {
                         sbError.append(str)
-                                .append(":\n- It is not possible to create the output because it is not a X13 specification\n");
+                                .append(":\nIt is not possible to create the output because it is not a X13 specification\n");
                     }
                     item.compress();
                 }

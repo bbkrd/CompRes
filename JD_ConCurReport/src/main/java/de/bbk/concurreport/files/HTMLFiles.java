@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
@@ -44,20 +45,11 @@ public class HTMLFiles {
     private String currentDir;
     private String fileName = "";
     private String errorMessage = "";
-    private static HTMLFiles hTMLFiles;
+    private OverrideOption override = OverrideOption.ASK; //
 
     private static final String LAST_FOLDER = "concurreport_lastfolder";
 
-    public static HTMLFiles getInstance() {
-        if (hTMLFiles == null) {
-            hTMLFiles = new HTMLFiles();
-            return hTMLFiles;
-        } else {
-            return hTMLFiles;
-        }
-    }
-
-    private HTMLFiles() {
+    public HTMLFiles() {
         currentDir = NbPreferences.forModule(HTMLFiles.class).get(LAST_FOLDER, null);
     }
 
@@ -124,7 +116,37 @@ public class HTMLFiles {
             //   fileName = NumberForFile(fileName);
             File file = new File(fileName.toString());
             if (file.exists()) {
-                file = selectFileName(file);
+                int option;
+                switch (override) {
+                    case ASK:
+                        option = JOptionPane.showOptionDialog(null, "The file for " + saItemName + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                                new Object[]{"Yes", "Yes to all", "Select new path", "No", "No to all"}, "");
+                        break;
+                    case YES:
+                        option = 0;
+                        break;
+                    case NO:
+                        option = 3;
+                        break;
+                    default:
+                        option = 2;
+                }
+                switch (option) {
+                    case 1:
+                        override = OverrideOption.YES;
+                    case 0:
+                        break;
+                    case 2:
+                        file = selectFileName(file);
+                        break;
+                    case 4:
+                        override = OverrideOption.NO;
+                    case 3:
+                    default:
+                        this.fileName = fileName.toString();
+                        errorMessage = "File already exists";
+                        return false;
+                }
             }
             if (file != null) {
 
@@ -257,5 +279,11 @@ public class HTMLFiles {
      */
     public String getFileName() {
         return fileName;
+    }
+
+    private static enum OverrideOption {
+        ASK,
+        YES,
+        NO;
     }
 }
