@@ -299,7 +299,8 @@ public class Processing {
         dom = FixTimeDomain.domLastYear(dom);
 
         if (tsData != null) {
-            return tsData.fittoDomain(dom);
+            TsDomain intersection = tsData.getDomain().intersection(dom);
+            return tsData.fittoDomain(intersection);
         }
         return new TsData(dom);
 
