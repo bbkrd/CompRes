@@ -36,7 +36,6 @@ import ec.tss.html.HtmlTag;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.algorithm.CompositeResults;
 import ec.tstoolkit.modelling.arima.x13.RegressionSpec;
-import ec.tstoolkit.timeseries.regression.OutlierDefinition;
 import ec.tstoolkit.timeseries.regression.OutlierEstimation;
 import ec.tstoolkit.timeseries.simplets.*;
 import ec.ui.grid.JTsGrid;
@@ -46,10 +45,8 @@ import ec.ui.interfaces.ITsGrid;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -128,16 +125,20 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         return jPanel;
     }
 
-    public void getTablesAsHtml(HtmlStream stream) {
+    public void getTablesAsHtml(HtmlStream stream, boolean includeTableTags, boolean includeHeader) {
         try {
-            stream.write("<table style=\"table-layout:fixed\"");
-            stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"")
-                    .write(String.valueOf(freq + 1))
-                    .write("\">")
-                    .write("D8B");
-            stream.close(HtmlTag.TABLEHEADER);
-            stream.close(HtmlTag.TABLEROW);
+            if (includeTableTags) {
+                stream.write("<table style=\"table-layout:fixed\" >");
+            }
+            if (includeHeader) {
+                stream.open(HtmlTag.TABLEROW);
+                stream.write("<th colspan=\"")
+                        .write(String.valueOf(freq + 1))
+                        .write("\" style=\"text-align:left\">")
+                        .write("D8B");
+                stream.close(HtmlTag.TABLEHEADER);
+                stream.close(HtmlTag.TABLEROW);
+            }
             d8b(stream);
 
             stream.open(HtmlTag.TABLEROW);
@@ -182,7 +183,9 @@ public final class JPanelCCA extends JPanel implements IDisposable {
                     stream.close(HtmlTag.TABLEROW);
                 }
             }
-            stream.close(HtmlTag.TABLE);
+            if (includeTableTags) {
+                stream.close(HtmlTag.TABLE);
+            }
         } catch (IOException ex) {
             Logger.getLogger(JPanelCCA.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -202,11 +205,13 @@ public final class JPanelCCA extends JPanel implements IDisposable {
             d8 = getMainSeries("decomposition.d-tables.d8");
             d8 = InPercent.convertTsInPercentIfMult(d8, mode.isMultiplicative());
             TsData d8Data = d8.getTsData();
+            int frequency = d8Data.getFrequency().intValue();
+
             if (d8Data.getDomain().getYearsCount() > 10) {
-                TsDomain domMax10years = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue() * 10), d8Data.getFrequency().intValue() * 10);
+                TsDomain domMax10years = new TsDomain(d8Data.getEnd().minus(frequency * 10), frequency * 10);
                 d8Data = d8Data.fittoDomain(domMax10years);
             }
-            TsDomain domain = new TsDomain(d8Data.getEnd().minus(d8Data.getFrequency().intValue()), d8Data.getFrequency().intValue());
+            TsDomain domain = new TsDomain(d8Data.getEnd().minus(frequency), frequency);
             d8.set(d8Data);
             d8Grid.getTsCollection().replace(d8);
             d8Grid.setSelection(d8Grid.getTsCollection().toArray());
@@ -219,18 +224,11 @@ public final class JPanelCCA extends JPanel implements IDisposable {
                 System.arraycopy(estimations, 0, both, prespecified.length, estimations.length);
                 d8Grid.setOutliers(both);
             }
-            if (doc.getSpecification() != null) {
-                List<FixedOutlier> fixedOutliersList = new ArrayList<>();
+            if (doc.getSpecification() != null
+                    && doc.getSpecification().getRegArimaSpecification() != null
+                    && doc.getSpecification().getRegArimaSpecification().getRegression() != null) {
                 RegressionSpec regression = doc.getSpecification().getRegArimaSpecification().getRegression();
-                OutlierDefinition[] outliers = regression.getOutliers();
-                for (OutlierDefinition outlier : outliers) {
-                    String name = outlier.toString().replaceAll("\\.(\\d{4}(-\\d{2}){2})", " \\($1\\)");
-                    double[] fixedCoefficients = regression.getFixedCoefficients(name);
-                    if (fixedCoefficients != null) {
-                        fixedOutliersList.add(new FixedOutlier(fixedCoefficients[0], outlier.getCode(), new TsPeriod(d8Data.getFrequency(), outlier.getPosition())));
-                    }
-                }
-                fixedOutliers = fixedOutliersList.toArray(new FixedOutlier[fixedOutliersList.size()]);
+                fixedOutliers = FixedOutlier.extractFixedOutliers(regression, frequency);
                 d8Grid.setFixedOutliers(fixedOutliers);
             }
 

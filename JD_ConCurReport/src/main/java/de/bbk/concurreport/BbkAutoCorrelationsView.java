@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -22,24 +22,30 @@ package de.bbk.concurreport;
 
 import ec.ui.view.AutoCorrelationsView;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
 
 /**
  *
  * @author s4504ch
  */
 public class BbkAutoCorrelationsView extends AutoCorrelationsView {
-    
+
     public BbkAutoCorrelationsView() {
         super();
     }
-    
+
     public JFreeChart getChart() {
-        return chartPanel.getChart();
+        JFreeChart chart = chartPanel.getChart();
+        ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis();
+        rangeAxis.setAutoRange(false);
+        rangeAxis.setLowerBound(-1);
+        rangeAxis.setUpperBound(1);
+        return chart;
     }
-    
+
     public void extendTitle(String text) {
         String title = this.chartPanel.getChart().getTitle().getText() + text;
         this.chartPanel.getChart().getTitle().setText(title);
     }
-    
+
 }

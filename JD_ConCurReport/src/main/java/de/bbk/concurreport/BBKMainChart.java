@@ -33,6 +33,7 @@ import ec.util.chart.SeriesFunction;
 import ec.util.chart.swing.JTimeSeriesChart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import org.jfree.data.xy.IntervalXYDataset;
 
 /**
@@ -52,8 +53,9 @@ public class BBKMainChart extends JTsChart {
         chart.setColorSchemeSupport(themeSupport);
         chart.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT); //muss gemacht werden sonst exception
         chart.doLayout();
-        ByteArrayOutputStream os;
-        os = new ByteArrayOutputStream();
+        NumberFormat valueFormat = chart.getValueFormat();
+        valueFormat.setMaximumFractionDigits(2);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         // chart.writeImage("image/jpeg", stream);
         chart.writeImage("image/svg+xml", os);
 

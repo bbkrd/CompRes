@@ -20,17 +20,18 @@
  */
 package de.bbk.concurreport;
 
-import de.bbk.concur.html.HtmlCCA;
 import de.bbk.concur.html.HtmlTsData;
 import de.bbk.concur.util.FixTimeDomain;
+import de.bbk.concur.util.InPercent;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.util.TsData_Saved;
-import de.bbk.concur.view.TablesPercentageChangeView;
 import de.bbk.concurreport.files.HTMLFiles;
 import de.bbk.concurreport.html.*;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
 import de.bbk.concurreport.util.Frozen;
 import de.bbk.concurreport.util.Pagebreak;
+import ec.satoolkit.DecompositionMode;
+import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.HtmlStream;
@@ -39,6 +40,7 @@ import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
+import ec.tstoolkit.algorithm.CompositeResults;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
@@ -50,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.swing.*;
+import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +67,7 @@ public class Processing {
     private static final String NEW_STYLE = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    private final ProgressHandle progressHandle = ProgressHandle.createHandle("Creating report");
     private HTMLFiles htmlf;
 
     private boolean makeHtmlf() {
@@ -91,13 +95,10 @@ public class Processing {
         return true;
     }
 
-    public String createOutput(SaItem item) {
+    private String createOutput(SaItem item) {
         StringWriter writer = new StringWriter();
         SaDocument<?> doc = item.toDocument();
         X13Document x13doc = (X13Document) doc;
-
-        Ts tsY = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y);
-        TsDomain domCharMax5years = FixTimeDomain.domLastFiveYears(tsY);
 
         try {
             //Open the stream
@@ -107,30 +108,20 @@ public class Processing {
             stream.write(HTMLStyle.STYLE);
 
             final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
-            headerbbk.write(stream);
-            stream.newLine();
+            stream.write(headerbbk)
+                    .newLine()
+                    .write(createDiv(x13doc));
 
-            final HTMLBBKText1 bBKText1 = new HTMLBBKText1(x13doc);
-            final HTMLBBKBox bBKBox = new HTMLBBKBox();
+            stream.write(new Pagebreak())
+                    .write(headerbbk);
 
-            bBKBox.add(new HTMLBBKChartMain(x13doc, domCharMax5years));
-            bBKBox.add(new HTMLBBKChartAutocorrelations(x13doc, false));
-            bBKBox.add(new HTMLBBKAutoRegressiveSpectrumView(x13doc));
-            bBKBox.add(new HTMLBBKPeriodogram(x13doc));
+            writeCalendar(x13doc, stream);
 
-            final HTML2Div hTML2Div = new HTML2Div(bBKText1, bBKBox);
-            hTML2Div.write(stream);
+            stream.newLine()
+                    .write(new HTMLBBKTableD8B(x13doc))
+                    .newLine();
 
-            final Pagebreak p = new Pagebreak();
-            p.write(stream);
-
-            headerbbk.write(stream);
-
-            final HTMLBBKTableD8A hTMLBBKTableD8B = new HTMLBBKTableD8A(x13doc);
-            hTMLBBKTableD8B.write(stream);
-
-            stream.newLine();
-            Ts savedD10 = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
+            Ts savedD10 = TsData_Saved.convertMetaDataToTs(x13doc.getMetaData(), SavedTables.SEASONALFACTOR);
             if (savedD10 != null && savedD10.getTsData() != null) {
                 TsDomain savedD10dom = savedD10.getTsData().getDomain();
                 stream.write("Last available forecast for the ")
@@ -139,45 +130,61 @@ public class Processing {
                         .write(".").newLine();
             }
 
-            TablesPercentageChangeView tpcv = new TablesPercentageChangeView();
-            tpcv.set(x13doc);
-            TsDomain domain = x13doc.getSeries().getDomain();
-            Ts SeasonallyadjustedPercentageChange = tpcv.getSeasonallyAdjustedPercentageChange();
-
-            stream.write(HtmlTag.HEADER3, SeasonallyadjustedPercentageChange.getName());
-            HtmlTsData.builder()
-                    .data(lastYearOfSeries(domain, SeasonallyadjustedPercentageChange.getTsData()))
-                    .build()
-                    .write(stream);
-            stream.newLine();
-
-            stream.write(HtmlTag.HEADER3, tpcv.getSavedSeasonallyAdjustedPercentageChange().getName());
-            HtmlTsData.builder()
-                    .data(lastYearOfSeries(domain, tpcv.getSavedSeasonallyAdjustedPercentageChange().getTsData()))
-                    .build()
-                    .write(stream);
-            stream.newLine();
-
-            HTMLBBKSIRatioView sIRatioView = new HTMLBBKSIRatioView(x13doc);
-            sIRatioView.write(stream);
-            stream.newLine();
-
-            HtmlCCA htmlCCA = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), x13doc);
-            htmlCCA.writeTextForHTML(stream);
-
-            HtmlComments htmlComments = new HtmlComments(x13doc, headerbbk);
-            htmlComments.write(stream);
-
-            stream.close();
-            tpcv.dispose();
-
+            stream.write(new HTMLBBKSIRatioView(x13doc))
+                    .newLine()
+                    .write(new HtmlComments(x13doc, headerbbk))
+                    .close();
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
         return writer.toString();
     }
 
+    private void writeCalendar(X13Document x13doc, HtmlStream stream) throws IOException {
+        CompositeResults results = x13doc.getResults();
+        if (results == null) {
+            return;
+        }
+        TsData a6 = results.getData(X11Kernel.A6, TsData.class);
+        TsData a7 = results.getData(X11Kernel.A7, TsData.class);
+        DecompositionMode mode = results.getData("mode", DecompositionMode.class);
+        TsData tsData;
+        if (a6 == null) {
+            tsData = a7;
+        } else {
+            if (mode.isMultiplicative()) {
+                tsData = a6.times(a7);
+            } else {
+                tsData = a6.plus(a7);
+            }
+        }
+
+        if (tsData != null) {
+            int frequency = tsData.getFrequency().intValue();
+            tsData = InPercent.convertTsDataInPercentIfMult(tsData, mode.isMultiplicative());
+            if (tsData.getDomain().getYearsCount() > 10) {
+                TsDomain domainLastTenYears = new TsDomain(tsData.getEnd().minus(frequency * 10), frequency * 10);
+                tsData = tsData.fittoDomain(domainLastTenYears);
+            }
+
+            stream.write("<table style=\"table-layout:fixed\" >")
+                    .open(HtmlTag.TABLEROW)
+                    .write("<th colspan=\"")
+                    .write(String.valueOf(frequency + 1))
+                    .write("\" style=\"text-align:left\">")
+                    .write(mode.isMultiplicative() ? "A6 * A7" : "A6 + A7")
+                    .close(HtmlTag.TABLEHEADER)
+                    .close(HtmlTag.TABLEROW)
+                    .write(HtmlTsData.builder()
+                            .data(tsData)
+                            .includeTableTags(false)
+                            .build())
+                    .close(HtmlTag.TABLE);
+        }
+    }
+
     public void process(Map<String, List<SaItem>> map) {
+        progressHandle.start();
 
         if (!makeHtmlf() || !checkLookAndFeel()) {
             return;
@@ -278,6 +285,7 @@ public class Processing {
             });
 
         }
+        progressHandle.finish();
         if (!sbError.toString().isEmpty()) {
             JTextArea jta = new JTextArea(sbError.toString());
             jta.setEditable(false);
@@ -295,15 +303,21 @@ public class Processing {
         }
     }
 
-    private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
-        dom = FixTimeDomain.domLastYear(dom);
+    private HTML2Div createDiv(X13Document x13doc) {
+        Ts tsY = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y);
+        TsDomain domCharMax5years = FixTimeDomain.domLastFiveYears(tsY);
 
-        if (tsData != null) {
-            TsDomain intersection = tsData.getDomain().intersection(dom);
-            return tsData.fittoDomain(intersection);
-        }
-        return new TsData(dom);
+        HTMLBBKBox leftBox = new HTMLBBKBox();
+        leftBox.add(new HTMLBBKText1(x13doc));
+        leftBox.add(new HTMLWrapperCCA(MultiLineNameUtil.join(x13doc.getInput().getName()), x13doc));
 
+        HTMLBBKBox rightBox = new HTMLBBKBox();
+        rightBox.add(new HTMLBBKChartMain(x13doc, domCharMax5years));
+        rightBox.add(new HTMLBBKChartAutocorrelations(x13doc, false));
+        rightBox.add(new HTMLBBKAutoRegressiveSpectrumView(x13doc));
+        rightBox.add(new HTMLBBKPeriodogram(x13doc));
+
+        return new HTML2Div(leftBox, rightBox);
     }
 
 }

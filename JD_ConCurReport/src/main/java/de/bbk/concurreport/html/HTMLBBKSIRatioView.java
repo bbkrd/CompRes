@@ -81,7 +81,7 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
         div.write(stream);
 
         stream.write("<p style='text-align:center; '>")
-                .write("Dots - D8, red - current D10, blue - D10")
+                .write("Dots - D8, Cross - D9, red - current D10, blue - D10")
                 .write("</p>")
                 .newLine();
         sIViewSaved.dispose();

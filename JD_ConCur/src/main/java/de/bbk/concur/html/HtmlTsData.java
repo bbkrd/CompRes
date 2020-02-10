@@ -28,6 +28,8 @@ public class HtmlTsData extends AbstractHtmlElement {
     @lombok.Builder.Default
     private final boolean includeTableTags = true;
     @lombok.Builder.Default
+    private final boolean dataItalic = false;
+    @lombok.Builder.Default
     private final String numberFormat = "%.2f";
 
     @Override
@@ -38,7 +40,7 @@ public class HtmlTsData extends AbstractHtmlElement {
         int nfreq = data.getFrequency().intValue();
 
         if (includeTableTags) {
-            stream.open(HtmlTag.TABLE);
+            stream.write("<table style=\"table-layout:fixed\" >");
         }
 
         if (includeHeader) {
@@ -65,7 +67,13 @@ public class HtmlTsData extends AbstractHtmlElement {
                 if (Double.isFinite(block.data.get(i))) {
                     Formatter formatter = new Formatter();
                     formatter.format(numberFormat, block.data.get(i));
-                    stream.write(HtmlTag.TABLECELL, formatter.toString());
+                    String tmp;
+                    if (dataItalic) {
+                        tmp = "<i>" + formatter.toString() + "</i>";
+                    } else {
+                        tmp = formatter.toString();
+                    }
+                    stream.write(HtmlTag.TABLECELL, tmp);
                 } else {
                     stream.write(HtmlTag.TABLECELL, ".");
                 }

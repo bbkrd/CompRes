@@ -43,6 +43,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -78,6 +79,7 @@ public class SIViewSaved extends ATsView {
     private static final int S_INDEX = 0;
     private static final int T_INDEX = 1;
     private static final int SI_INDEX = 2;
+    private static final int CORRECTED_INDEX = 3;
     private static final Stroke MARKER_STROKE = new BasicStroke(0.5f);
     private static final Paint MARKER_PAINT = Color.DARK_GRAY;
     private static final float MARKER_ALPHA = .8f;
@@ -88,6 +90,7 @@ public class SIViewSaved extends ATsView {
     private final XYLineAndShapeRenderer tRenderer;
     private final XYLineAndShapeRenderer siDetailRenderer;
     private final XYLineAndShapeRenderer siMasterRenderer;
+    private final XYLineAndShapeRenderer cRenderer;
     private final JFreeChart masterChart;
 
     public JFreeChart getJFreeChart() {
@@ -147,13 +150,15 @@ public class SIViewSaved extends ATsView {
         final BasicXYDataset.Series S1_;
         final BasicXYDataset.Series S2_;
         final BasicXYDataset.Series S3_;
+        final BasicXYDataset.Series correctionValues;
         final String label_;
 
-        Graphs(BasicXYDataset.Series s1, BasicXYDataset.Series s2, BasicXYDataset.Series s3, String label) {
+        Graphs(BasicXYDataset.Series s1, BasicXYDataset.Series s2, BasicXYDataset.Series s3, BasicXYDataset.Series correctionValues, String label) {
             S1_ = s1;
             S2_ = s2;
             S3_ = s3;
             label_ = label;
+            this.correctionValues = correctionValues;
         }
 
         static double minYear(BasicXYDataset.Series S) {
@@ -201,11 +206,23 @@ public class SIViewSaved extends ATsView {
         this.tRenderer = new LineRenderer(T_INDEX, true, false);
         this.siDetailRenderer = new LineRenderer(SI_INDEX, false, true);
         this.siMasterRenderer = new LineRenderer(SI_INDEX, false, true);
-        this.masterChart = createMasterChart(sRenderer, tRenderer, siMasterRenderer);
-        this.detailChart = createDetailChart(sRenderer, tRenderer, siDetailRenderer);
+        this.cRenderer = new LineRenderer(CORRECTED_INDEX, false, true);
+        this.masterChart = createMasterChart(sRenderer, tRenderer, siMasterRenderer, cRenderer);
+        this.detailChart = createDetailChart(sRenderer, tRenderer, siDetailRenderer, cRenderer);
         this.chartPanel = new JChartPanel(null);
         this.numberFormat = DemetraUI.getDefault().getDataFormat().newNumberFormat();
         initComponents();
+    }
+
+    private Shape createRegularCross(double x) {
+        final GeneralPath p0 = new GeneralPath();
+        p0.moveTo(-x, x);
+        p0.lineTo(x, -x);
+        x += .3;
+        p0.moveTo(-x, -x);
+        p0.lineTo(x, x);
+        p0.closePath();
+        return p0;
     }
 
     private void initComponents() {
@@ -216,6 +233,10 @@ public class SIViewSaved extends ATsView {
         siMasterRenderer.setAutoPopulateSeriesShape(false);
         siMasterRenderer.setBaseShape(new Ellipse2D.Double(-1, -1, 2, 2));
         siMasterRenderer.setBaseShapesFilled(false);
+
+        cRenderer.setAutoPopulateSeriesShape(false);
+        cRenderer.setBaseShape(createRegularCross(2));
+        cRenderer.setBaseShapesFilled(false);
 
         enableRescaleOnResize();
         enableObsHighlight();
@@ -364,21 +385,22 @@ public class SIViewSaved extends ATsView {
         plot.setDataset(S_INDEX, new BasicXYDataset(Collections.singletonList(g.S2_)));
         plot.setDataset(T_INDEX, new BasicXYDataset(Collections.singletonList(g.S1_)));
         plot.setDataset(SI_INDEX, new BasicXYDataset(Collections.singletonList(g.S3_)));
+        plot.setDataset(CORRECTED_INDEX, new BasicXYDataset(Collections.singletonList(g.correctionValues)));
 
         detailChart.setTitle(g.label_);
         chartPanel.setChart(detailChart);
         onColorSchemeChange();
     }
 
-    public void setSiData(TsData seas, TsData si, TsData seas_saved) {
+    public void setSiData(TsData seas, TsData si, TsData seas_saved, TsData correctionValues) {
 
-        setData(seas, si, seas_saved);
+        setData(seas, si, seas_saved, correctionValues);
     }
 
     public void setData(TsData seas) {
         reset();
         if (seas != null) {
-            displayData(seas, null, null);
+            displayData(seas, null, null, null);
         }
     }
 
@@ -400,13 +422,16 @@ public class SIViewSaved extends ATsView {
 
             TsData si = x11.getData("d8", TsData.class);
             TsData seas = x11.getData("d10", TsData.class);
+            TsData correctionValues = x11.getData("d9", TsData.class);
 
             if (x11.getSeriesDecomposition().getMode() == DecompositionMode.LogAdditive) {
                 si = si.exp();
+                correctionValues = correctionValues.exp();
             }
             seas = convertTsDataInPercentIfMult(seas, mode.isMultiplicative());
             si = convertTsDataInPercentIfMult(si, mode.isMultiplicative());
-            this.setSiData(seas, si, seasonalfactor.getTsData());
+            correctionValues = convertTsDataInPercentIfMult(correctionValues, mode.isMultiplicative());
+            this.setSiData(seas, si, seasonalfactor.getTsData(), correctionValues);
 
         } else {
             this.reset();
@@ -421,7 +446,7 @@ public class SIViewSaved extends ATsView {
      * @param irr D8
      * @param seas_saved D10_saved
      */
-    public void setData(TsData seas, TsData irr, TsData seas_saved) {
+    public void setData(TsData seas, TsData irr, TsData seas_saved, TsData correctionValues) {
         reset();
         if (seas == null && irr == null) {
             return;
@@ -431,11 +456,11 @@ public class SIViewSaved extends ATsView {
         } else if (irr == null) {
             irr = new TsData(seas.getDomain(), 1);
         }
-        displayData(seas, irr, seas_saved);
+        displayData(seas, irr, seas_saved, correctionValues);
 
     }
 
-    private void displayData(TsData seas, TsData irr, TsData seas_saved) {
+    private void displayData(TsData seas, TsData irr, TsData seas_saved, TsData correctionValues) {
         TsFrequency freq = seas.getFrequency();
         if (freq == TsFrequency.Undefined) {
             return;
@@ -447,6 +472,7 @@ public class SIViewSaved extends ATsView {
 
         BasicXYDataset sDataset = new BasicXYDataset();
         BasicXYDataset siDataset = new BasicXYDataset();
+        BasicXYDataset correctedDataset = new BasicXYDataset();
         BasicXYDataset tDataset = new BasicXYDataset();
         PeriodIterator speriods = new PeriodIterator(seas);
         double xstart = -0.4;
@@ -475,6 +501,7 @@ public class SIViewSaved extends ATsView {
                 double[] sX2 = new double[n];
                 double[] sY = new double[n];
                 double[] siY = new double[n];
+                double[] corrected = new double[n];
 
                 double x = xstart + xstep * (startyear - start.getYear());
                 for (int i = 0; i < n; ++i, x += xstep, startyear++) {
@@ -489,14 +516,25 @@ public class SIViewSaved extends ATsView {
                     tX[i] = x;
                     tX2[i] = startyear;
                     if (seas_saved != null) {
-                        if (seas_saved.getDomain().search(datablock.period(i)) != -1) {
-                            int pos = seas_saved.getDomain().search(datablock.period(i));
+                        int pos = seas_saved.getDomain().search(datablock.period(i));
+                        if (pos != -1) {
                             tY[i] = seas_saved.get(pos);
                         } else {
-                            tY[i] = 1;
+                            tY[i] = Double.NaN;
                         }
                     } else {
                         tY[i] = Double.NaN;
+                    }
+
+                    if (correctionValues != null) {
+                        int pos = correctionValues.getDomain().search(datablock.period(i));
+                        if (pos != -1) {
+                            corrected[i] = correctionValues.get(pos);
+                        } else {
+                            corrected[i] = Double.NaN;
+                        }
+                    } else {
+                        corrected[i] = Double.NaN;
                     }
                 }
 
@@ -509,13 +547,17 @@ public class SIViewSaved extends ATsView {
                 BasicXYDataset.Series si = irr != null ? BasicXYDataset.Series.of(key, sX, siY) : BasicXYDataset.Series.empty(key);
                 BasicXYDataset.Series si2 = irr != null ? BasicXYDataset.Series.of(key, sX2, siY) : BasicXYDataset.Series.empty(key);
 
+                BasicXYDataset.Series c = BasicXYDataset.Series.of(key, sX, corrected);
+                BasicXYDataset.Series c2 = BasicXYDataset.Series.of(key, sX2, corrected);
+
                 SIViewSaved.Bornes b = new SIViewSaved.Bornes(xstart, xend);
-                SIViewSaved.Graphs g = new SIViewSaved.Graphs(t2, s2, si2, TsPeriod.formatPeriod(freq, il));
+                SIViewSaved.Graphs g = new SIViewSaved.Graphs(t2, s2, si2, c2, TsPeriod.formatPeriod(freq, il));
                 graphs_.put(b, g);
 
                 sDataset.addSeries(s);
                 tDataset.addSeries(t);
                 siDataset.addSeries(si);
+                correctedDataset.addSeries(c);
             }
 
             xstart++;
@@ -528,6 +570,7 @@ public class SIViewSaved extends ATsView {
         plot.setDataset(S_INDEX, sDataset);
         plot.setDataset(T_INDEX, tDataset);
         plot.setDataset(SI_INDEX, siDataset);
+        plot.setDataset(CORRECTED_INDEX, correctedDataset);
 
         showMain();
     }
@@ -567,7 +610,7 @@ public class SIViewSaved extends ATsView {
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
     }
 
-    static JFreeChart createMasterChart(XYLineAndShapeRenderer sRenderer, XYLineAndShapeRenderer tRenderer, XYLineAndShapeRenderer siRenderer2) {
+    static JFreeChart createMasterChart(XYLineAndShapeRenderer sRenderer, XYLineAndShapeRenderer tRenderer, XYLineAndShapeRenderer siRenderer2, XYLineAndShapeRenderer cRenderer) {
         XYPlot plot = new XYPlot();
 
         plot.setDataset(S_INDEX, Charts.emptyXYDataset());
@@ -584,6 +627,12 @@ public class SIViewSaved extends ATsView {
         plot.setRenderer(SI_INDEX, siRenderer2);
         plot.mapDatasetToDomainAxis(SI_INDEX, 0);
         plot.mapDatasetToRangeAxis(SI_INDEX, 0);
+
+        plot.setDataset(CORRECTED_INDEX, Charts.emptyXYDataset());
+        plot.setRenderer(CORRECTED_INDEX, cRenderer);
+        plot.mapDatasetToDomainAxis(CORRECTED_INDEX, 0);
+        plot.mapDatasetToRangeAxis(CORRECTED_INDEX, 0);
+
         plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
 
         JFreeChart result = new JFreeChart("", TsCharts.CHART_TITLE_FONT, plot, false);
@@ -591,7 +640,7 @@ public class SIViewSaved extends ATsView {
         return result;
     }
 
-    static JFreeChart createDetailChart(XYLineAndShapeRenderer sRenderer, XYLineAndShapeRenderer tRenderer, XYLineAndShapeRenderer siRenderer1) {
+    static JFreeChart createDetailChart(XYLineAndShapeRenderer sRenderer, XYLineAndShapeRenderer tRenderer, XYLineAndShapeRenderer siRenderer1, XYLineAndShapeRenderer cRenderer) {
         XYPlot plot = new XYPlot();
 
         plot.setDataset(S_INDEX, Charts.emptyXYDataset());
@@ -608,6 +657,11 @@ public class SIViewSaved extends ATsView {
         plot.setRenderer(SI_INDEX, siRenderer1);
         plot.mapDatasetToDomainAxis(SI_INDEX, 0);
         plot.mapDatasetToRangeAxis(SI_INDEX, 0);
+
+        plot.setDataset(CORRECTED_INDEX, Charts.emptyXYDataset());
+        plot.setRenderer(CORRECTED_INDEX, cRenderer);
+        plot.mapDatasetToDomainAxis(CORRECTED_INDEX, 0);
+        plot.mapDatasetToRangeAxis(CORRECTED_INDEX, 0);
 
         JFreeChart result = new JFreeChart("", TsCharts.CHART_TITLE_FONT, plot, false);
         result.setPadding(TsCharts.CHART_PADDING);
@@ -673,7 +727,7 @@ public class SIViewSaved extends ATsView {
 
         @Override
         public boolean getItemShapeVisible(int series, int item) {
-            return index == SI_INDEX || revealObs.isEnabled() || isObsHighlighted(series, item);
+            return index == SI_INDEX || index == CORRECTED_INDEX || revealObs.isEnabled() || isObsHighlighted(series, item);
         }
 
         private boolean isObsHighlighted(int series, int item) {

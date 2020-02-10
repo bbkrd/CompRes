@@ -73,5 +73,7 @@ public class HTMLStyle {
             + "		display: inline-block;}\n"
             + "	tr:hover{\n"
             + "		background-color: #f5f5f5;}\n"
+            + "	@media print {\n"
+            + "		body {-webkit-print-color-adjust: exact;}}\n"
             + "</style>";
 }

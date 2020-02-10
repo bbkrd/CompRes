@@ -52,6 +52,14 @@ public class HtmlCCA extends AbstractHtmlElement {
         if (spec != null) {
             writeSpecification(stream);
         }
+        if (decomposition != null) {
+            writeFinalFilters(stream);
+        }
+
+        if (stats != null && stats.getRms() != null) {
+            writeMovingSeasonalityRatios(stream);
+        }
+
         writeTextForHTML(stream);
 
         if (stats != null) {
@@ -60,15 +68,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     }
 
     public void writeTextForHTML(HtmlStream stream) throws IOException {
-
-        if (decomposition != null) {
-            writeFinalFilters(stream);
-        }
-
         if (stats != null) {
-            if (stats.getRms() != null) {
-                writeMovingSeasonalityRatios(stream);
-            }
             writeICRatio(stream);
             stream.newLine();
         }
@@ -100,7 +100,6 @@ public class HtmlCCA extends AbstractHtmlElement {
         }
         stream.newLine();
 
-        //     stream.write("Seasonal filter: " + decomposition.getFinalSeasonalFilter()).newLine();
         stream.write("Trend filter: " + decomposition.getFinalTrendFilter()).newLine();
 
         stream.newLine();

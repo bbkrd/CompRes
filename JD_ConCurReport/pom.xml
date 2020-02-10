@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>concur-parent</artifactId>
-        <version>1.0.11</version>
+        <version>1.0.12-SNAPSHOT</version>
     </parent>
 
     <groupId>de.bbk</groupId>
@@ -134,6 +134,11 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <version>RELEASE82</version>
         </dependency>
     </dependencies>
 </project>
