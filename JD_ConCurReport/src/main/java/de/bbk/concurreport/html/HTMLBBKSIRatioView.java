@@ -24,6 +24,7 @@ import de.bbk.concur.util.SIViewSaved;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
+import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import ec.util.chart.swing.Charts;
 import java.awt.Dimension;
@@ -37,16 +38,16 @@ import javax.swing.JPanel;
  */
 public class HTMLBBKSIRatioView extends AbstractHtmlElement {
 
-    private final X13Document x13doc;
+    private final SaDocument doc;
     private static final int WIDTH = 450, HEIGHT = 250;
     int lastPeriod = 0;
     int forelastPeriod = 0;
 
-    public HTMLBBKSIRatioView(X13Document x13doc) {
-        this.x13doc = x13doc;
-        lastPeriod = x13doc.getSeries().getDomain().getLast().getPosition();
+    public HTMLBBKSIRatioView(SaDocument doc) {
+        this.doc = doc;
+        lastPeriod = doc.getSeries().getDomain().getLast().getPosition();
         if (lastPeriod == 0) {
-            forelastPeriod = x13doc.getSeries().getFrequency().intValue() - 1;
+            forelastPeriod = doc.getSeries().getFrequency().intValue() - 1;
         } else {
             forelastPeriod = lastPeriod - 1;
         }
@@ -56,7 +57,7 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
     public void write(HtmlStream stream) throws IOException {
 
         SIViewSaved sIViewSaved = new SIViewSaved();
-        sIViewSaved.setDoc(x13doc);
+        sIViewSaved.setDoc(doc);
 
         sIViewSaved.setSize(new Dimension(WIDTH, HEIGHT));
         sIViewSaved.setMaximumSize(new Dimension(WIDTH, HEIGHT));
@@ -80,8 +81,15 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
         HTML2Div div = new HTML2Div(forelastArrayOutputStream, lastArrayOutputStream);
         div.write(stream);
 
+        String description;
+        if (doc instanceof X13Document) {
+            description = "Dots - D8, Cross - D9, red - current D10, blue - D10";
+        } else {
+            description = "Dots - SI, red - SF current, blue - SF new";
+        }
+
         stream.write("<p style='text-align:center; '>")
-                .write("Dots - D8, Cross - D9, red - current D10, blue - D10")
+                .write(description)
                 .write("</p>")
                 .newLine();
         sIViewSaved.dispose();

@@ -23,9 +23,9 @@ package de.bbk.concur;
 import de.bbk.concur.util.SIViewSaved;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.view.*;
-import ec.satoolkit.x13.X13Specification;
+import ec.satoolkit.tramoseats.TramoSeatsSpecification;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.modelling.SeriesInfo;
 import ec.tstoolkit.utilities.DefaultInformationExtractor;
@@ -40,7 +40,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Thomas Witthohn
  */
-public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
+public class BbkSeatstViewFactory extends SaDocumentViewFactory<TramoSeatsSpecification, TramoSeatsDocument> {
 
     public static final String BBK = "ConCur";
     public static final String CCA = "CCA (if multiplicative then in pct.)";
@@ -65,17 +65,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220000)
-    public static class BBKOutputFactory extends ItemFactory<X13Document> {
+    public static class BBKOutputFactory extends ItemFactory<TramoSeatsDocument> {
 
         public BBKOutputFactory() {
-            super(BBK_MAIN, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_MAIN, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, MainBBKResultsView>(MainBBKResultsView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, MainBBKResultsView>(MainBBKResultsView.class) {
                 @Override
-                protected void init(MainBBKResultsView c, View host, X13Document information) {
+                protected void init(MainBBKResultsView c, View host, TramoSeatsDocument information) {
                     c.setTsToolkit(host.getToolkit());
                     c.set(information);
                 }
@@ -84,7 +84,7 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220010)
-    public static class ChartSAFactory extends ItemFactory<X13Document> {
+    public static class ChartSAFactory extends ItemFactory<TramoSeatsDocument> {
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
@@ -102,14 +102,14 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
         }
 
         public ChartSAFactory() {
-            super(BBK_CHARTS_SA, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_CHARTS_SA, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, SAView>(SAView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, SAView>(SAView.class) {
                 @Override
-                protected void init(SAView c, View host, X13Document information) {
+                protected void init(SAView c, View host, TramoSeatsDocument information) {
                     c.setNames(generateItems());
                     c.set(information);
                 }
@@ -118,7 +118,7 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220011)
-    public static class ChartOnlySAFactory extends ItemFactory<X13Document> {
+    public static class ChartOnlySAFactory extends ItemFactory<TramoSeatsDocument> {
 
         private static String[] generateItems() {
             StringBuilder y = new StringBuilder();
@@ -134,14 +134,14 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
         }
 
         public ChartOnlySAFactory() {
-            super(BBK_CHARTS_ONLYSA, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_CHARTS_ONLYSA, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, OnlySAView>(OnlySAView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, OnlySAView>(OnlySAView.class) {
                 @Override
-                protected void init(OnlySAView c, View host, X13Document information) {
+                protected void init(OnlySAView c, View host, TramoSeatsDocument information) {
                     c.setNames(generateItems());
                     c.set(information);
                 }
@@ -150,17 +150,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220012)
-    public static class ChartSIRatioFactory extends ItemFactory<X13Document> {
+    public static class ChartSIRatioFactory extends ItemFactory<TramoSeatsDocument> {
 
         public ChartSIRatioFactory() {
-            super(BBK_CHARTS_SIRATIO, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_CHARTS_SIRATIO, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, SIViewSaved>(SIViewSaved.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, SIViewSaved>(SIViewSaved.class) {
                 @Override
-                protected void init(SIViewSaved c, View host, X13Document information) {
+                protected void init(SIViewSaved c, View host, TramoSeatsDocument information) {
                     c.setDoc(information);
                 }
             });
@@ -168,17 +168,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220013)
-    public static class ChartSeasonalFactory extends ItemFactory<X13Document> {
+    public static class ChartSeasonalFactory extends ItemFactory<TramoSeatsDocument> {
 
         public ChartSeasonalFactory() {
-            super(BBK_CHARTS_SEASONAL, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_CHARTS_SEASONAL, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, SeasonalView>(SeasonalView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, SeasonalView>(SeasonalView.class) {
                 @Override
-                protected void init(SeasonalView c, View host, X13Document information) {
+                protected void init(SeasonalView c, View host, TramoSeatsDocument information) {
                     c.set(information);
                 }
             });
@@ -187,17 +187,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
 
     //<editor-fold defaultstate="collapsed" desc="REGISTER CCA">
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220020)
-    public static class CCAFactory extends ItemFactory<X13Document> {
+    public static class CCAFactory extends ItemFactory<TramoSeatsDocument> {
 
         public CCAFactory() {
-            super(BBK_CCA, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_CCA, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, CCAView>(CCAView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, CCAView>(CCAView.class) {
                 @Override
-                protected void init(CCAView c, View host, X13Document information) {
+                protected void init(CCAView c, View host, TramoSeatsDocument information) {
                     c.setTsToolkit(host.getToolkit());
                     c.set(information);
                 }
@@ -208,17 +208,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="REGISTER TablesSeries">
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220020)
-    public static class TablesSeriesViewFactory extends ItemFactory<X13Document> {
+    public static class TablesSeriesViewFactory extends ItemFactory<TramoSeatsDocument> {
 
         public TablesSeriesViewFactory() {
-            super(BBK_TABLE_SERIES, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_TABLE_SERIES, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, TablesSeriesView>(TablesSeriesView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, TablesSeriesView>(TablesSeriesView.class) {
                 @Override
-                protected void init(TablesSeriesView c, View host, X13Document information) {
+                protected void init(TablesSeriesView c, View host, TramoSeatsDocument information) {
                     c.set(information);
                 }
             });
@@ -226,17 +226,17 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220030)
-    public static class TablesPercentageChangeViewFactory extends ItemFactory<X13Document> {
+    public static class TablesPercentageChangeViewFactory extends ItemFactory<TramoSeatsDocument> {
 
         public TablesPercentageChangeViewFactory() {
-            super(BBK_TABLE_PERCENTAGECHANGE, new DefaultInformationExtractor<X13Document, X13Document>() {
+            super(BBK_TABLE_PERCENTAGECHANGE, new DefaultInformationExtractor<TramoSeatsDocument, TramoSeatsDocument>() {
                 @Override
-                public X13Document retrieve(X13Document source) {
+                public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, TablesPercentageChangeView>(TablesPercentageChangeView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, TablesPercentageChangeView>(TablesPercentageChangeView.class) {
                 @Override
-                protected void init(TablesPercentageChangeView c, View host, X13Document information) {
+                protected void init(TablesPercentageChangeView c, View host, TramoSeatsDocument information) {
                     c.set(information);
                 }
             });
@@ -244,10 +244,10 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     //</editor-fold>
-    private static class ItemFactory<I> extends ComposedProcDocumentItemFactory<X13Document, I> {
+    private static class ItemFactory<I> extends ComposedProcDocumentItemFactory<TramoSeatsDocument, I> {
 
-        ItemFactory(Id itemId, InformationExtractor<? super X13Document, I> informationExtractor, ItemUI<? extends IProcDocumentView<X13Document>, I> itemUI) {
-            super(X13Document.class, itemId, informationExtractor, itemUI);
+        ItemFactory(Id itemId, InformationExtractor<? super TramoSeatsDocument, I> informationExtractor, ItemUI<? extends IProcDocumentView<TramoSeatsDocument>, I> itemUI) {
+            super(TramoSeatsDocument.class, itemId, informationExtractor, itemUI);
         }
     }
 

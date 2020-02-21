@@ -20,17 +20,13 @@
  */
 package de.bbk.concur.view;
 
-import static de.bbk.concur.util.SavedTables.NAME_ONLY_SEASONALLY_ADJUSTED;
+import de.bbk.concur.util.SavedTables;
 import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.algorithm.CompositeResults;
-import ec.tstoolkit.modelling.ModellingDictionary;
-import ec.tstoolkit.modelling.SeriesInfo;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -61,21 +57,19 @@ public class OnlySAView extends JComponent implements IDisposable {
         this.names = names;
     }
 
-    public void set(X13Document doc) {
+    public void set(SaDocument doc) {
         if (doc == null) {
             return;
         }
 
-        X11Results x11 = doc.getDecompositionPart();
-        if (x11 != null) {
-            chart.getTsCollection().clear();
-            TsCollection items = DocumentManager.create(Arrays.asList(names), doc);
+        chart.getTsCollection().clear();
+        if (doc.getDecompositionPart() != null) {
 
+            TsCollection items = DocumentManager.create(Arrays.asList(names), doc);
             chart.getTsCollection().append(items);
 
-            CompositeResults results = doc.getResults();
-            TsData y = results.getData(ModellingDictionary.Y, TsData.class).update(results.getData(ModellingDictionary.Y + SeriesInfo.F_SUFFIX, TsData.class));
-            TsData s_cmp = results.getData(ModellingDictionary.S_CMP, TsData.class).update(results.getData(ModellingDictionary.S_CMP + SeriesInfo.F_SUFFIX, TsData.class));
+            TsData y = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
+            TsData s_cmp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
 
             TsData onlySAData;
             if (doc.getFinalDecomposition().getMode() != DecompositionMode.Additive) {
@@ -84,11 +78,9 @@ public class OnlySAView extends JComponent implements IDisposable {
                 onlySAData = y.minus(s_cmp);
             }
 
-            Ts onlySA = TsFactory.instance.createTs(NAME_ONLY_SEASONALLY_ADJUSTED, null, onlySAData);
+            Ts onlySA = TsFactory.instance.createTs(SavedTables.NAME_ONLY_SEASONALLY_ADJUSTED, null, onlySAData);
             chart.getTsCollection().add(onlySA);
-            chart.setTitle(doc.getInput().getRawName());
-        } else {
-            chart.getTsCollection().clear();
+            chart.setTitle(((Ts) doc.getInput()).getRawName());
         }
     }
 

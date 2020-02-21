@@ -28,7 +28,9 @@ import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.implementation.HtmlProcessingInformation;
 import ec.tss.html.implementation.HtmlRegArima;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
+import ec.tstoolkit.algorithm.IProcResults;
+import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.modelling.arima.PreprocessingModel;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import java.io.IOException;
@@ -41,12 +43,14 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
 
     private final String title;
     private final PreprocessingModel model;
-    private final X11Results decomposition;
+    private final IProcResults decomposition;
+    private final boolean multiplicative;
 
-    public HtmlBBKSummary(String title, X13Document doc) {
+    public HtmlBBKSummary(String title, SaDocument doc) {
         this.title = title;
         this.model = doc.getPreprocessingPart();
         this.decomposition = doc.getDecompositionPart();
+        this.multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
     }
 
     @Override
@@ -57,19 +61,19 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
             writeDetails(stream);
         }
         if (decomposition != null) {
-            writeCombinedSeasonalityTest(stream, decomposition);
+            writeCombinedSeasonalityTest(stream);
         }
 
     }
 
     private void writeMainResultsSummary(HtmlStream stream) throws IOException {
-        HtmlProcessingInformation hpi = new HtmlProcessingInformation(this.decomposition);
+        HtmlProcessingInformation hpi = new HtmlProcessingInformation(decomposition);
         hpi.write(stream);
 
         if (model == null) {
             stream.write(HtmlTag.HEADER2, "No pre-processing").newLine();
         } else {
-            stream.write(HtmlTag.HEADER2, "Pre-processing (RegArima)").newLine();
+            stream.write(HtmlTag.HEADER2, "Pre-processing").newLine();
             stream.write(new HtmlRegArima(model, true));
         }
     }
@@ -91,9 +95,22 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
 
     }
 
-    public static void writeCombinedSeasonalityTest(HtmlStream stream, X11Results decomposition) throws IOException {
-        CombinedSeasonalityTest test = new CombinedSeasonalityTest(decomposition.getData(X11Kernel.D8, TsData.class),
-                                                                   decomposition.getSeriesDecomposition().getMode().isMultiplicative());
+    public void writeCombinedSeasonalityTest(HtmlStream stream) throws IOException {
+        TsData si;
+        if (decomposition instanceof X11Results) {
+            si = decomposition.getData(X11Kernel.D8, TsData.class);
+        } else {
+            TsData seas = decomposition.getData(ModellingDictionary.S_CMP, TsData.class);
+            TsData i = decomposition.getData(ModellingDictionary.I_CMP, TsData.class);
+
+            if (multiplicative) {
+                si = TsData.multiply(seas, i);
+            } else {
+                si = TsData.add(seas, i);
+            }
+        }
+
+        CombinedSeasonalityTest test = new CombinedSeasonalityTest(si, multiplicative);
 
         stream.write(HtmlTag.HEADER2, "F-Test for stable seasonality");
         stream.write("Stable Value: " + df4.format(test.getStableSeasonality().getValue())).newLine();

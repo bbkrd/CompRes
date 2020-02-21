@@ -20,10 +20,12 @@
  */
 package de.bbk.concur.util;
 
+import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST;
 import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsFactory;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.documents.DocumentManager;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.MetaData;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
@@ -34,9 +36,9 @@ import ec.tstoolkit.timeseries.simplets.TsFrequency;
  */
 public class SeasonallyAdjusted_Saved {
 
-    public static final Ts calcSeasonallyAdjusted(X13Document doc) {
-        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
-        TsData tsdA1_all = doc.getResults().getData("a-tables.a1", TsData.class).update(doc.getResults().getData("a-tables.a1a", TsData.class));
+    public static final Ts calcSeasonallyAdjusted(SaDocument doc) {
+        DecompositionMode mode = doc.getFinalDecomposition().getMode();
+        TsData tsdA1_all = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
         return calcSeasonallyAdjusted(doc.getMetaData(), mode, tsdA1_all);
     }
 

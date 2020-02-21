@@ -53,10 +53,11 @@ public class SavedTables {
     public static final String COMPOSITE_RESULTS_TREND = "@composite@" + NAME_TREND + "=,final.t,";
     public static final String COMPOSITE_RESULTS_IRREGULAR = "@composite@" + NAME_IRREGULAR + "=,final.i,";
     public static final String COMPOSITE_RESULTS_SEASONALLY_ADJUSTED = "@composite@" + NAME_SEASONALLY_ADJUSTED + "=,final.sa,";
-    public static final String DECOMPOSITION_D10 = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d10";
     public static final String COMPOSITE_RESULTS_SERIES_WITH_FORECAST = "@composite@" + NAME_SERIES + "=,final.y,final.y_f";
     public static final String COMPOSITE_RESULTS_TREND_WITH_FORECAST = "@composite@" + NAME_TREND + "=,final.t,final.t_f";
     public static final String COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST = "@composite@" + NAME_IRREGULAR + "=,final.i,final.i_f";
     public static final String COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST = "@composite@" + NAME_SEASONALLY_ADJUSTED + "=,final.sa,final.sa_f";
-    public static final String DECOMPOSITION_D10_D10A = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d10,decomposition.d10a";
+    public static final String COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST = "@composite@" + NAME_CALENDAR_FACTOR + "=,cal,cal_f";
+    public static final String COMPOSITE_RESULTS_SEASONAL = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,";
+    public static final String COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,s_cmp_f";
 }

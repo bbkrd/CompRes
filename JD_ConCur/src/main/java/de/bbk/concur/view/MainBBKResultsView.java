@@ -27,9 +27,8 @@ import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import ec.nbdemetra.ui.NbComponents;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
-import ec.tstoolkit.algorithm.CompositeResults;
 import ec.ui.Disposables;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -52,7 +51,7 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
     private transient ITsViewToolkit toolkit = TsViewToolkit.getInstance();
     private final Box document;
     private final JTsChart chart;
-    private X13Document doc;
+    private SaDocument doc;
     private FixTimeDomain td;
 
     public MainBBKResultsView() {
@@ -74,17 +73,12 @@ public class MainBBKResultsView extends JComponent implements IDisposable {
         this.toolkit = toolkit;
     }
 
-    public void set(X13Document doc) {
+    public void set(SaDocument doc) {
         this.doc = doc;
-        if (doc == null) {
+        if (doc == null || doc.getDecompositionPart() == null) {
             return;
         }
-        CompositeResults results = doc.getResults();
-        if (results == null) {
-            return;
-        }
-
-        HtmlBBKSummary summary = new HtmlBBKSummary(MultiLineNameUtil.join(doc.getInput().getName()), doc);
+        HtmlBBKSummary summary = new HtmlBBKSummary(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
         Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
 
         td = new FixTimeDomain(getMainSeries(COMPOSITE_RESULTS_SERIES));

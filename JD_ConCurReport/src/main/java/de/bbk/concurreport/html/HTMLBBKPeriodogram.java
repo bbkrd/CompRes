@@ -25,7 +25,7 @@ import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.util.chart.swing.Charts;
@@ -48,8 +48,8 @@ public class HTMLBBKPeriodogram extends AbstractHtmlElement {
      *
      * @param tsData the time series is differenced in the write
      */
-    public HTMLBBKPeriodogram(X13Document x13doc) {
-        Ts ts = DocumentManager.instance.getTs(x13doc, ModellingDictionary.SA);
+    public HTMLBBKPeriodogram(SaDocument doc) {
+        Ts ts = DocumentManager.instance.getTs(doc, ModellingDictionary.SA);
         this.tsData = ts.getTsData();
     }
 

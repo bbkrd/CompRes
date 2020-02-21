@@ -23,7 +23,7 @@ package de.bbk.concurreport.html;
 import de.bbk.concurreport.util.Pagebreak;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.MetaData;
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ public class HtmlComments extends AbstractHtmlElement {
     private final MetaData metaData;
     private final HTMLBBkHeader headerbbk;
 
-    public HtmlComments(X13Document doc, HTMLBBkHeader headerbbk) {
+    public HtmlComments(SaDocument doc, HTMLBBkHeader headerbbk) {
         this.headerbbk = headerbbk;
         this.metaData = doc.getMetaData();
 
@@ -44,10 +44,7 @@ public class HtmlComments extends AbstractHtmlElement {
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-
-        if (metaData == null || !metaData.containsKey("comment")) {
-
-        } else {
+        if (metaData != null && metaData.containsKey("comment")) {
             Pagebreak p = new Pagebreak();
             p.write(stream);
             headerbbk.write(stream);
@@ -57,7 +54,6 @@ public class HtmlComments extends AbstractHtmlElement {
 
             stream.write(comment.replaceAll("\n", "<br/>")).newLine();
         }
-
     }
 
 }

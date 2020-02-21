@@ -5,13 +5,14 @@
  */
 package de.bbk.concurreport.options;
 
+import de.bbk.concurreport.ReportStyle;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
 public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
-    
+
     private final ConCurReportOptionsOptionsPanelController controller;
-    
+
     ConCurReportOptionsPanel(ConCurReportOptionsOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
@@ -25,50 +26,104 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup = new javax.swing.ButtonGroup();
+        javax.swing.JPanel hTMLOptionPanel = new javax.swing.JPanel();
         buttonOneHTML = new javax.swing.JRadioButton();
         buttonHTMLforEach = new javax.swing.JRadioButton();
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        reportStyle = new javax.swing.JComboBox<>(de.bbk.concurreport.ReportStyle.values());
 
-        setLayout(new java.awt.GridBagLayout());
+        setMinimumSize(new java.awt.Dimension(389, 100));
+
+        hTMLOptionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.hTMLOptionPanel.border.title"))); // NOI18N
+        hTMLOptionPanel.setMinimumSize(new java.awt.Dimension(300, 100));
+        hTMLOptionPanel.setPreferredSize(new java.awt.Dimension(300, 100));
+        hTMLOptionPanel.setLayout(new java.awt.GridLayout(1, 0));
 
         buttonGroup.add(buttonOneHTML);
         org.openide.awt.Mnemonics.setLocalizedText(buttonOneHTML, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonOneHTML.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.ipadx = 66;
-        gridBagConstraints.ipady = 153;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(buttonOneHTML, gridBagConstraints);
+        buttonOneHTML.setBorder(null);
+        buttonOneHTML.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        buttonOneHTML.setMaximumSize(new java.awt.Dimension(100, 10));
+        buttonOneHTML.setMinimumSize(new java.awt.Dimension(100, 10));
+        buttonOneHTML.setPreferredSize(new java.awt.Dimension(100, 10));
+        hTMLOptionPanel.add(buttonOneHTML);
 
         buttonGroup.add(buttonHTMLforEach);
         org.openide.awt.Mnemonics.setLocalizedText(buttonHTMLforEach, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonHTMLforEach.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.ipadx = 64;
-        gridBagConstraints.ipady = 153;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(buttonHTMLforEach, gridBagConstraints);
+        buttonHTMLforEach.setBorder(null);
+        buttonHTMLforEach.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        buttonHTMLforEach.setMaximumSize(new java.awt.Dimension(100, 10));
+        buttonHTMLforEach.setMinimumSize(new java.awt.Dimension(100, 10));
+        buttonHTMLforEach.setPreferredSize(new java.awt.Dimension(100, 10));
+        hTMLOptionPanel.add(buttonHTMLforEach);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jPanel1.border.title"))); // NOI18N
+        jPanel1.setMaximumSize(new java.awt.Dimension(100, 25));
+        jPanel1.setMinimumSize(new java.awt.Dimension(100, 25));
+        jPanel1.setPreferredSize(new java.awt.Dimension(100, 25));
+
+        reportStyle.setBorder(null);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(200, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     void load() {
         Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
+
         boolean oneHTML = preferences.getBoolean(JUST_ONE_HTML, true);
         buttonOneHTML.setSelected(oneHTML);
         buttonHTMLforEach.setSelected(!oneHTML);
+
+        String reportStyleName = preferences.get(REPORT_STYLE, ReportStyle.SHORT.name());
+        reportStyle.setSelectedItem(ReportStyle.valueOf(reportStyleName));
     }
-    
+
     void store() {
         Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
+
         boolean oneHTML = buttonOneHTML.isSelected();
-        preferences.putBoolean(JUST_ONE_HTML, oneHTML);       
+        preferences.putBoolean(JUST_ONE_HTML, oneHTML);
+
+        ReportStyle selectedReportStyle = (ReportStyle) reportStyle.getSelectedItem();
+        preferences.put(REPORT_STYLE, selectedReportStyle.name());
     }
-    
+
     public static final String JUST_ONE_HTML = "oneHTML";
-    
+    public static final String REPORT_STYLE = "reportStyle";
+
     boolean valid() {
         // TODO check whether form is consistent and complete
         return true;
@@ -78,5 +133,6 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JRadioButton buttonHTMLforEach;
     private javax.swing.JRadioButton buttonOneHTML;
+    private javax.swing.JComboBox<de.bbk.concurreport.ReportStyle> reportStyle;
     // End of variables declaration//GEN-END:variables
 }

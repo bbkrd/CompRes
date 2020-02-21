@@ -27,6 +27,7 @@ import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
 import ec.satoolkit.DecompositionMode;
+import ec.tss.documents.DocumentManager;
 import ec.tss.sa.SaItem;
 import ec.tstoolkit.MetaData;
 import ec.tstoolkit.algorithm.CompositeResults;
@@ -67,7 +68,7 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
 
     @Override
     protected void refreshAction() {
-        setEnabled(context().getSelectionCount() > 0);
+        setEnabled(context() != null && context().getSelectionCount() > 0);
     }
 
     @Override
@@ -87,16 +88,13 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
             }
             if (results != null) {
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
-                TsData d10 = results.getData("decomposition.d-tables.d10", TsData.class);
-                if (d10 != null) {
-                    TsData d10a = results.getData("decomposition.d-tables.d10a", TsData.class);
-                    TsData d10AndD10a = d10.update(d10a);
+                TsData seasonalFactor = DocumentManager.instance.getTs(item.toDocument(), SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
+                if (seasonalFactor != null) {
 
-                    d10AndD10a = convertTsDataInPercentIfMult(d10AndD10a, mode.isMultiplicative());
-                    TsData_MetaDataConverter.convertTsToMetaData(d10AndD10a, meta, SavedTables.SEASONALFACTOR);
+                    seasonalFactor = convertTsDataInPercentIfMult(seasonalFactor, mode.isMultiplicative());
+                    TsData_MetaDataConverter.convertTsToMetaData(seasonalFactor, meta, SavedTables.SEASONALFACTOR);
                 } else {
                     nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveSeasonalFactorToWorkspace(item.getName()), NotifyDescriptor.ERROR_MESSAGE);
-                    //TODO Rollback? No Return?
                     if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
                         return;
                     }

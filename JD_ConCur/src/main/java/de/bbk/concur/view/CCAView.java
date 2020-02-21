@@ -23,9 +23,9 @@ package de.bbk.concur.view;
 import de.bbk.concur.html.HtmlCCA;
 import de.bbk.concur.util.JPanelCCA;
 import ec.nbdemetra.ui.NbComponents;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.Ts;
+import ec.tss.sa.documents.SaDocument;
 import ec.tss.tsproviders.utils.MultiLineNameUtil;
-import ec.tstoolkit.algorithm.CompositeResults;
 import ec.ui.Disposables;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.view.tsprocessing.ITsViewToolkit;
@@ -63,16 +63,12 @@ public class CCAView extends JComponent implements IDisposable {
         this.toolkit = toolkit;
     }
 
-    public void set(X13Document doc) {
-        if (doc == null) {
-            return;
-        }
-        CompositeResults results = doc.getResults();
-        if (results == null) {
+    public void set(SaDocument doc) {
+        if (doc == null || doc.getResults() == null) {
             return;
         }
 
-        HtmlCCA summary = new HtmlCCA(MultiLineNameUtil.join(doc.getInput().getName()), doc);
+        HtmlCCA summary = new HtmlCCA(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
         Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
 
         jPanelCCA.set(doc);

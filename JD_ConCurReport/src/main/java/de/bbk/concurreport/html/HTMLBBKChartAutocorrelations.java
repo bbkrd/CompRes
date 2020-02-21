@@ -23,7 +23,7 @@ package de.bbk.concurreport.html;
 import de.bbk.concurreport.BbkAutoCorrelationsView;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.view.AutoCorrelationsView;
 import ec.util.chart.swing.Charts;
@@ -36,13 +36,13 @@ import java.io.IOException;
  */
 public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement {
 
-    private final X13Document x13doc;
+    private final SaDocument doc;
     private final boolean partial;
     private final BbkAutoCorrelationsView acv;
     private static final int WIDTH = 450, HEIGHT = 450;
 
-    public HTMLBBKChartAutocorrelations(X13Document x13doc, boolean partial) {
-        this.x13doc = x13doc;
+    public HTMLBBKChartAutocorrelations(SaDocument doc, boolean partial) {
+        this.doc = doc;
         this.partial = partial;
         this.acv = new BbkAutoCorrelationsView();
 
@@ -51,10 +51,10 @@ public class HTMLBBKChartAutocorrelations extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
 
-        if (x13doc.getPreprocessingPart() == null) {
+        if (doc.getPreprocessingPart() == null) {
             return;
         }
-        TsData tsFullRes = x13doc.getPreprocessingPart().getFullResiduals();
+        TsData tsFullRes = doc.getPreprocessingPart().getFullResiduals();
         if (tsFullRes != null && !tsFullRes.isEmpty()) {
             acv.setDataBlock(tsFullRes);
 

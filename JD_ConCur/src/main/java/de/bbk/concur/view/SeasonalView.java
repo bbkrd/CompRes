@@ -24,11 +24,10 @@ import static de.bbk.concur.util.InPercent.convertTsInPercentIfMult;
 import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -53,29 +52,26 @@ public class SeasonalView extends JComponent implements IDisposable {
         add(chart, BorderLayout.CENTER);
     }
 
-    public void set(X13Document doc) {
+    public void set(SaDocument doc) {
         if (doc == null) {
             return;
         }
+        chartContent.clear();
 
-        X11Results x11 = doc.getDecompositionPart();
-        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
-        if (x11 != null) {
-            chartContent.clear();
+        if (doc.getFinalDecomposition() != null) {
+            DecompositionMode mode = doc.getFinalDecomposition().getMode();
 
-            Ts tsd10 = DocumentManager.instance.getTs(doc, DECOMPOSITION_D10_D10A, false);
-            tsd10 = convertTsInPercentIfMult(tsd10, mode.isMultiplicative());
-            tsd10 = tsd10.rename(NAME_SEASONAL_FACTOR);
-            chartContent.add(tsd10);
+            Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST);
+            if (seasonalFactor != null && seasonalFactor.getTsData() != null) {
+                seasonalFactor = convertTsInPercentIfMult(seasonalFactor, mode.isMultiplicative());
+                chartContent.add(seasonalFactor);
+            }
 
-            Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SEASONALFACTOR);
-            seasonalfactor = seasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
-            chartContent.add(seasonalfactor);
+            Ts savedSeasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SEASONALFACTOR);
+            savedSeasonalfactor = savedSeasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
+            chartContent.add(savedSeasonalfactor);
 
-            chart.setTitle(doc.getInput().getRawName());
-
-        } else {
-            chartContent.clear();
+            chart.setTitle(((Ts) doc.getInput()).getRawName());
         }
 
     }

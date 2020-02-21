@@ -20,7 +20,6 @@
  */
 package de.bbk.concur.view;
 
-import de.bbk.concur.actions.SelectionSaveCalendarfactorToWorkspace;
 import de.bbk.concur.util.InPercent;
 import de.bbk.concur.util.SavedTables;
 import static de.bbk.concur.util.SavedTables.*;
@@ -29,11 +28,8 @@ import de.bbk.concur.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
-import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.algorithm.CompositeResults;
-import ec.tstoolkit.timeseries.simplets.TsData;
+import ec.tss.sa.documents.SaDocument;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -59,19 +55,15 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         add(seriesGrid, BorderLayout.CENTER);
     }
 
-    public void set(X13Document doc) {
+    public void set(SaDocument doc) {
         seriesGridContent.clear();
         if (doc == null) {
             return;
         }
-        CompositeResults results = doc.getResults();
-        if (results == null) {
-            return;
-        }
 
-        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
-        Ts x = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST, false);
-        seriesGridContent.add(x);
+        boolean isMultiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
+        Ts series = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST, false);
+        seriesGridContent.add(series);
 
         Ts trend = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_TREND_WITH_FORECAST, false);
         seriesGridContent.add(trend);
@@ -85,31 +77,31 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         Ts savedSeasonallyAdjusted = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
         seriesGridContent.add(savedSeasonallyAdjusted);
 
-        Ts tsd10aAll = DocumentManager.instance.getTs(doc, DECOMPOSITION_D10_D10A, false);
-        tsd10aAll = InPercent.convertTsInPercentIfMult(tsd10aAll, mode.isMultiplicative());
-        seriesGridContent.add(tsd10aAll.rename(NAME_SEASONAL_FACTOR));
+        Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST, false);
+        if (seasonalFactor.getTsData() != null) {
+            seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactor, isMultiplicative);
+        }
+        seriesGridContent.add(seasonalFactor.rename(NAME_SEASONAL_FACTOR));
 
         Ts savedSeasonalFactors = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
         seriesGridContent.add(savedSeasonalFactors.rename(NAME_SEASONAL_FACTOR_SAVED));
 
-        Ts a6_7ts = calcA6_7(results, mode);
-
-        seriesGridContent.add(a6_7ts);
+        Ts calendarFactor = getCalendarFactor(doc);
+        seriesGridContent.add(calendarFactor);
 
         Ts savedCalendarFactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR);
         seriesGridContent.add(savedCalendarFactor.rename(NAME_CALENDAR_FACTOR_SAVED));
 
     }
 
-    public static Ts calcA6_7(CompositeResults results, DecompositionMode mode) {
+    private Ts getCalendarFactor(SaDocument doc) {
+        DecompositionMode mode = doc.getFinalDecomposition().getMode();
 
-        TsData a6_7 = SelectionSaveCalendarfactorToWorkspace.calcCalendarFactor(results, mode);
-        Ts a6_7ts = TsFactory.instance.createTs("a6_7");
-        if (a6_7 != null) {
-            a6_7ts.set(InPercent.convertTsDataInPercentIfMult(a6_7, mode.isMultiplicative()));
+        Ts calendarFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST);
+        if (calendarFactor.getTsData() != null) {
+            return InPercent.convertTsInPercentIfMult(calendarFactor, mode.isMultiplicative());
         }
-
-        return a6_7ts.rename(NAME_CALENDAR_FACTOR);
+        return calendarFactor;
 
     }
 

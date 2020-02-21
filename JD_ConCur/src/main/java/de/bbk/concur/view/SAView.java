@@ -22,11 +22,10 @@ package de.bbk.concur.view;
 
 import de.bbk.concur.BBKOutputViewFactory;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
-import ec.satoolkit.x11.X11Results;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.MetaData;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -43,8 +42,7 @@ import javax.swing.JComponent;
 public class SAView extends JComponent implements IDisposable {
 
     private final JTsChart chart;
-    private final List<String> names = new ArrayList<>(),
-            saved = new ArrayList<>();
+    private final List<String> names = new ArrayList<>();
 
     public SAView() {
         setLayout(new BorderLayout());
@@ -56,37 +54,31 @@ public class SAView extends JComponent implements IDisposable {
     }
 
     public void setNames(String... names) {
-        saved.clear();
         this.names.clear();
         for (String name : names) {
-            if (name.startsWith(BBKOutputViewFactory.OLD)) {
-                saved.add(name);
-            } else {
+            if (!name.startsWith(BBKOutputViewFactory.OLD)) {
                 this.names.add(name);
             }
         }
     }
 
-    public void set(X13Document doc) {
+    public void set(SaDocument doc) {
         if (doc == null) {
             return;
         }
+        chart.getTsCollection().clear();
 
-        X11Results x11 = doc.getDecompositionPart();
-        if (x11 != null) {
-            chart.getTsCollection().clear();
+        if (doc.getDecompositionPart() != null) {
+
             TsCollection items = DocumentManager.create(names, doc);
             chart.getTsCollection().append(items);
-            chart.setTitle(doc.getInput().getRawName());
+            chart.setTitle(((Ts) doc.getInput()).getRawName());
 
             MetaData metadata = doc.getMetaData();
             if (metadata != null) {
                 Ts savedSA = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
                 chart.getTsCollection().add(savedSA);
             }
-
-        } else {
-            chart.getTsCollection().clear();
         }
     }
 

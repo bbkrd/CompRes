@@ -7,6 +7,7 @@ package de.bbk.concurreport.html;
 
 import de.bbk.concur.html.HtmlCCA;
 import ec.tss.html.HtmlStream;
+import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import java.io.IOException;
 
@@ -14,10 +15,10 @@ public class HTMLWrapperCCA extends HtmlCCA {
 
     private String trend = "";
 
-    public HTMLWrapperCCA(String title, X13Document doc) {
+    public HTMLWrapperCCA(String title, SaDocument doc) {
         super(title, doc);
-        if (doc != null && doc.getDecompositionPart() != null) {
-            trend = doc.getDecompositionPart().getFinalTrendFilter();
+        if (doc instanceof X13Document && doc.getDecompositionPart() != null) {
+            trend = ((X13Document) doc).getDecompositionPart().getFinalTrendFilter();
         }
     }
 

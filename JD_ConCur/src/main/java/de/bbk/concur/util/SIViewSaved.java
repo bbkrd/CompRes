@@ -23,11 +23,14 @@ package de.bbk.concur.util;
 import static de.bbk.concur.util.InPercent.convertTsDataInPercentIfMult;
 import ec.nbdemetra.ui.DemetraUI;
 import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Results;
+import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.TsInformation;
+import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
+import ec.tstoolkit.algorithm.IProcResults;
 import ec.tstoolkit.data.DataBlock;
+import ec.tstoolkit.modelling.ModellingDictionary;
 import ec.tstoolkit.timeseries.simplets.*;
 import ec.ui.ATsView;
 import ec.ui.chart.BasicXYDataset;
@@ -404,59 +407,68 @@ public class SIViewSaved extends ATsView {
         }
     }
 
-    public void setDoc(X13Document doc) {
+    public void setDoc(SaDocument doc) {
 
-        if (doc == null) {
-            this.reset();
+        if (doc == null || doc.getDecompositionPart() == null) {
+            reset();
             return;
         }
 
         Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
         if (seasonalfactor == null) {
-            this.reset();
+            reset();
             return;
         }
-        X11Results x11 = doc.getDecompositionPart();
-        DecompositionMode mode = doc.getDecompositionPart().getSeriesDecomposition().getMode();
-        if (x11 != null) {
+        DecompositionMode mode = doc.getFinalDecomposition().getMode();
+        IProcResults decomposition = doc.getDecompositionPart();
 
-            TsData si = x11.getData("d8", TsData.class);
-            TsData seas = x11.getData("d10", TsData.class);
-            TsData correctionValues = x11.getData("d9", TsData.class);
-
-            if (x11.getSeriesDecomposition().getMode() == DecompositionMode.LogAdditive) {
+        TsData si;
+        TsData correctionValues;
+        TsData seas = decomposition.getData(ModellingDictionary.S_CMP, TsData.class);
+        if (seas == null) {
+            reset();
+            return;
+        }
+        if (doc instanceof X13Document) {
+            si = decomposition.getData(X11Kernel.D8, TsData.class);
+            correctionValues = decomposition.getData(X11Kernel.D9, TsData.class);
+            if (mode == DecompositionMode.LogAdditive) {
                 si = si.exp();
                 correctionValues = correctionValues.exp();
             }
-            seas = convertTsDataInPercentIfMult(seas, mode.isMultiplicative());
-            si = convertTsDataInPercentIfMult(si, mode.isMultiplicative());
-            correctionValues = convertTsDataInPercentIfMult(correctionValues, mode.isMultiplicative());
-            this.setSiData(seas, si, seasonalfactor.getTsData(), correctionValues);
-
         } else {
-            this.reset();
+            TsData i = decomposition.getData(ModellingDictionary.I_CMP, TsData.class);
+
+            if (mode.isMultiplicative()) {
+                si = TsData.multiply(seas, i);
+            } else {
+                si = TsData.add(seas, i);
+            }
+            correctionValues = null;
         }
 
+        seas = convertTsDataInPercentIfMult(seas, mode.isMultiplicative());
+        si = convertTsDataInPercentIfMult(si, mode.isMultiplicative());
+        if (correctionValues != null) {
+            correctionValues = convertTsDataInPercentIfMult(correctionValues, mode.isMultiplicative());
+        }
+        this.setSiData(seas, si, seasonalfactor.getTsData(), correctionValues);
     }
 
     /**
      * This method needs a saved D10 else the wrong class is used
      *
      * @param seas D10
-     * @param irr D8
+     * @param si D8
      * @param seas_saved D10_saved
+     * @param correctionValues D9
      */
-    public void setData(TsData seas, TsData irr, TsData seas_saved, TsData correctionValues) {
+    public void setData(TsData seas, TsData si, TsData seas_saved, TsData correctionValues) {
         reset();
-        if (seas == null && irr == null) {
+        if (seas == null || si == null) {
             return;
         }
-        if (seas == null) {
-            seas = new TsData(irr.getDomain(), 1);
-        } else if (irr == null) {
-            irr = new TsData(seas.getDomain(), 1);
-        }
-        displayData(seas, irr, seas_saved, correctionValues);
+        displayData(seas, si, seas_saved, correctionValues);
 
     }
 

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.bbk.concur.html;
+package de.bbk.concurreport.html;
 
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;

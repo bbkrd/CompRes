@@ -27,6 +27,7 @@ import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
 import ec.satoolkit.DecompositionMode;
+import ec.tss.documents.DocumentManager;
 import ec.tss.sa.SaItem;
 import ec.tstoolkit.MetaData;
 import ec.tstoolkit.algorithm.CompositeResults;
@@ -68,7 +69,7 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
 
     @Override
     protected void refreshAction() {
-        setEnabled(context().getSelectionCount() > 0);
+        setEnabled(context() != null && context().getSelectionCount() > 0);
     }
 
     @Override
@@ -88,10 +89,10 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
             }
             if (results != null) {
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
-                TsData cal = calcCalendarFactor(results, mode);
-                if (cal != null) {
-                    cal = convertTsDataInPercentIfMult(cal, mode.isMultiplicative());
-                    TsData_MetaDataConverter.convertTsToMetaData(cal, meta, SavedTables.CALENDARFACTOR);
+                TsData calendarFactor = DocumentManager.instance.getTs(item.toDocument(), SavedTables.COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST).getTsData();
+                if (calendarFactor != null) {
+                    calendarFactor = convertTsDataInPercentIfMult(calendarFactor, mode.isMultiplicative());
+                    TsData_MetaDataConverter.convertTsToMetaData(calendarFactor, meta, SavedTables.CALENDARFACTOR);
                 } else {
                     nd = new NotifyDescriptor.Message(Bundle.CTL_NoSaveCalendarfactorToWorkspace(item.getName()), NotifyDescriptor.ERROR_MESSAGE);
                     //TODO Rollback? No Return?
@@ -104,19 +105,4 @@ public class SelectionSaveCalendarfactorToWorkspace extends AbstractViewAction<S
         cur.setSelection(new SaItem[0]);
         cur.setSelection(selection);
     }
-
-    public static TsData calcCalendarFactor(CompositeResults results, DecompositionMode mode) {
-        TsData a6 = results.getData("decomposition.a-tables.a6", TsData.class);
-        TsData a7 = results.getData("decomposition.a-tables.a7", TsData.class);
-
-        if (a6 == null) {
-            return a7;
-        }
-        if (mode.isMultiplicative()) {
-            return a6.times(a7);
-        } else {
-            return a6.plus(a7);
-        }
-    }
-
 }

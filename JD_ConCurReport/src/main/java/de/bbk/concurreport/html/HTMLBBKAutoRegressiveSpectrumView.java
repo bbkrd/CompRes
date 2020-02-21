@@ -24,7 +24,7 @@ import de.bbk.concurreport.BbkAutoRegressiveSpectrumView;
 import ec.satoolkit.ISeriesDecomposition;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
-import ec.tss.sa.documents.X13Document;
+import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.modelling.ComponentInformation;
 import ec.tstoolkit.modelling.ComponentType;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -40,7 +40,7 @@ import org.jfree.chart.JFreeChart;
  */
 public class HTMLBBKAutoRegressiveSpectrumView extends AbstractHtmlElement {
 
-    private final X13Document x13doc;
+    private final SaDocument doc;
     private static final int WIDTH = 450;
     private static final int HEIGHT = 220; //450
 
@@ -48,15 +48,15 @@ public class HTMLBBKAutoRegressiveSpectrumView extends AbstractHtmlElement {
      *
      * @param tsData the time series is differenced in the write
      */
-    public HTMLBBKAutoRegressiveSpectrumView(X13Document x13doc) {
+    public HTMLBBKAutoRegressiveSpectrumView(SaDocument doc) {
 
-        this.x13doc = x13doc;
+        this.doc = doc;
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
 
-        ISeriesDecomposition finals = x13doc.getFinalDecomposition();
+        ISeriesDecomposition finals = doc.getFinalDecomposition();
         if (finals == null) {
             return;
         }

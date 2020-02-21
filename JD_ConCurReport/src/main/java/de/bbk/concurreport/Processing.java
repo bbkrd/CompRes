@@ -20,30 +20,17 @@
  */
 package de.bbk.concurreport;
 
-import de.bbk.concur.html.HtmlTsData;
-import de.bbk.concur.util.FixTimeDomain;
-import de.bbk.concur.util.InPercent;
-import de.bbk.concur.util.SavedTables;
-import de.bbk.concur.util.TsData_Saved;
 import de.bbk.concurreport.files.HTMLFiles;
 import de.bbk.concurreport.html.*;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
+import de.bbk.concurreport.report.tramo.TramoSeatsReport;
+import de.bbk.concurreport.report.x13.X13Report;
 import de.bbk.concurreport.util.Frozen;
-import de.bbk.concurreport.util.Pagebreak;
-import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Kernel;
-import ec.tss.Ts;
-import ec.tss.documents.DocumentManager;
 import ec.tss.html.HtmlStream;
-import ec.tss.html.HtmlTag;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tss.sa.documents.X13Document;
-import ec.tss.tsproviders.utils.MultiLineNameUtil;
-import ec.tstoolkit.algorithm.CompositeResults;
-import ec.tstoolkit.modelling.ModellingDictionary;
-import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import java.awt.Dimension;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -87,7 +74,7 @@ public class Processing {
         if (!"Windows".equals(lookAndFeel.getName())) {
             int n = JOptionPane.showConfirmDialog(
                     null, "You have selected the LookAndFeel Option " + lookAndFeel.getName() + ".\nTherefore the ConCur Report is"
-                    + " not optimized. \nThis might couse problems. \nWould you like to continue anyway?",
+                    + " not optimized.\nThis might cause problems.\nWould you like to continue anyway?",
                     "Warning",
                     JOptionPane.YES_NO_OPTION);
             return n == JOptionPane.YES_OPTION;
@@ -98,94 +85,34 @@ public class Processing {
     private String createOutput(SaItem item) {
         StringWriter writer = new StringWriter();
         SaDocument<?> doc = item.toDocument();
-        X13Document x13doc = (X13Document) doc;
-
         try {
             //Open the stream
             HtmlStream stream = new HtmlStream(writer);
             stream.open();
-
             stream.write(HTMLStyle.STYLE);
-
-            final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
-            stream.write(headerbbk)
-                    .newLine()
-                    .write(createDiv(x13doc));
-
-            stream.write(new Pagebreak())
-                    .write(headerbbk);
-
-            writeCalendar(x13doc, stream);
-
-            stream.newLine()
-                    .write(new HTMLBBKTableD8B(x13doc))
-                    .newLine();
-
-            Ts savedD10 = TsData_Saved.convertMetaDataToTs(x13doc.getMetaData(), SavedTables.SEASONALFACTOR);
-            if (savedD10 != null && savedD10.getTsData() != null) {
-                TsDomain savedD10dom = savedD10.getTsData().getDomain();
-                stream.write("Last available forecast for the ")
-                        .write(SavedTables.NAME_SEASONAL_FACTOR_SAVED)
-                        .write(" is ").write(savedD10dom.getLast().toString())
-                        .write(".").newLine();
+            if (doc instanceof X13Document) {
+                stream.write(new X13Report(item));
+            } else if (doc instanceof TramoSeatsDocument) {
+                stream.write(new TramoSeatsReport(item));
             }
 
-            stream.write(new HTMLBBKSIRatioView(x13doc))
-                    .newLine()
-                    .write(new HtmlComments(x13doc, headerbbk))
-                    .close();
+            stream.close();
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
         return writer.toString();
     }
 
-    private void writeCalendar(X13Document x13doc, HtmlStream stream) throws IOException {
-        CompositeResults results = x13doc.getResults();
-        if (results == null) {
-            return;
-        }
-        TsData a6 = results.getData(X11Kernel.A6, TsData.class);
-        TsData a7 = results.getData(X11Kernel.A7, TsData.class);
-        DecompositionMode mode = results.getData("mode", DecompositionMode.class);
-        TsData tsData;
-        if (a6 == null) {
-            tsData = a7;
-        } else {
-            if (mode.isMultiplicative()) {
-                tsData = a6.times(a7);
-            } else {
-                tsData = a6.plus(a7);
-            }
-        }
-
-        if (tsData != null) {
-            int frequency = tsData.getFrequency().intValue();
-            tsData = InPercent.convertTsDataInPercentIfMult(tsData, mode.isMultiplicative());
-            if (tsData.getDomain().getYearsCount() > 10) {
-                TsDomain domainLastTenYears = new TsDomain(tsData.getEnd().minus(frequency * 10), frequency * 10);
-                tsData = tsData.fittoDomain(domainLastTenYears);
-            }
-
-            stream.write("<table style=\"table-layout:fixed\" >")
-                    .open(HtmlTag.TABLEROW)
-                    .write("<th colspan=\"")
-                    .write(String.valueOf(frequency + 1))
-                    .write("\" style=\"text-align:left\">")
-                    .write(mode.isMultiplicative() ? "A6 * A7" : "A6 + A7")
-                    .close(HtmlTag.TABLEHEADER)
-                    .close(HtmlTag.TABLEROW)
-                    .write(HtmlTsData.builder()
-                            .data(tsData)
-                            .includeTableTags(false)
-                            .build())
-                    .close(HtmlTag.TABLE);
+    public void process(Map<String, List<SaItem>> map) {
+        try {
+            progressHandle.start();
+            run(map);
+        } finally {
+            progressHandle.finish();
         }
     }
 
-    public void process(Map<String, List<SaItem>> map) {
-        progressHandle.start();
-
+    private void run(Map<String, List<SaItem>> map) {
         if (!makeHtmlf() || !checkLookAndFeel()) {
             return;
         }
@@ -196,38 +123,30 @@ public class Processing {
         StringBuilder sbSuccessful = new StringBuilder();
 
         if (just_one_html) {
-            try (FileWriter writer = new FileWriter(htmlf.createHtmlFile("WS"), true);) {
+            try (FileWriter writer = new FileWriter(htmlf.createHtmlFile("WS"), true)) {
                 // alle
                 for (Map.Entry<String, List<SaItem>> entry : map.entrySet()) {
                     String saProcessingName = entry.getKey();
                     List<SaItem> items = entry.getValue();
-                    for (int i = 0; i < items.size(); i++) {
-                        SaItem item = items.get(i);
-                        SaDocument<?> doc = item.toDocument();
+                    for (SaItem item : items) {
                         StringBuilder str = new StringBuilder();
                         str.append(Frozen.removeFrozen(item.getName()))
                                 .append(" in Multi-doc ")
                                 .append(saProcessingName);
                         String name = str.toString().replace("\n", "-");
 
-                        if (doc instanceof X13Document) {
-                            if (item.getStatus() == SaItem.Status.Valid) {
-                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
-                                        .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                        .replace("▶", "&#9654;");
-                                writer.append(output).append('\n');
-                                writer.flush();
-                                sbSuccessful.append(name).append("\n");
-                            } else {
-                                sbError.append(name)
-                                        .append(":\nIt is not possible to create the output because it is not valid\n");
-                            }
+                        if (item.getStatus() == SaItem.Status.Valid) {
+                            String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
+                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                    .replace("▶", "&#9654;");
+                            writer.append(output).append('\n');
+                            writer.flush();
+                            sbSuccessful.append(name).append("\n");
                         } else {
                             sbError.append(name)
-                                    .append(":\nIt is not possible to create the output because it is not a X13 specification\n");
+                                    .append(":\nIt is not possible to create the output because it is not valid\n");
                         }
                         item.compress();
-
                     }
                 }
             } catch (IOException ex) {
@@ -247,45 +166,39 @@ public class Processing {
 
                 for (int i = 0; i < items.size(); i++) {
                     SaItem item = items.get(i);
-                    SaDocument<?> doc = item.toDocument();
                     String str = Frozen.removeFrozen(item.getName())
                             + "in Multi-doc " + saProcessingName;
                     str = str.replace("\n", "-");
 
-                    if (doc instanceof X13Document) {
-                        if (item.getStatus() == SaItem.Status.Valid) {
-                            String output = createOutput(item);
-                            output = output.replace(OLD_STYLE, NEW_STYLE)
-                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                    .replace("▶", "&#9654;");
-                            if (!htmlf.writeHTMLFile(output, item.getName())) {
-                                sbError.append(str)
-                                        .append(":\n")
-                                        .append("It is not possible to create the file\n");
-                                if (!htmlf.getFileName().isEmpty()) {
-                                    sbError.append(htmlf.getFileName())
-                                            .append("\n");
-                                }
-                                sbError.append("Reason: ")
-                                        .append(htmlf.getErrorMessage())
-                                        .append("\n");
-                            } else {
-                                sbSuccessful.append(str).append("\n");
-                            }
-                        } else {
+                    if (item.getStatus() == SaItem.Status.Valid) {
+                        String output = createOutput(item);
+                        output = output.replace(OLD_STYLE, NEW_STYLE)
+                                .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                .replace("▶", "&#9654;");
+                        if (!htmlf.writeHTMLFile(output, item.getName())) {
                             sbError.append(str)
-                                    .append(":\nIt is not possible to create the output because it is not valid\n");
+                                    .append(":\n")
+                                    .append("It is not possible to create the file\n");
+                            if (!htmlf.getFileName().isEmpty()) {
+                                sbError.append(htmlf.getFileName())
+                                        .append("\n");
+                            }
+                            sbError.append("Reason: ")
+                                    .append(htmlf.getErrorMessage())
+                                    .append("\n");
+                        } else {
+                            sbSuccessful.append(str).append("\n");
                         }
                     } else {
                         sbError.append(str)
-                                .append(":\nIt is not possible to create the output because it is not a X13 specification\n");
+                                .append(":\nIt is not possible to create the output because it is not valid\n");
                     }
                     item.compress();
                 }
             });
 
         }
-        progressHandle.finish();
+
         if (!sbError.toString().isEmpty()) {
             JTextArea jta = new JTextArea(sbError.toString());
             jta.setEditable(false);
@@ -302,22 +215,4 @@ public class Processing {
             JOptionPane.showMessageDialog(null, jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-    private HTML2Div createDiv(X13Document x13doc) {
-        Ts tsY = DocumentManager.instance.getTs(x13doc, ModellingDictionary.Y);
-        TsDomain domCharMax5years = FixTimeDomain.domLastFiveYears(tsY);
-
-        HTMLBBKBox leftBox = new HTMLBBKBox();
-        leftBox.add(new HTMLBBKText1(x13doc));
-        leftBox.add(new HTMLWrapperCCA(MultiLineNameUtil.join(x13doc.getInput().getName()), x13doc));
-
-        HTMLBBKBox rightBox = new HTMLBBKBox();
-        rightBox.add(new HTMLBBKChartMain(x13doc, domCharMax5years));
-        rightBox.add(new HTMLBBKChartAutocorrelations(x13doc, false));
-        rightBox.add(new HTMLBBKAutoRegressiveSpectrumView(x13doc));
-        rightBox.add(new HTMLBBKPeriodogram(x13doc));
-
-        return new HTML2Div(leftBox, rightBox);
-    }
-
 }
