@@ -58,22 +58,15 @@ public class LongReport implements IHtmlElement {
 
     private void write(HtmlStream stream, String tsName, boolean withForecast) throws IOException {
         TsData tsData = compositeResults.getData(tsName, TsData.class);
-        int frequency = tsData.getFrequency().intValue();
         if (withForecast) {
             TsData forecast = compositeResults.getData(tsName + "a", TsData.class);
             tsData = tsData.update(forecast);
         }
 
         stream.write("<table style=\"table-layout:fixed\" >")
-                .open(HtmlTag.TABLEROW)
-                .write("<th colspan=\"")
-                .write(String.valueOf(frequency + 1))
-                .write("\" style=\"text-align:left\">")
-                .write(tsName.toUpperCase())
-                .close(HtmlTag.TABLEHEADER)
-                .close(HtmlTag.TABLEROW)
                 .write(HtmlTsData.builder()
                         .data(tsData)
+                        .title(tsName.toUpperCase())
                         .includeTableTags(false)
                         .build())
                 .close(HtmlTag.TABLE)

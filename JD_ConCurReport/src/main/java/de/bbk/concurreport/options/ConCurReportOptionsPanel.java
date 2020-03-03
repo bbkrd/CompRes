@@ -5,17 +5,67 @@
  */
 package de.bbk.concurreport.options;
 
+import de.bbk.concurreport.MainTable;
 import de.bbk.concurreport.ReportStyle;
+import ec.satoolkit.x11.X11Kernel;
+import ec.util.list.swing.JListSelection;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import org.openide.util.NbPreferences;
 
 public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
 
-    private final ConCurReportOptionsOptionsPanelController controller;
+    private final ConCurReportOptionsPanelController controller;
+    private final JListSelection x13Selection, mainSelection, d8bSelection, valueSelection, graphicSelection;
 
-    ConCurReportOptionsPanel(ConCurReportOptionsOptionsPanelController controller) {
+    private static final HashMap<String, Integer> POSITION = new HashMap<>();
+    private static final List<String> ALL_X11_TABLES, MAIN_TABLES, D8B, VALUES, GRAPHICS;
+
+    static {
+        ALL_X11_TABLES = new ArrayList<>();
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_A));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_B));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_C));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_D));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_E));
+
+        int counter = 0;
+        for (String string : ALL_X11_TABLES) {
+            POSITION.put(string, counter++);
+        }
+
+        MAIN_TABLES = new ArrayList<>();
+        Arrays.stream(MainTable.values()).map(item -> item.toString()).forEach(MAIN_TABLES::add);
+        D8B = new ArrayList<>();
+        D8B.add("D8B");
+        VALUES = new ArrayList<>();
+        GRAPHICS = new ArrayList<>();
+    }
+
+    ConCurReportOptionsPanel(ConCurReportOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
+        x13Selection = new JListSelection();
+        userDefineTabs.add("X13", x13Selection);
+
+        mainSelection = new JListSelection();
+        userDefineTabs.add("Main", mainSelection);
+
+        d8bSelection = new JListSelection();
+        userDefineTabs.add("D8B", d8bSelection);
+
+        valueSelection = new JListSelection();
+        userDefineTabs.add("Values", valueSelection);
+
+        graphicSelection = new JListSelection();
+        userDefineTabs.add("Graphic", graphicSelection);
+
+        reportPanel.add(userDefineTabs);
         // TODO listen to changes in form fields and call controller.changed()
     }
 
@@ -31,8 +81,15 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         javax.swing.JPanel hTMLOptionPanel = new javax.swing.JPanel();
         buttonOneHTML = new javax.swing.JRadioButton();
         buttonHTMLforEach = new javax.swing.JRadioButton();
-        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
+        tableSpinner = new javax.swing.JSpinner();
+        graphicSpinner = new javax.swing.JSpinner();
+        javax.swing.JTextPane jTextPane1 = new javax.swing.JTextPane();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        reportPanel = new javax.swing.JPanel();
         reportStyle = new javax.swing.JComboBox<>(de.bbk.concurreport.ReportStyle.values());
+        userDefineTabs = new javax.swing.JTabbedPane();
 
         setMinimumSize(new java.awt.Dimension(389, 100));
 
@@ -59,56 +116,151 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         buttonHTMLforEach.setPreferredSize(new java.awt.Dimension(100, 10));
         hTMLOptionPanel.add(buttonHTMLforEach);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jPanel1.border.title"))); // NOI18N
-        jPanel1.setMaximumSize(new java.awt.Dimension(100, 25));
-        jPanel1.setMinimumSize(new java.awt.Dimension(100, 25));
-        jPanel1.setPreferredSize(new java.awt.Dimension(100, 25));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jPanel2.border.title"))); // NOI18N
+
+        tableSpinner.setModel(new javax.swing.SpinnerNumberModel(5, null, null, 1));
+
+        graphicSpinner.setModel(new javax.swing.SpinnerNumberModel(5, null, null, 1));
+
+        jTextPane1.setEditable(false);
+        jTextPane1.setBackground(new java.awt.Color(240, 240, 240));
+        jTextPane1.setBorder(null);
+        jTextPane1.setText(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jTextPane1.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jLabel1.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.jLabel2.text")); // NOI18N
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addGap(70, 70, 70)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(graphicSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(tableSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(tableSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(graphicSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        reportPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.reportPanel.border.title"))); // NOI18N
+        reportPanel.setMaximumSize(new java.awt.Dimension(100, 25));
+        reportPanel.setMinimumSize(new java.awt.Dimension(100, 25));
+        reportPanel.setPreferredSize(new java.awt.Dimension(100, 25));
 
         reportStyle.setBorder(null);
+        reportStyle.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                reportStyleItemStateChanged(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout reportPanelLayout = new javax.swing.GroupLayout(reportPanel);
+        reportPanel.setLayout(reportPanelLayout);
+        reportPanelLayout.setHorizontalGroup(
+            reportPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reportPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(200, Short.MAX_VALUE))
+                .addGroup(reportPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(reportPanelLayout.createSequentialGroup()
+                        .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(userDefineTabs, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        reportPanelLayout.setVerticalGroup(
+            reportPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reportPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(userDefineTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void reportStyleItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_reportStyleItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            userDefineTabs.setVisible(reportStyle.getSelectedItem() == ReportStyle.INDIVIDUAL);
+        }
+    }//GEN-LAST:event_reportStyleItemStateChanged
+
     void load() {
         Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
 
-        boolean oneHTML = preferences.getBoolean(JUST_ONE_HTML, true);
+        boolean oneHTML = preferences.getBoolean(JUST_ONE_HTML, DEFAULT_JUST_ONE_HTML);
         buttonOneHTML.setSelected(oneHTML);
         buttonHTMLforEach.setSelected(!oneHTML);
 
-        String reportStyleName = preferences.get(REPORT_STYLE, ReportStyle.SHORT.name());
-        reportStyle.setSelectedItem(ReportStyle.valueOf(reportStyleName));
+        String reportStyleName = preferences.get(REPORT_STYLE, DEFAULT_REPORT_STYLE);
+        ReportStyle style = ReportStyle.valueOf(reportStyleName);
+        reportStyle.setSelectedItem(style);
+        userDefineTabs.setVisible(style == ReportStyle.INDIVIDUAL);
+
+        int tableTimespan = preferences.getInt(TIMESPAN_TABLE, DEFAULT_TIMESPAN_TABLE);
+        tableSpinner.setValue(tableTimespan);
+
+        int graphicTimespan = preferences.getInt(TIMESPAN_GRAPHIC, DEFAULT_TIMESPAN_GRAPHIC);
+        graphicSpinner.setValue(graphicTimespan);
+
+        loadUserDefined(preferences, USER_DEFINED_REPORT_CONTENT_X13, "", x13Selection, ALL_X11_TABLES);
+        loadUserDefined(preferences, USER_DEFINED_REPORT_CONTENT_MAIN, "", mainSelection, MAIN_TABLES);
+        loadUserDefined(preferences, USER_DEFINED_REPORT_CONTENT_D8B, "", d8bSelection, D8B);
+        loadUserDefined(preferences, USER_DEFINED_REPORT_CONTENT_VALUE, "", valueSelection, VALUES);
+        loadUserDefined(preferences, USER_DEFINED_REPORT_CONTENT_GRAPHIC, "", graphicSelection, GRAPHICS);
+    }
+
+    private void loadUserDefined(Preferences preferences, String option, String defaultResult, JListSelection selection, List<String> left) {
+        String x13 = preferences.get(option, defaultResult);
+        final List<String> rightElements = Arrays.asList(x13.split(";"));
+        selection.getSourceModel().clear();
+        left.stream().filter(x -> !rightElements.contains(x)).forEach(x -> selection.getSourceModel().addElement(x));
+        selection.getTargetModel().clear();
+        rightElements.stream().forEach(x -> selection.getTargetModel().addElement(x));
     }
 
     void store() {
@@ -119,20 +271,75 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
 
         ReportStyle selectedReportStyle = (ReportStyle) reportStyle.getSelectedItem();
         preferences.put(REPORT_STYLE, selectedReportStyle.name());
+
+        Number tableTimespan = (Number) tableSpinner.getValue();
+        preferences.putInt(TIMESPAN_TABLE, tableTimespan.intValue());
+
+        Number graphicTimeSpan = (Number) graphicSpinner.getValue();
+        preferences.putInt(TIMESPAN_GRAPHIC, graphicTimeSpan.intValue());
+
+        String x13 = Arrays.stream(x13Selection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .sorted(this::sortByPosition)
+                .collect(Collectors.joining(";"));
+        preferences.put(USER_DEFINED_REPORT_CONTENT_X13, x13);
+
+        String main = Arrays.stream(mainSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .collect(Collectors.joining(";"));
+        preferences.put(USER_DEFINED_REPORT_CONTENT_MAIN, main);
+
+        String d8b = Arrays.stream(d8bSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .collect(Collectors.joining(";"));
+        preferences.put(USER_DEFINED_REPORT_CONTENT_D8B, d8b);
+
+        String value = Arrays.stream(valueSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .collect(Collectors.joining(";"));
+        preferences.put(USER_DEFINED_REPORT_CONTENT_VALUE, value);
+
+        String graphic = Arrays.stream(graphicSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .collect(Collectors.joining(";"));
+        preferences.put(USER_DEFINED_REPORT_CONTENT_GRAPHIC, graphic);
+
     }
 
     public static final String JUST_ONE_HTML = "oneHTML";
     public static final String REPORT_STYLE = "reportStyle";
+    public static final String TIMESPAN_TABLE = "timespan_table";
+    public static final String TIMESPAN_GRAPHIC = "timespan_graphic";
+    public static final String USER_DEFINED_REPORT_CONTENT_X13 = "user_defined_report_content_x13";
+    public static final String USER_DEFINED_REPORT_CONTENT_MAIN = "user_defined_report_content_main";
+    public static final String USER_DEFINED_REPORT_CONTENT_D8B = "user_defined_report_content_d8b";
+    public static final String USER_DEFINED_REPORT_CONTENT_VALUE = "user_defined_report_content_value";
+    public static final String USER_DEFINED_REPORT_CONTENT_GRAPHIC = "user_defined_report_content_graphic";
+
+    public static final String DEFAULT_REPORT_STYLE = ReportStyle.SHORT.name();
+    public static final boolean DEFAULT_JUST_ONE_HTML = true;
+    public static final int DEFAULT_TIMESPAN_TABLE = 10;
+    public static final int DEFAULT_TIMESPAN_GRAPHIC = 10;
 
     boolean valid() {
         // TODO check whether form is consistent and complete
         return true;
     }
 
+    private int sortByPosition(String o1, String o2) {
+        Integer o1Position = POSITION.getOrDefault(o1, -1);
+        Integer o2Position = POSITION.getOrDefault(o2, -1);
+        return Integer.compare(o1Position, o2Position);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JRadioButton buttonHTMLforEach;
     private javax.swing.JRadioButton buttonOneHTML;
+    private javax.swing.JSpinner graphicSpinner;
+    private javax.swing.JPanel reportPanel;
     private javax.swing.JComboBox<de.bbk.concurreport.ReportStyle> reportStyle;
+    private javax.swing.JSpinner tableSpinner;
+    private javax.swing.JTabbedPane userDefineTabs;
     // End of variables declaration//GEN-END:variables
 }

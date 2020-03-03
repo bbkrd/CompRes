@@ -43,7 +43,8 @@ public class X13Report implements IHtmlElement {
                 report = new D8BReport(item);
                 break;
             case INDIVIDUAL:
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                report = new IndividualReport(item);
+                break;
             default:
                 throw new AssertionError(reportStyle.name());
 

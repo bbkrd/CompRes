@@ -103,29 +103,17 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
         TsData seasonallyAdjustedPercentageChange = tpc.getSeasonallyAdjusted().getTsData();
         TsData savedSeasonallyAdjustedPercentageChange = tpc.getSavedSeasonallyAdjusted().getTsData();
 
-        stream.open(HtmlTag.TABLEROW);
-        stream.write("<th colspan=\"")
-                .write(String.valueOf(frequency + 1))
-                .write("\" style=\"text-align:left; border-top: 3px solid\">")
-                .write("new GR");
-        stream.close(HtmlTag.TABLEHEADER);
-        stream.close(HtmlTag.TABLEROW);
         stream.write(HtmlTsData.builder()
                 .data(lastYearOfSeries(domain, seasonallyAdjustedPercentageChange))
+                .title("new GR")
                 .includeHeader(false)
                 .includeTableTags(false)
                 .dataItalic(true)
                 .build());
 
-        stream.open(HtmlTag.TABLEROW);
-        stream.write("<th colspan=\"")
-                .write(String.valueOf(frequency + 1))
-                .write("\" style=\"text-align:left\">")
-                .write("current GR");
-        stream.close(HtmlTag.TABLEHEADER);
-        stream.close(HtmlTag.TABLEROW);
         stream.write(HtmlTsData.builder()
                 .data(lastYearOfSeries(domain, savedSeasonallyAdjustedPercentageChange))
+                .title("current GR")
                 .includeHeader(false)
                 .includeTableTags(false)
                 .dataItalic(true)
@@ -192,34 +180,19 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
         try {
             d8b(stream);
 
-            stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"")
-                    .write(String.valueOf(frequency + 1))
-                    .write("\" style=\"text-align:left\">")
-                    .write("new");
-            stream.close(HtmlTag.TABLEHEADER);
-            stream.close(HtmlTag.TABLEROW);
             if (d8BInfos.getSeasonalFactor() != null) {
-
                 stream.write(HtmlTsData.builder()
                         .data(d8BInfos.getSeasonalFactor().getTsData())
+                        .title("new")
                         .includeHeader(false)
                         .includeTableTags(false)
                         .numberFormat(FMT)
                         .build());
             }
-
-            stream.open(HtmlTag.TABLEROW);
-            stream.write("<th colspan=\"")
-                    .write(String.valueOf(frequency + 1))
-                    .write("\" style=\"text-align:left\">")
-                    .write("current");
-
-            stream.close(HtmlTag.TABLEHEADER);
-            stream.close(HtmlTag.TABLEROW);
             if (d8BInfos.getSavedSeasonalFactor() != null) {
                 stream.write(HtmlTsData.builder()
                         .data(d8BInfos.getSavedSeasonalFactor().getTsData())
+                        .title("current")
                         .includeHeader(false)
                         .includeTableTags(false)
                         .numberFormat(FMT)

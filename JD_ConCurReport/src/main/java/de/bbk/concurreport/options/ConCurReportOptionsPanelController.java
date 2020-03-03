@@ -14,13 +14,16 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 @OptionsPanelController.SubRegistration(
-        displayName = "#AdvancedOption_DisplayName_ConCurReportOptions",
-        keywords = "#AdvancedOption_Keywords_ConCurReportOptions",
-        keywordsCategory = "Advanced/ConCurReportOptions"
+        location = "Demetra",
+        displayName = "#AdvancedOption_DisplayName_ConCurReport",
+        keywords = "#AdvancedOption_Keywords_ConCurReport",
+        keywordsCategory = "Advanced/ConCurReport",
+        id = ConCurReportOptionsPanelController.ID
 )
-@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_ConCurReportOptions=ConCurReportOptions", "AdvancedOption_Keywords_ConCurReportOptions=ConCurReportOptions"})
-public final class ConCurReportOptionsOptionsPanelController extends OptionsPanelController {
+@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_ConCurReport=ConCurReport", "AdvancedOption_Keywords_ConCurReport=ConCurReport"})
+public final class ConCurReportOptionsPanelController extends OptionsPanelController {
 
+    public static final String ID = "Demetra/ConCurReport";
     private ConCurReportOptionsPanel panel;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;

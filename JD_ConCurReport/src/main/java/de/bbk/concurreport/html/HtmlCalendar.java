@@ -49,15 +49,9 @@ public class HtmlCalendar implements IHtmlElement {
             }
 
             stream.write("<table style=\"table-layout:fixed\" >")
-                    .open(HtmlTag.TABLEROW)
-                    .write("<th colspan=\"")
-                    .write(String.valueOf(frequency + 1))
-                    .write("\" style=\"text-align:left\">")
-                    .write(header)
-                    .close(HtmlTag.TABLEHEADER)
-                    .close(HtmlTag.TABLEROW)
                     .write(HtmlTsData.builder()
                             .data(calendarFactor)
+                            .title(header)
                             .includeTableTags(false)
                             .build())
                     .close(HtmlTag.TABLE);
