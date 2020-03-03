@@ -40,10 +40,10 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Thomas Witthohn
  */
-public class BbkSeatstViewFactory extends SaDocumentViewFactory<TramoSeatsSpecification, TramoSeatsDocument> {
+public class BbkSeatsViewFactory extends SaDocumentViewFactory<TramoSeatsSpecification, TramoSeatsDocument> {
 
     public static final String BBK = "ConCur";
-    public static final String CCA = "CCA (if multiplicative then in pct.)";
+    public static final String CCA = "CCA";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
     public static final String OLD = "Old";

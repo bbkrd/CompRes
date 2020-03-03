@@ -22,6 +22,7 @@ package de.bbk.concur.util;
 
 import ec.nbdemetra.ui.NbComponents;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.X13Document;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -43,6 +44,7 @@ public final class JPanelCCA extends JPanel implements IDisposable {
     private final JSplitPane d8Pane;
     private final JSplitPane d10aPane;
     private final JSplitPane d10aOldPane;
+    private final JLabel lblD8;
     private static final int ROW_HEIGHT = 19;
     private static final int ROW_WIDTH = 70;
     private D8BInfos d8BInfos;
@@ -61,7 +63,7 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d10SavedGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         d10SavedGrid.setMode(ITsGrid.Mode.SINGLETS);
 
-        JLabel lblD8 = new JLabel("D8B", JLabel.CENTER);
+        lblD8 = new JLabel("D8B", JLabel.CENTER);
         d8Pane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD8, d8Grid);
 
         d8Pane.setEnabled(false);
@@ -111,6 +113,12 @@ public final class JPanelCCA extends JPanel implements IDisposable {
             fixSize(d10aOldPane, d8BInfos.getFrequency(), d8BInfos.getSavedSeasonalFactor().getTsData().getDomain().getYearsCount());
         } else {
             fixSize(d10aOldPane, d8BInfos.getFrequency(), 1);
+        }
+
+        if (doc instanceof X13Document) {
+            lblD8.setText("D8B");
+        } else {
+            lblD8.setText("Pseudo D8B");
         }
     }
 

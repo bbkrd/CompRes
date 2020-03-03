@@ -100,10 +100,10 @@ public class D8BInfos {
         }
 
         Ts savedSeasonalFactorTemp = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
-        if (savedSeasonalFactorTemp != null && savedSeasonalFactorTemp.getTsData() != null && savedSeasonalFactorTemp.getTsData().getFrequency().intValue() != frequency) {
+        if (savedSeasonalFactorTemp.getTsData() != null && savedSeasonalFactorTemp.getTsData().getFrequency().intValue() != frequency) {
             savedSeasonalFactor = TsFactory.instance.createTs(savedSeasonalFactorTemp.getName());
             savedSeasonalFactor.setInvalidDataCause("Frequency mismatch");
-        } else if (savedSeasonalFactorTemp != null && savedSeasonalFactorTemp.getTsData() != null) {
+        } else if (savedSeasonalFactorTemp.getTsData() != null) {
             TsDomain intersectionDomain = savedSeasonalFactorTemp.getTsData().getDomain().intersection(domain);
             savedSeasonalFactor = TsFactory.instance.createTs(savedSeasonalFactorTemp.getName(), savedSeasonalFactorTemp.getMetaData(), savedSeasonalFactorTemp.getTsData().fittoDomain(intersectionDomain));
         } else {

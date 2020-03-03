@@ -31,5 +31,5 @@ import ec.tstoolkit.design.ServiceDefinition;
 @ServiceDefinition
 public interface IExternalDataProvider {
 
-    public Ts convertMetaDataToTs(MetaData meta, String tableName);
+    Ts convertMetaDataToTs(MetaData meta, String tableName);
 }

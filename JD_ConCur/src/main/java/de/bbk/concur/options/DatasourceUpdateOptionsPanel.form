@@ -18,11 +18,17 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="checkBoxDefaultDataSource" max="32767" attributes="0"/>
-                  <Component id="providerBox" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="matrixTabs" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="checkBoxDefaultDataSource" max="32767" attributes="0"/>
+                          <Component id="providerBox" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="121" max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace pref="240" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -33,7 +39,9 @@
               <Component id="checkBoxDefaultDataSource" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="providerBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="matrixTabs" pref="198" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -61,5 +69,9 @@
         <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="Collection&lt;? extends IExternalDataProvider&gt; collection =Lookup.getDefault().lookupAll(IExternalDataProvider.class);&#xa;      String[] names = collection.stream().map(x -&gt; x.getClass().getName()).toArray(size -&gt; new String[size]);"/>
       </AuxValues>
     </Component>
+    <Container class="javax.swing.JTabbedPane" name="matrixTabs">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+    </Container>
   </SubComponents>
 </Form>

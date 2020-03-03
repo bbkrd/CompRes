@@ -6,14 +6,6 @@
 package de.bbk.concur;
 
 import de.bbk.concur.util.SavedTables;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_TREND_WITH_FORECAST;
-import static de.bbk.concur.util.SavedTables.NAME_CALENDAR_FACTOR_SAVED;
-import static de.bbk.concur.util.SavedTables.NAME_SEASONAL_FACTOR_SAVED;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import de.bbk.concur.util.TsData_Saved;
 import ec.tss.Ts;
@@ -45,20 +37,20 @@ public class TablesPercentageChange {
             return;
         }
 
-        series = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST));
-        trend = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_TREND_WITH_FORECAST));
-        irregular = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST));
-        seasonallyAdjusted = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST));
-        seasonalFactor = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST));
-        calendarFactor = percentageChange(DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST));
+        series = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST));
+        trend = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_TREND_WITH_FORECAST));
+        irregular = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST));
+        seasonallyAdjusted = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED);
+        seasonalFactor = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR);
+        calendarFactor = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_CALENDAR_FACTOR);
 
-        savedSeasonallyAdjusted = percentageChange(SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc));
-        savedSeasonalFactor = percentageChange(TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR).rename(NAME_SEASONAL_FACTOR_SAVED));
-        savedCalenderFactor = percentageChange(TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR).rename(NAME_CALENDAR_FACTOR_SAVED));
+        savedSeasonallyAdjusted = percentageChange(SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc)).rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED);
+        savedSeasonalFactor = percentageChange(TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR)).rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR_SAVED);
+        savedCalenderFactor = percentageChange(TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR)).rename(SavedTables.NAME_SHORT_CALENDAR_FACTOR_SAVED);
     }
 
     private Ts percentageChange(Ts ts) {
-        Ts tsPercentageChange = TsFactory.instance.createTs(ts.getName() + " (PtP GR)");
+        Ts tsPercentageChange = TsFactory.instance.createTs(ts.getName());
         TsData tsData = ts.getTsData();
         tsPercentageChange.set(percentageChange(tsData));
         return tsPercentageChange;

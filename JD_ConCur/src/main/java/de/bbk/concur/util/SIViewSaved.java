@@ -62,6 +62,7 @@ import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.XYItemEntity;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
@@ -124,7 +125,7 @@ public class SIViewSaved extends ATsView {
         Bornes bperiod = map.get(dd);
 
         Graphs g = graphs_.get(bperiod);
-        showDetail(g, bperiod);
+        showDetail(g);
 
         return detailChart;
     }
@@ -134,7 +135,7 @@ public class SIViewSaved extends ATsView {
 
     private final RevealObs revealObs;
 
-    private static XYItemEntity highlight;
+    private XYItemEntity highlight;
 
     static class Bornes {
 
@@ -276,11 +277,9 @@ public class SIViewSaved extends ATsView {
                     if (masterChart.equals(chartPanel.getChart())) {
                         double x = chartPanel.getChartX(e.getX());
                         Graphs g = null;
-                        Bornes fb = Bornes.ZERO;
                         for (Bornes b : graphs_.keySet()) {
                             if (x >= b.min_ && x <= b.max_) {
                                 g = graphs_.get(b);
-                                fb = b;
                                 break;
                             }
                         }
@@ -288,7 +287,7 @@ public class SIViewSaved extends ATsView {
                             return;
                         }
 
-                        showDetail(g, fb);
+                        showDetail(g);
                     } else if (detailChart.equals(chartPanel.getChart())) {
                         showMain();
                     }
@@ -370,7 +369,7 @@ public class SIViewSaved extends ATsView {
         onColorSchemeChange();
     }
 
-    private void showDetail(Graphs g, Bornes fb) {
+    private void showDetail(Graphs g) {
         XYPlot plot = detailChart.getXYPlot();
 
         NumberAxis yAxis = new NumberAxis();
@@ -415,10 +414,6 @@ public class SIViewSaved extends ATsView {
         }
 
         Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
-        if (seasonalfactor == null) {
-            reset();
-            return;
-        }
         DecompositionMode mode = doc.getFinalDecomposition().getMode();
         IProcResults decomposition = doc.getDecompositionPart();
 
@@ -688,8 +683,9 @@ public class SIViewSaved extends ATsView {
 
         @Override
         public void chartMouseMoved(ChartMouseEvent event) {
-            if (event.getEntity() instanceof XYItemEntity) {
-                XYItemEntity xxx = (XYItemEntity) event.getEntity();
+            ChartEntity entity = event.getEntity();
+            if (entity instanceof XYItemEntity) {
+                XYItemEntity xxx = (XYItemEntity) entity;
                 setHighlightedObs(xxx);
             } else {
                 setHighlightedObs(null);

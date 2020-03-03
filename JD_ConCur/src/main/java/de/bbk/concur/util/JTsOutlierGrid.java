@@ -171,8 +171,8 @@ public class JTsOutlierGrid extends JTsGrid {
                                             .append(fixedOutlier.getCode()).append("<br>");
                                     setBackground(ColorChooser.getColor(fixedOutlier.getCode()));
                                     setForeground(ColorChooser.getForeColor(fixedOutlier.getCode()));
+                                    break;
                                 }
-                                break;
                             }
 
                         }

@@ -21,20 +21,54 @@
 package de.bbk.concur.options;
 
 import de.bbk.concur.servicedefinition.IExternalDataProvider;
+import ec.satoolkit.x11.X11Kernel;
+import ec.util.list.swing.JListSelection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
 
 public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
 
     private final DatasourceUpdateOptionsOptionsPanelController controller;
+    private final JListSelection matrixOneSelection, matrixTwoSelection;
+
+    public static final String USEDEFAULT = "useDefault",
+            PROVIDERNAME = "providerName",
+            MATRIX_VIEW_ONE = "matrixViewOne",
+            MATRIX_VIEW_ONE_DEFAULT = "a1;b1;d11;d12",
+            MATRIX_VIEW_TWO = "matrixViewTwo",
+            MATRIX_VIEW_TWO_DEFAULT = "a6;a9;d10;d13";
+
+    private static final List<String> ALL_X11_TABLES;
+    private static final HashMap<String, Integer> POSITION = new HashMap<>();
+
+    static {
+        ALL_X11_TABLES = new ArrayList<>();
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_A));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_B));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_C));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_D));
+        ALL_X11_TABLES.addAll(Arrays.asList(X11Kernel.ALL_E));
+
+        int counter = 0;
+        for (String string : ALL_X11_TABLES) {
+            POSITION.put(string, counter++);
+        }
+    }
 
     public DatasourceUpdateOptionsPanel(DatasourceUpdateOptionsOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-
-        // TODO listen to changes in form fields and call controller.changed()
+        matrixOneSelection = new JListSelection();
+        matrixTabs.add("Matrix view one", matrixOneSelection);
+        matrixTwoSelection = new JListSelection();
+        matrixTabs.add("Matrix view two", matrixTwoSelection);
     }
 
     /**
@@ -47,6 +81,7 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
 
         checkBoxDefaultDataSource = new javax.swing.JCheckBox();
         providerBox = new javax.swing.JComboBox();
+        matrixTabs = new javax.swing.JTabbedPane();
 
         checkBoxDefaultDataSource.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(checkBoxDefaultDataSource, org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxDefaultDataSource.text")); // NOI18N
@@ -67,10 +102,14 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(checkBoxDefaultDataSource, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(providerBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(240, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(matrixTabs)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(checkBoxDefaultDataSource, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(providerBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 121, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,7 +118,9 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
                 .addComponent(checkBoxDefaultDataSource)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(providerBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(matrixTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -92,13 +133,24 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         String providerName = preferences.get(PROVIDERNAME, "");
         providerBox.setSelectedItem(providerName);
 
-        boolean b = NbPreferences.forModule(DatasourceUpdateOptionsPanel.class).getBoolean(USEDEFAULT, true);
+        boolean b = preferences.getBoolean(USEDEFAULT, true);
         checkBoxDefaultDataSource.setSelected(b || providerBox.getItemCount() == 0);
         checkBoxDefaultDataSource.setEnabled(providerBox.getItemCount() != 0);
 
+        String mvo = preferences.get(MATRIX_VIEW_ONE, MATRIX_VIEW_ONE_DEFAULT);
+        final List<String> rightElements = Arrays.asList(mvo.split(";"));
+        matrixOneSelection.getSourceModel().clear();
+        ALL_X11_TABLES.stream().filter(x -> !rightElements.contains(x)).forEach(x -> matrixOneSelection.getSourceModel().addElement(x));
+        matrixOneSelection.getTargetModel().clear();
+        rightElements.stream().forEach(x -> matrixOneSelection.getTargetModel().addElement(x));
+
+        String mvt = preferences.get(MATRIX_VIEW_TWO, MATRIX_VIEW_TWO_DEFAULT);
+        final List<String> rightElements2 = Arrays.asList(mvt.split(";"));
+        matrixTwoSelection.getSourceModel().clear();
+        ALL_X11_TABLES.stream().filter(x -> !rightElements2.contains(x)).forEach(x -> matrixTwoSelection.getSourceModel().addElement(x));
+        matrixTwoSelection.getTargetModel().clear();
+        rightElements2.stream().forEach(x -> matrixTwoSelection.getTargetModel().addElement(x));
     }
-    public static final String USEDEFAULT = "useDefault",
-            PROVIDERNAME = "providerName";
 
     void store() {
         Preferences preferences = NbPreferences.forModule(DatasourceUpdateOptionsPanel.class);
@@ -110,6 +162,18 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
             preferences.remove(PROVIDERNAME);
         }
 
+        String mvo = Arrays.stream(matrixOneSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .sorted(this::sortByPosition)
+                .collect(Collectors.joining(";"));
+        preferences.put(MATRIX_VIEW_ONE, mvo);
+
+        String mvt = Arrays.stream(matrixTwoSelection.getTargetModel().toArray())
+                .map(x -> x.toString())
+                .sorted(this::sortByPosition)
+                .collect(Collectors.joining(";"));
+        preferences.put(MATRIX_VIEW_TWO, mvt);
+
     }
 
     boolean valid() {
@@ -117,8 +181,15 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         return true;
     }
 
+    private int sortByPosition(String o1, String o2) {
+        Integer o1Position = POSITION.getOrDefault(o1, -1);
+        Integer o2Position = POSITION.getOrDefault(o2, -1);
+        return Integer.compare(o1Position, o2Position);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxDefaultDataSource;
+    private javax.swing.JTabbedPane matrixTabs;
     private javax.swing.JComboBox providerBox;
     // End of variables declaration//GEN-END:variables
 

@@ -31,7 +31,7 @@ public class SavedTables {
     public static final String CALENDARFACTOR = "calendarfactor";
 //    public static final String FORECAST = "forecast";
 
-    public static enum TABLES {
+    public enum TABLES {
         SEASONALFACTOR, CALENDARFACTOR, FORECAST
     }
 
@@ -47,8 +47,13 @@ public class SavedTables {
     public static final String NAME_SERIES = "Series";
     public static final String NAME_IRREGULAR = "Irregular";
 
-    //   Ts x = DocumentManager.instance.getTs(doc, "@composite@Series=,final.y,final.y_f", false);
-    // public static final String COMPOSITE_RESULTS_SERIES = ModellingDictionary.Y;
+    public static final String NAME_SHORT_SEASONALLY_ADJUSTED_SAVED = "SA (old)";
+    public static final String NAME_SHORT_SEASONAL_FACTOR_SAVED = "SF (old)";
+    public static final String NAME_SHORT_CALENDAR_FACTOR_SAVED = "CF (old)";
+    public static final String NAME_SHORT_SEASONALLY_ADJUSTED = "SA (new)";
+    public static final String NAME_SHORT_SEASONAL_FACTOR = "SF (new)";
+    public static final String NAME_SHORT_CALENDAR_FACTOR = "CF (new)";
+
     public static final String COMPOSITE_RESULTS_SERIES = "@composite@" + NAME_SERIES + "=,final.y,";
     public static final String COMPOSITE_RESULTS_TREND = "@composite@" + NAME_TREND + "=,final.t,";
     public static final String COMPOSITE_RESULTS_IRREGULAR = "@composite@" + NAME_IRREGULAR + "=,final.i,";
@@ -57,6 +62,7 @@ public class SavedTables {
     public static final String COMPOSITE_RESULTS_TREND_WITH_FORECAST = "@composite@" + NAME_TREND + "=,final.t,final.t_f";
     public static final String COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST = "@composite@" + NAME_IRREGULAR + "=,final.i,final.i_f";
     public static final String COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST = "@composite@" + NAME_SEASONALLY_ADJUSTED + "=,final.sa,final.sa_f";
+    public static final String COMPOSITE_RESULTS_CALENDAR = "@composite@" + NAME_CALENDAR_FACTOR + "=,cal,";
     public static final String COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST = "@composite@" + NAME_CALENDAR_FACTOR + "=,cal,cal_f";
     public static final String COMPOSITE_RESULTS_SEASONAL = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,";
     public static final String COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,s_cmp_f";

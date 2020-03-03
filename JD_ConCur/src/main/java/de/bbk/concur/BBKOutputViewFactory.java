@@ -43,11 +43,13 @@ import org.openide.util.lookup.ServiceProvider;
 public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
 
     public static final String BBK = "ConCur";
-    public static final String CCA = "CCA (if multiplicative then in pct.)";
+    public static final String CCA = "CCA";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
     public static final String OLD = "Old";
     public static final String PERCENTAGECHANGE = "Percentage Change";
+    public static final String LEVEL = "Level";
+    public static final String TRANSFORM_DEPENDENT = "Transformation dependent";
     public static final Id BBK_MAIN = new LinearId(BBK);
     public static final Id BBK_CHARTS = new LinearId(BBK, CHARTS);
     public static final Id BBK_CHARTS_SA = new LinearId(BBK, CHARTS, SA);
@@ -58,6 +60,8 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     public static final Id BBK_TABLE = new LinearId(BBK, TABLE);
     public static final Id BBK_TABLE_SERIES = new LinearId(BBK, TABLE, SERIES);
     public static final Id BBK_TABLE_PERCENTAGECHANGE = new LinearId(BBK, TABLE, PERCENTAGECHANGE);
+    public static final Id BBK_MATRIX_LEVEL = new LinearId(BBK, MATRIX, LEVEL);
+    public static final Id BBK_MATRIX_TRANSFORM_DEPENDENT = new LinearId(BBK, MATRIX, TRANSFORM_DEPENDENT);
 
     @Override
     public Id getPreferredView() {
@@ -244,6 +248,42 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     }
 
     //</editor-fold>
+    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220050)
+    public static class MatrixLevelViewFactory extends ItemFactory<X13Document> {
+
+        public MatrixLevelViewFactory() {
+            super(BBK_MATRIX_LEVEL, new DefaultInformationExtractor<X13Document, X13Document>() {
+                @Override
+                public X13Document retrieve(X13Document source) {
+                    return source;
+                }
+            }, new PooledItemUI<View, X13Document, MatrixView>(MatrixView.class) {
+                @Override
+                protected void init(MatrixView c, View host, X13Document information) {
+                    c.set(information, false);
+                }
+            });
+        }
+    }
+
+    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220060)
+    public static class MatrixTransformViewFactory extends ItemFactory<X13Document> {
+
+        public MatrixTransformViewFactory() {
+            super(BBK_MATRIX_TRANSFORM_DEPENDENT, new DefaultInformationExtractor<X13Document, X13Document>() {
+                @Override
+                public X13Document retrieve(X13Document source) {
+                    return source;
+                }
+            }, new PooledItemUI<View, X13Document, MatrixView>(MatrixView.class) {
+                @Override
+                protected void init(MatrixView c, View host, X13Document information) {
+                    c.set(information, true);
+                }
+            });
+        }
+    }
+
     private static class ItemFactory<I> extends ComposedProcDocumentItemFactory<X13Document, I> {
 
         ItemFactory(Id itemId, InformationExtractor<? super X13Document, I> informationExtractor, ItemUI<? extends IProcDocumentView<X13Document>, I> itemUI) {

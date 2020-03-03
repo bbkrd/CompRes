@@ -22,10 +22,8 @@ package de.bbk.concur.view;
 
 import de.bbk.concur.util.InPercent;
 import de.bbk.concur.util.SavedTables;
-import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import de.bbk.concur.util.TsData_Saved;
-import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
@@ -62,46 +60,38 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         }
 
         boolean isMultiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
-        Ts series = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST, false);
+        Ts series = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST, false);
         seriesGridContent.add(series);
 
-        Ts trend = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_TREND_WITH_FORECAST, false);
+        Ts trend = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_TREND_WITH_FORECAST, false);
         seriesGridContent.add(trend);
 
-        Ts irreg = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST, false);
+        Ts irreg = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST, false);
         seriesGridContent.add(irreg);
 
-        Ts seasonallyAdjusted = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST, false);
-        seriesGridContent.add(seasonallyAdjusted);
+        Ts seasonallyAdjusted = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST, false);
+        seriesGridContent.add(seasonallyAdjusted.rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED));
 
         Ts savedSeasonallyAdjusted = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
-        seriesGridContent.add(savedSeasonallyAdjusted);
+        seriesGridContent.add(savedSeasonallyAdjusted.rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED));
 
-        Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST, false);
+        Ts seasonalFactor = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST, false);
         if (seasonalFactor.getTsData() != null) {
             seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactor, isMultiplicative);
         }
-        seriesGridContent.add(seasonalFactor.rename(NAME_SEASONAL_FACTOR));
+        seriesGridContent.add(seasonalFactor.rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR));
 
         Ts savedSeasonalFactors = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
-        seriesGridContent.add(savedSeasonalFactors.rename(NAME_SEASONAL_FACTOR_SAVED));
+        seriesGridContent.add(savedSeasonalFactors.rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR_SAVED));
 
-        Ts calendarFactor = getCalendarFactor(doc);
-        seriesGridContent.add(calendarFactor);
+        Ts calendarFactor = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST);
+        if (calendarFactor.getTsData() != null) {
+            calendarFactor = InPercent.convertTsInPercentIfMult(calendarFactor, isMultiplicative);
+        }
+        seriesGridContent.add(calendarFactor.rename(SavedTables.NAME_SHORT_CALENDAR_FACTOR));
 
         Ts savedCalendarFactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.CALENDARFACTOR);
-        seriesGridContent.add(savedCalendarFactor.rename(NAME_CALENDAR_FACTOR_SAVED));
-
-    }
-
-    private Ts getCalendarFactor(SaDocument doc) {
-        DecompositionMode mode = doc.getFinalDecomposition().getMode();
-
-        Ts calendarFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST);
-        if (calendarFactor.getTsData() != null) {
-            return InPercent.convertTsInPercentIfMult(calendarFactor, mode.isMultiplicative());
-        }
-        return calendarFactor;
+        seriesGridContent.add(savedCalendarFactor.rename(SavedTables.NAME_SHORT_CALENDAR_FACTOR_SAVED));
 
     }
 
