@@ -129,19 +129,24 @@ public class Processing {
                     String saProcessingName = entry.getKey();
                     List<SaItem> items = entry.getValue();
                     for (SaItem item : items) {
+                        item.process();
                         StringBuilder str = new StringBuilder();
                         str.append(Frozen.removeFrozen(item.getName()))
-                                .append(" in Multi-doc ")
+                                .append("in Multi-doc ")
                                 .append(saProcessingName);
                         String name = str.toString().replace("\n", "-");
 
                         if (item.getStatus() == SaItem.Status.Valid) {
-                            String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
-                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                    .replace("▶", "&#9654;");
-                            writer.append(output).append('\n');
-                            writer.flush();
-                            sbSuccessful.append(name).append("\n");
+                            try {
+                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
+                                        .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                        .replace("▶", "&#9654;");
+                                writer.append(output).append('\n');
+                                writer.flush();
+                                sbSuccessful.append(name).append("\n");
+                            } catch (ReportException ex) {
+                                sbError.append(name).append(": ").append(ex.getMessage()).append("\n");
+                            }
                         } else {
                             sbError.append(name)
                                     .append(":\nIt is not possible to create the output because it is not valid\n");
@@ -164,30 +169,34 @@ public class Processing {
             map.keySet().stream().forEach((saProcessingName) -> {
                 List<SaItem> items = map.get(saProcessingName);
 
-                for (int i = 0; i < items.size(); i++) {
-                    SaItem item = items.get(i);
+                for (SaItem item : items) {
+                    item.process();
                     String str = Frozen.removeFrozen(item.getName())
                             + "in Multi-doc " + saProcessingName;
                     str = str.replace("\n", "-");
 
                     if (item.getStatus() == SaItem.Status.Valid) {
-                        String output = createOutput(item);
-                        output = output.replace(OLD_STYLE, NEW_STYLE)
-                                .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                .replace("▶", "&#9654;");
-                        if (!htmlf.writeHTMLFile(output, item.getName())) {
-                            sbError.append(str)
-                                    .append(":\n")
-                                    .append("It is not possible to create the file\n");
-                            if (!htmlf.getFileName().isEmpty()) {
-                                sbError.append(htmlf.getFileName())
+                        try {
+                            String output = createOutput(item);
+                            output = output.replace(OLD_STYLE, NEW_STYLE)
+                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                    .replace("▶", "&#9654;");
+                            if (!htmlf.writeHTMLFile(output, item.getName())) {
+                                sbError.append(str)
+                                        .append(":\n")
+                                        .append("It is not possible to create the file\n");
+                                if (!htmlf.getFileName().isEmpty()) {
+                                    sbError.append(htmlf.getFileName())
+                                            .append("\n");
+                                }
+                                sbError.append("Reason: ")
+                                        .append(htmlf.getErrorMessage())
                                         .append("\n");
+                            } else {
+                                sbSuccessful.append(str).append("\n");
                             }
-                            sbError.append("Reason: ")
-                                    .append(htmlf.getErrorMessage())
-                                    .append("\n");
-                        } else {
-                            sbSuccessful.append(str).append("\n");
+                        } catch (ReportException ex) {
+                            sbError.append(str).append(": ").append(ex.getMessage()).append("\n");
                         }
                     } else {
                         sbError.append(str)

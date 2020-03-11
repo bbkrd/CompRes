@@ -72,9 +72,9 @@ public class HtmlTsData extends AbstractHtmlElement {
         }
 
         int maxDomainLength = data.getEnd().getPosition() + maxTimeInYears * frequency;
-        TsDomain x = new TsDomain(data.getEnd().minus(maxDomainLength), maxDomainLength + 1).intersection(data.getDomain());
+        TsDomain domain = new TsDomain(data.getEnd().minus(maxDomainLength), maxDomainLength + 1).intersection(data.getDomain());
 
-        YearIterator iter = new YearIterator(data.fittoDomain(x));
+        YearIterator iter = new YearIterator(data.fittoDomain(domain));
         while (iter.hasMoreElements()) {
             stream.open(HtmlTag.TABLEROW);
             TsDataBlock block = iter.nextElement();

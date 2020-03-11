@@ -5,6 +5,7 @@
  */
 package de.bbk.concurreport.options;
 
+import de.bbk.concurreport.Graphic;
 import de.bbk.concurreport.MainTable;
 import de.bbk.concurreport.ReportStyle;
 import ec.satoolkit.x11.X11Kernel;
@@ -41,10 +42,14 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
 
         MAIN_TABLES = new ArrayList<>();
         Arrays.stream(MainTable.values()).map(item -> item.toString()).forEach(MAIN_TABLES::add);
+
         D8B = new ArrayList<>();
         D8B.add("D8B");
+
         VALUES = new ArrayList<>();
+
         GRAPHICS = new ArrayList<>();
+        Arrays.stream(Graphic.values()).map(item -> item.toString()).forEach(GRAPHICS::add);
     }
 
     ConCurReportOptionsPanel(ConCurReportOptionsPanelController controller) {

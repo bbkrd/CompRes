@@ -14,7 +14,6 @@ import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import java.io.IOException;
 
 /**
@@ -41,12 +40,7 @@ public class HtmlCalendar implements IHtmlElement {
         }
 
         if (calendarFactor != null) {
-            int frequency = calendarFactor.getFrequency().intValue();
             calendarFactor = InPercent.convertTsDataInPercentIfMult(calendarFactor, multiplicative);
-            if (calendarFactor.getDomain().getYearsCount() > 10) {
-                TsDomain domainLastTenYears = new TsDomain(calendarFactor.getEnd().minus(frequency * 10), frequency * 10);
-                calendarFactor = calendarFactor.fittoDomain(domainLastTenYears);
-            }
 
             stream.write("<table style=\"table-layout:fixed\" >")
                     .write(HtmlTsData.builder()

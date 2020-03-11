@@ -42,7 +42,7 @@ public enum MainTable {
         return compositeFormula;
     }
 
-    public MainTable fromDisplayName(String displayName) {
+    public static MainTable fromDisplayName(String displayName) {
         for (MainTable value : MainTable.values()) {
             if (value.displayName.equalsIgnoreCase(displayName)) {
                 return value;

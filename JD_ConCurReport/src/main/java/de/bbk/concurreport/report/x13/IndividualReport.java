@@ -5,6 +5,9 @@
  */
 package de.bbk.concurreport.report.x13;
 
+import de.bbk.concurreport.Graphic;
+import de.bbk.concurreport.MainTable;
+import de.bbk.concurreport.html.HTMLBBKTableD8B;
 import de.bbk.concurreport.html.HTMLBBkHeader;
 import de.bbk.concurreport.html.HtmlTsData;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
@@ -55,6 +58,34 @@ public class IndividualReport implements IHtmlElement {
                             .build())
                             .newLine();
                 }
+            }
+            String main = preferences.get(USER_DEFINED_REPORT_CONTENT_MAIN, "");
+            for (String name : main.split(";")) {
+                MainTable table = MainTable.fromDisplayName(name);
+                if (table == null) {
+                    continue;
+                }
+                Ts ts = DocumentManager.instance.getTs(doc, table.getCompositeFormula());
+                if (ts.getTsData() != null) {
+                    stream.write(HtmlTsData.builder()
+                            .data(ts.getTsData())
+                            .title(name)
+                            .build())
+                            .newLine();
+                }
+            }
+
+            String d8b = preferences.get(USER_DEFINED_REPORT_CONTENT_D8B, "");
+            if (!d8b.isEmpty()) {
+                stream.write(new HTMLBBKTableD8B(doc));
+            }
+            String graphics = preferences.get(USER_DEFINED_REPORT_CONTENT_GRAPHIC, "");
+            for (String name : graphics.split(";")) {
+                Graphic graphic = Graphic.fromDisplayName(name);
+                if (graphic == null) {
+                    continue;
+                }
+                stream.write(graphic.createFromDoc(doc));
             }
         } else {
             stream.write("The item doesn't contain a X13Specification!");

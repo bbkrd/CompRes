@@ -406,11 +406,10 @@ public class SIViewSaved extends ATsView {
         }
     }
 
-    public void setDoc(SaDocument doc) {
-
+    public boolean setDoc(SaDocument doc) {
         if (doc == null || doc.getDecompositionPart() == null) {
             reset();
-            return;
+            return false;
         }
 
         Ts seasonalfactor = TsData_Saved.convertMetaDataToTs(doc.getMetaData(), SavedTables.SEASONALFACTOR);
@@ -422,7 +421,7 @@ public class SIViewSaved extends ATsView {
         TsData seas = decomposition.getData(ModellingDictionary.S_CMP, TsData.class);
         if (seas == null) {
             reset();
-            return;
+            return false;
         }
         if (doc instanceof X13Document) {
             si = decomposition.getData(X11Kernel.D8, TsData.class);
@@ -448,6 +447,7 @@ public class SIViewSaved extends ATsView {
             correctionValues = convertTsDataInPercentIfMult(correctionValues, mode.isMultiplicative());
         }
         this.setSiData(seas, si, seasonalfactor.getTsData(), correctionValues);
+        return true;
     }
 
     /**

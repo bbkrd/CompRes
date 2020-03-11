@@ -5,6 +5,7 @@
  */
 package de.bbk.concurreport.report.tramo;
 
+import de.bbk.concurreport.ReportException;
 import de.bbk.concurreport.ReportStyle;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
 import static de.bbk.concurreport.options.ConCurReportOptionsPanel.REPORT_STYLE;
@@ -37,12 +38,12 @@ public class TramoSeatsReport implements IHtmlElement {
                 report = new ShortReport(item);
                 break;
             case LONG:
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                throw new ReportException("Long reports for TramoSeats are not supported yet.");
             case D8B:
                 report = new D8BReport(item);
                 break;
             case INDIVIDUAL:
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                throw new ReportException("Userdefined reports for TramoSeats are not supported yet.");
             default:
                 throw new AssertionError(reportStyle.name());
 

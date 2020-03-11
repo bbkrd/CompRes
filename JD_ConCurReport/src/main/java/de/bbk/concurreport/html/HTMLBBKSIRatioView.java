@@ -57,7 +57,10 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
     public void write(HtmlStream stream) throws IOException {
 
         SIViewSaved sIViewSaved = new SIViewSaved();
-        sIViewSaved.setDoc(doc);
+        if (!sIViewSaved.setDoc(doc)) {
+            sIViewSaved.dispose();
+            return;
+        }
 
         sIViewSaved.setSize(new Dimension(WIDTH, HEIGHT));
         sIViewSaved.setMaximumSize(new Dimension(WIDTH, HEIGHT));
@@ -72,11 +75,11 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
         sIViewSaved.doLayout();
         ByteArrayOutputStream osLast = new ByteArrayOutputStream();
         Charts.writeChartAsSVG(osLast, sIViewSaved.getDetailChart(lastPeriod), WIDTH, HEIGHT);
-        ByteArrayOutputStream osForeast = new ByteArrayOutputStream();
-        Charts.writeChartAsSVG(osForeast, sIViewSaved.getDetailChart(forelastPeriod), WIDTH, HEIGHT);
+        ByteArrayOutputStream osForelast = new ByteArrayOutputStream();
+        Charts.writeChartAsSVG(osForelast, sIViewSaved.getDetailChart(forelastPeriod), WIDTH, HEIGHT);
 
         HTMLByteArrayOutputStream lastArrayOutputStream = new HTMLByteArrayOutputStream(osLast);
-        HTMLByteArrayOutputStream forelastArrayOutputStream = new HTMLByteArrayOutputStream(osForeast);
+        HTMLByteArrayOutputStream forelastArrayOutputStream = new HTMLByteArrayOutputStream(osForelast);
 
         HTML2Div div = new HTML2Div(forelastArrayOutputStream, lastArrayOutputStream);
         div.write(stream);
