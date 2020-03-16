@@ -18,8 +18,9 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package de.bbk.concurreport;
+package de.bbk.concurreport.actions;
 
+import de.bbk.concurreport.Processing;
 import ec.nbdemetra.sa.MultiProcessingDocument;
 import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.ws.IWorkspaceItemManager;

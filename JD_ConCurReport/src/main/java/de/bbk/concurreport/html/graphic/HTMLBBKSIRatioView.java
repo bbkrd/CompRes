@@ -18,9 +18,11 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package de.bbk.concurreport.html;
+package de.bbk.concurreport.html.graphic;
 
 import de.bbk.concur.util.SIViewSaved;
+import de.bbk.concurreport.html.HTML2Div;
+import de.bbk.concurreport.html.HTMLByteArrayOutputStream;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;

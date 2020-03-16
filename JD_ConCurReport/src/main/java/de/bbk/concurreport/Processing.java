@@ -158,7 +158,7 @@ public class Processing {
                 java.util.logging.Logger.getLogger(Processing.class.getName()).log(Level.SEVERE, null, ex);
                 sbError.append(":\n")
                         .append("- It is not possible to create the file:\n")
-                        .append(htmlf.getFileName())
+                        .append(htmlf.getFilePath())
                         .append("\n because ")
                         .append(htmlf.getErrorMessage())
                         .append("\n");
@@ -185,8 +185,8 @@ public class Processing {
                                 sbError.append(str)
                                         .append(":\n")
                                         .append("It is not possible to create the file\n");
-                                if (!htmlf.getFileName().isEmpty()) {
-                                    sbError.append(htmlf.getFileName())
+                                if (!htmlf.getFilePath().isEmpty()) {
+                                    sbError.append(htmlf.getFilePath())
                                             .append("\n");
                                 }
                                 sbError.append("Reason: ")

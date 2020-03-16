@@ -18,8 +18,9 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package de.bbk.concurreport;
+package de.bbk.concurreport.actions;
 
+import de.bbk.concurreport.Processing;
 import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
@@ -45,8 +46,7 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionReferences({
     @ActionReference(path = MultiProcessingManager.CONTEXTPATH, position = 2260)
-    ,
-    @ActionReference(path = MultiProcessingManager.LOCALPATH, position = 2260)
+    ,@ActionReference(path = MultiProcessingManager.LOCALPATH, position = 2260)
 })
 
 @Messages("CTL_ConCurReport=Create HTML")

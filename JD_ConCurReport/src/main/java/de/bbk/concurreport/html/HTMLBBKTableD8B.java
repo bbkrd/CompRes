@@ -98,11 +98,9 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
     private void writeGrowthRates(HtmlStream stream) throws IOException {
 
         TsDomain domain = document.getSeries().getDomain();
-        TablesPercentageChange tpc = new TablesPercentageChange(document);;
+        TablesPercentageChange tpc = new TablesPercentageChange(document);
 
-        TsData seasonallyAdjustedPercentageChange = tpc.getSeasonallyAdjusted().getTsData();
-        TsData savedSeasonallyAdjustedPercentageChange = tpc.getSavedSeasonallyAdjusted().getTsData();
-
+        TsData seasonallyAdjustedPercentageChange = tpc.getSeasonallyAdjusted() != null ? tpc.getSeasonallyAdjusted().getTsData() : new TsData(domain);
         stream.write(HtmlTsData.builder()
                 .data(lastYearOfSeries(domain, seasonallyAdjustedPercentageChange))
                 .title("new GR")
@@ -111,6 +109,7 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
                 .dataItalic(true)
                 .build());
 
+        TsData savedSeasonallyAdjustedPercentageChange = tpc.getSavedSeasonallyAdjusted() != null ? tpc.getSavedSeasonallyAdjusted().getTsData() : new TsData(domain);
         stream.write(HtmlTsData.builder()
                 .data(lastYearOfSeries(domain, savedSeasonallyAdjustedPercentageChange))
                 .title("current GR")
@@ -179,25 +178,24 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
     private void writeD8B(HtmlStream stream) {
         try {
             d8b(stream);
+            TsDomain domain = document.getSeries().getDomain();
+            TsData seasonalFactor = d8BInfos.getSeasonalFactor() != null ? d8BInfos.getSeasonalFactor().getTsData() : new TsData(domain);
+            stream.write(HtmlTsData.builder()
+                    .data(lastYearOfSeries(domain, seasonalFactor))
+                    .title("new")
+                    .includeHeader(false)
+                    .includeTableTags(false)
+                    .numberFormat(FMT)
+                    .build());
 
-            if (d8BInfos.getSeasonalFactor() != null) {
-                stream.write(HtmlTsData.builder()
-                        .data(d8BInfos.getSeasonalFactor().getTsData())
-                        .title("new")
-                        .includeHeader(false)
-                        .includeTableTags(false)
-                        .numberFormat(FMT)
-                        .build());
-            }
-            if (d8BInfos.getSavedSeasonalFactor() != null) {
-                stream.write(HtmlTsData.builder()
-                        .data(d8BInfos.getSavedSeasonalFactor().getTsData())
-                        .title("current")
-                        .includeHeader(false)
-                        .includeTableTags(false)
-                        .numberFormat(FMT)
-                        .build());
-            }
+            TsData savedSeasonalFactor = d8BInfos.getSavedSeasonalFactor() != null ? d8BInfos.getSavedSeasonalFactor().getTsData() : new TsData(domain);
+            stream.write(HtmlTsData.builder()
+                    .data(lastYearOfSeries(domain, savedSeasonalFactor))
+                    .title("current")
+                    .includeHeader(false)
+                    .includeTableTags(false)
+                    .numberFormat(FMT)
+                    .build());
 
             if (document.getMetaData() != null) {
                 String savedID = document.getMetaData().get("prodebene.seasonalfactor.loadid");

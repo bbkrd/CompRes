@@ -18,8 +18,9 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package de.bbk.concurreport;
+package de.bbk.concurreport.actions;
 
+import de.bbk.concurreport.Processing;
 import ec.nbdemetra.sa.MultiProcessingDocument;
 import ec.nbdemetra.ws.WorkspaceItem;
 import ec.nbdemetra.ws.nodes.ItemWsNode;
@@ -39,13 +40,13 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.NodeAction;
 
 @ActionID(category = "Edit",
-          id = "de.bundesbank.jdemetra.sa.multidocextension.CreateSelectedMultidoc")
+        id = "de.bundesbank.jdemetra.sa.multidocextension.CreateSelectedMultidoc")
 @ActionRegistration(
         displayName = "#CTL_CreateSelectedMultidoc", lazy = false)
 @ActionReference(path = "Menu/Tools", position = 2100)
 
 @Messages({"CTL_CreateSelectedMultidoc=Create HTML for selected multi-documents",
-           "CTL_CreateSelectedMultidoc_Message=Do you really want to create the output for the selected multi-documents?"})
+    "CTL_CreateSelectedMultidoc_Message=Do you really want to create the output for the selected multi-documents?"})
 
 public final class CreateSelectedMultidoc extends NodeAction {
 

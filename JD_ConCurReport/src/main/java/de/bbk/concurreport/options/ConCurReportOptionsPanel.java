@@ -8,6 +8,7 @@ package de.bbk.concurreport.options;
 import de.bbk.concurreport.Graphic;
 import de.bbk.concurreport.MainTable;
 import de.bbk.concurreport.ReportStyle;
+import de.bbk.concurreport.Value;
 import ec.satoolkit.x11.X11Kernel;
 import ec.util.list.swing.JListSelection;
 import java.awt.event.ItemEvent;
@@ -47,6 +48,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         D8B.add("D8B");
 
         VALUES = new ArrayList<>();
+        Arrays.stream(Value.values()).map(item -> item.toString()).forEach(VALUES::add);
 
         GRAPHICS = new ArrayList<>();
         Arrays.stream(Graphic.values()).map(item -> item.toString()).forEach(GRAPHICS::add);
@@ -265,7 +267,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         selection.getSourceModel().clear();
         left.stream().filter(x -> !rightElements.contains(x)).forEach(x -> selection.getSourceModel().addElement(x));
         selection.getTargetModel().clear();
-        rightElements.stream().forEach(x -> selection.getTargetModel().addElement(x));
+        rightElements.stream().filter(x -> !"".equals(x)).forEach(x -> selection.getTargetModel().addElement(x));
     }
 
     void store() {

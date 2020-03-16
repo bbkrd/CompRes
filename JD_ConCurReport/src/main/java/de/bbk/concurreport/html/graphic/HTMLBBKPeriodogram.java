@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package de.bbk.concurreport.html;
+package de.bbk.concurreport.html.graphic;
 
 import de.bbk.concurreport.BbkPeriodogramView;
 import ec.tss.Ts;

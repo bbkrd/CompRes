@@ -5,10 +5,10 @@
  */
 package de.bbk.concurreport;
 
-import de.bbk.concurreport.html.HTMLBBKAutoRegressiveSpectrumView;
-import de.bbk.concurreport.html.HTMLBBKChartAutocorrelations;
-import de.bbk.concurreport.html.HTMLBBKPeriodogram;
-import de.bbk.concurreport.html.HTMLBBKSIRatioView;
+import de.bbk.concurreport.html.graphic.HTMLBBKAutoRegressiveSpectrumView;
+import de.bbk.concurreport.html.graphic.HTMLBBKChartAutocorrelations;
+import de.bbk.concurreport.html.graphic.HTMLBBKPeriodogram;
+import de.bbk.concurreport.html.graphic.HTMLBBKSIRatioView;
 import ec.satoolkit.ISaSpecification;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.documents.SaDocument;

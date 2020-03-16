@@ -7,6 +7,7 @@ package de.bbk.concurreport.report.x13;
 
 import de.bbk.concurreport.Graphic;
 import de.bbk.concurreport.MainTable;
+import de.bbk.concurreport.Value;
 import de.bbk.concurreport.html.HTMLBBKTableD8B;
 import de.bbk.concurreport.html.HTMLBBkHeader;
 import de.bbk.concurreport.html.HtmlTsData;
@@ -43,35 +44,36 @@ public class IndividualReport implements IHtmlElement {
                 .newLine();
         SaDocument<?> doc = item.toDocument();
         if (doc instanceof X13Document) {
-//            X13Document x13doc = (X13Document) doc;
             Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
-            int tableTimespan = preferences.getInt(TIMESPAN_TABLE, DEFAULT_TIMESPAN_TABLE);
-            int graphicTimespan = preferences.getInt(TIMESPAN_GRAPHIC, DEFAULT_TIMESPAN_GRAPHIC);
 
             String x13 = preferences.get(USER_DEFINED_REPORT_CONTENT_X13, "");
-            for (String name : x13.split(";")) {
-                Ts ts = DocumentManager.instance.getTs(doc, name);
-                if (ts.getTsData() != null) {
-                    stream.write(HtmlTsData.builder()
-                            .data(ts.getTsData())
-                            .title(name.toUpperCase())
-                            .build())
-                            .newLine();
+            if (!x13.isEmpty()) {
+                for (String name : x13.split(";")) {
+                    Ts ts = DocumentManager.instance.getTs(doc, name);
+                    if (ts.getTsData() != null) {
+                        stream.write(HtmlTsData.builder()
+                                .data(ts.getTsData())
+                                .title(name.toUpperCase())
+                                .build())
+                                .newLine();
+                    }
                 }
             }
             String main = preferences.get(USER_DEFINED_REPORT_CONTENT_MAIN, "");
-            for (String name : main.split(";")) {
-                MainTable table = MainTable.fromDisplayName(name);
-                if (table == null) {
-                    continue;
-                }
-                Ts ts = DocumentManager.instance.getTs(doc, table.getCompositeFormula());
-                if (ts.getTsData() != null) {
-                    stream.write(HtmlTsData.builder()
-                            .data(ts.getTsData())
-                            .title(name)
-                            .build())
-                            .newLine();
+            if (!main.isEmpty()) {
+                for (String name : main.split(";")) {
+                    MainTable table = MainTable.fromDisplayName(name);
+                    if (table == null) {
+                        continue;
+                    }
+                    Ts ts = DocumentManager.instance.getTs(doc, table.getCompositeFormula());
+                    if (ts.getTsData() != null) {
+                        stream.write(HtmlTsData.builder()
+                                .data(ts.getTsData())
+                                .title(name)
+                                .build())
+                                .newLine();
+                    }
                 }
             }
 
@@ -79,13 +81,26 @@ public class IndividualReport implements IHtmlElement {
             if (!d8b.isEmpty()) {
                 stream.write(new HTMLBBKTableD8B(doc));
             }
-            String graphics = preferences.get(USER_DEFINED_REPORT_CONTENT_GRAPHIC, "");
-            for (String name : graphics.split(";")) {
-                Graphic graphic = Graphic.fromDisplayName(name);
-                if (graphic == null) {
-                    continue;
+            String values = preferences.get(USER_DEFINED_REPORT_CONTENT_VALUE, "");
+            if (!values.isEmpty()) {
+                for (String name : values.split(";")) {
+                    Value value = Value.fromDisplayName(name);
+                    if (value == null) {
+                        continue;
+                    }
+                    stream.write(value.createFromDoc(doc)).newLine();
                 }
-                stream.write(graphic.createFromDoc(doc));
+            }
+
+            String graphics = preferences.get(USER_DEFINED_REPORT_CONTENT_GRAPHIC, "");
+            if (!graphics.isEmpty()) {
+                for (String name : graphics.split(";")) {
+                    Graphic graphic = Graphic.fromDisplayName(name);
+                    if (graphic == null) {
+                        continue;
+                    }
+                    stream.write(graphic.createFromDoc(doc));
+                }
             }
         } else {
             stream.write("The item doesn't contain a X13Specification!");

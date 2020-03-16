@@ -42,6 +42,7 @@ public class HTMLRegressionModel extends AbstractHtmlElement {
 
     @Override
     public void write(HtmlStream stream) throws IOException {
+        stream.write(HtmlTag.HEADER2, "Regression model").newLine();
         writeMean(stream);
         TsFrequency context = preprocessingModel.description.getEstimationDomain().getFrequency();
         writeRegressionItems(stream, context, true, var -> var instanceof ITradingDaysVariable);
@@ -55,7 +56,7 @@ public class HTMLRegressionModel extends AbstractHtmlElement {
         writeRegressionItems(stream, "Ramps", true, context, var -> var instanceof Ramp);
         writeRegressionItems(stream, "Intervention variables", true, context, var -> var instanceof InterventionVariable);
         writeRegressionItems(stream, "User variables", true, context, var -> var instanceof IUserTsVariable
-                             && !(var instanceof InterventionVariable) && !(var instanceof Ramp));
+                && !(var instanceof InterventionVariable) && !(var instanceof Ramp));
         writeFixedRegressionItems(stream, "Fixed other regression effects", context, var -> var.isUser());
         writeMissing(stream);
     }

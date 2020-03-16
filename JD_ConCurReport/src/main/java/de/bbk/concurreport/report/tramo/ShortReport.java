@@ -7,12 +7,12 @@ package de.bbk.concurreport.report.tramo;
 
 import de.bbk.concur.util.FixTimeDomain;
 import de.bbk.concurreport.html.HTML2Div;
-import de.bbk.concurreport.html.HTMLBBKAutoRegressiveSpectrumView;
+import de.bbk.concurreport.html.graphic.HTMLBBKAutoRegressiveSpectrumView;
 import de.bbk.concurreport.html.HTMLBBKBox;
-import de.bbk.concurreport.html.HTMLBBKChartAutocorrelations;
-import de.bbk.concurreport.html.HTMLBBKChartMain;
-import de.bbk.concurreport.html.HTMLBBKPeriodogram;
-import de.bbk.concurreport.html.HTMLBBKSIRatioView;
+import de.bbk.concurreport.html.graphic.HTMLBBKChartAutocorrelations;
+import de.bbk.concurreport.html.graphic.HTMLBBKChartMain;
+import de.bbk.concurreport.html.graphic.HTMLBBKPeriodogram;
+import de.bbk.concurreport.html.graphic.HTMLBBKSIRatioView;
 import de.bbk.concurreport.html.HTMLBBKTableD8B;
 import de.bbk.concurreport.html.HTMLBBKText1;
 import de.bbk.concurreport.html.HTMLBBkHeader;
