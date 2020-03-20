@@ -20,8 +20,11 @@
  */
 package de.bbk.concur.options;
 
+import static de.bbk.concur.BBKOutputViewFactory.LEVEL;
+import static de.bbk.concur.BBKOutputViewFactory.TRANSFORM_DEPENDENT;
 import de.bbk.concur.servicedefinition.IExternalDataProvider;
 import ec.satoolkit.x11.X11Kernel;
+import static ec.ui.view.tsprocessing.sa.SaDocumentViewFactory.MATRIX;
 import ec.util.list.swing.JListSelection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,9 +69,9 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         this.controller = controller;
         initComponents();
         matrixOneSelection = new JListSelection();
-        matrixTabs.add("Matrix view one", matrixOneSelection);
+        matrixTabs.add(MATRIX + " " + LEVEL, matrixOneSelection);
         matrixTwoSelection = new JListSelection();
-        matrixTabs.add("Matrix view two", matrixTwoSelection);
+        matrixTabs.add(MATRIX + " " + TRANSFORM_DEPENDENT, matrixTwoSelection);
     }
 
     /**

@@ -35,7 +35,7 @@ public class D8BInfos {
 
     public D8BInfos(SaDocument doc) {
         IProcResults decomposition = doc.getDecompositionPart();
-        if (decomposition == null) {
+        if (decomposition == null || doc.getFinalDecomposition() == null) {
             this.frequency = 0;
             this.si = null;
             this.replacementValues = null;

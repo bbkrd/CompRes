@@ -1,15 +1,15 @@
-/* 
+/*
  * Copyright 2017 Deutsche Bundesbank
- * 
+ *
  * Licensed under the EUPL, Version 1.1 or – as soon they
- * will be approved by the European Commission - subsequent 
+ * will be approved by the European Commission - subsequent
  * versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the
  * Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl.html
- * 
+ *
  * Unless required by applicable law or agreed to in
  * writing, software distributed under the Licence is
  * distributed on an "AS IS" basis,
@@ -47,7 +47,7 @@ public class FixTimeDomain {
      * @return a new timesereis with the domain set in the Constructor
      */
     public Ts getTsWithDomain(Ts ts) {
-        if (ts.getTsData() == null || ts.getTsData().isEmpty()) {
+        if (ts == null || ts.getTsData() == null || ts.getTsData().isEmpty()) {
             return ts;
         } else {
             Ts t = TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));

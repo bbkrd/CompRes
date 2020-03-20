@@ -30,6 +30,9 @@ public class HtmlCalendar implements IHtmlElement {
 
     @Override
     public void write(HtmlStream stream) throws IOException {
+        if (doc.getFinalDecomposition() == null) {
+            return;
+        }
         boolean multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
         TsData calendarFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST).getTsData();
         String header;

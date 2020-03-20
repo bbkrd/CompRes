@@ -407,7 +407,7 @@ public class SIViewSaved extends ATsView {
     }
 
     public boolean setDoc(SaDocument doc) {
-        if (doc == null || doc.getDecompositionPart() == null) {
+        if (doc == null || doc.getDecompositionPart() == null || doc.getFinalDecomposition() == null) {
             reset();
             return false;
         }

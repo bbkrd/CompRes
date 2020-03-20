@@ -58,7 +58,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         this.controller = controller;
         initComponents();
         x13Selection = new JListSelection();
-        userDefineTabs.add("X13", x13Selection);
+        userDefineTabs.add("X13 Tables", x13Selection);
 
         mainSelection = new JListSelection();
         userDefineTabs.add("Main", mainSelection);

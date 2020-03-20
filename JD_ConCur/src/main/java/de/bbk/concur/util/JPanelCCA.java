@@ -91,7 +91,12 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d8Grid.getTsCollection().clear();
         d10Grid.getTsCollection().clear();
         d10SavedGrid.getTsCollection().clear();
-
+        if (!d8BInfos.isValid()) {
+            fixSize(d8Pane, 12, 1);
+            fixSize(d10aPane, 12, 1);
+            fixSize(d10aOldPane, 12, 1);
+            return;
+        }
         d8Grid.getTsCollection().add(d8BInfos.getSi());
         d8Grid.setSelection(d8Grid.getTsCollection().toArray());
         d8Grid.setOutliers(d8BInfos.getBoth());

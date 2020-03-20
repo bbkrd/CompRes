@@ -50,7 +50,11 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
         this.title = title;
         this.model = doc.getPreprocessingPart();
         this.decomposition = doc.getDecompositionPart();
-        this.multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
+        if (doc.getFinalDecomposition() != null) {
+            this.multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
+        } else {
+            this.multiplicative = false;
+        }
     }
 
     @Override

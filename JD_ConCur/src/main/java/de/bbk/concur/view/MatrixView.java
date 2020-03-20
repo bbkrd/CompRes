@@ -53,7 +53,7 @@ public class MatrixView extends JComponent implements IDisposable {
 
     public void set(SaDocument doc, boolean automatic) {
         seriesGridContent.clear();
-        if (doc == null) {
+        if (doc == null || doc.getFinalDecomposition() == null) {
             return;
         }
         boolean multiplicative;

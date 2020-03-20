@@ -37,9 +37,14 @@ import ec.tstoolkit.timeseries.simplets.TsFrequency;
 public class SeasonallyAdjusted_Saved {
 
     public static final Ts calcSeasonallyAdjusted(SaDocument doc) {
-        DecompositionMode mode = doc.getFinalDecomposition().getMode();
-        TsData tsdA1_all = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
-        return calcSeasonallyAdjusted(doc.getMetaData(), mode, tsdA1_all);
+        if (doc.getFinalDecomposition() != null) {
+            DecompositionMode mode = doc.getFinalDecomposition().getMode();
+            TsData tsdA1_all = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
+            return calcSeasonallyAdjusted(doc.getMetaData(), mode, tsdA1_all);
+        }
+        Ts createTs = TsFactory.instance.createTs(SavedTables.NAME_SEASONALLY_ADJUSTED_SAVED);
+        createTs.setInvalidDataCause("Invalid Adjustment");
+        return createTs;
     }
 
     public static final Ts calcSeasonallyAdjusted(MetaData meta, DecompositionMode mode, TsData tsdSeriesWithForecast) {

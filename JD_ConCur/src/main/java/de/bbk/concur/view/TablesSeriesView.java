@@ -55,7 +55,7 @@ public class TablesSeriesView extends JComponent implements IDisposable {
 
     public void set(SaDocument doc) {
         seriesGridContent.clear();
-        if (doc == null) {
+        if (doc == null || doc.getFinalDecomposition() == null) {
             return;
         }
 

@@ -63,7 +63,7 @@ public class OnlySAView extends JComponent implements IDisposable {
         }
 
         chart.getTsCollection().clear();
-        if (doc.getDecompositionPart() != null) {
+        if (doc.getDecompositionPart() != null && doc.getFinalDecomposition() != null) {
 
             TsCollection items = DocumentManager.create(Arrays.asList(names), doc);
             chart.getTsCollection().append(items);
