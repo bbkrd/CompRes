@@ -154,7 +154,7 @@ public class HTMLFiles {
                 switch (override) {
                     case ASK:
                         option = JOptionPane.showOptionDialog(null, "The file for " + saItemName + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                                new Object[]{"Yes", "Yes to all", "Select new path", "No", "No to all"}, "");
+                                new Object[]{"Yes", "Yes to all", "Select new name", "No", "No to all"}, "");
                         break;
                     case YES:
                         option = 0;
