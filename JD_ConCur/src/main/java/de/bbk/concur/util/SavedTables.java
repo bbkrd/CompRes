@@ -48,11 +48,11 @@ public class SavedTables {
     public static final String NAME_IRREGULAR = "Irregular";
 
     public static final String NAME_SHORT_SEASONALLY_ADJUSTED_SAVED = "SA (old)";
-    public static final String NAME_SHORT_SEASONAL_FACTOR_SAVED = "SF (old)";
-    public static final String NAME_SHORT_CALENDAR_FACTOR_SAVED = "CF (old)";
+    public static final String NAME_SHORT_SEASONAL_FACTOR_SAVED = "S (old)";
+    public static final String NAME_SHORT_CALENDAR_FACTOR_SAVED = "C (old)";
     public static final String NAME_SHORT_SEASONALLY_ADJUSTED = "SA (new)";
-    public static final String NAME_SHORT_SEASONAL_FACTOR = "SF (new)";
-    public static final String NAME_SHORT_CALENDAR_FACTOR = "CF (new)";
+    public static final String NAME_SHORT_SEASONAL_FACTOR = "S (new)";
+    public static final String NAME_SHORT_CALENDAR_FACTOR = "C (new)";
 
     public static final String COMPOSITE_RESULTS_SERIES = "@composite@" + NAME_SERIES + "=,final.y,";
     public static final String COMPOSITE_RESULTS_TREND = "@composite@" + NAME_TREND + "=,final.t,";
