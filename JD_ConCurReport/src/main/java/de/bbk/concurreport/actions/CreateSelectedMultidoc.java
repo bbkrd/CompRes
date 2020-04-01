@@ -50,8 +50,8 @@ import org.openide.util.actions.NodeAction;
 
 public final class CreateSelectedMultidoc extends NodeAction {
 
-    private static final Class<ItemWsNode> nodeType = ItemWsNode.class;
-    private static final Class<MultiProcessingDocument> itemType = MultiProcessingDocument.class;
+    private static final Class<ItemWsNode> NODE_TYPE = ItemWsNode.class;
+    private static final Class<MultiProcessingDocument> ITEM_TYPE = MultiProcessingDocument.class;
 
     @Override
     protected boolean enable(Node[] activatedNodes) {
@@ -59,7 +59,7 @@ public final class CreateSelectedMultidoc extends NodeAction {
             return false;
         }
         for (Node activatedNode : activatedNodes) {
-            if (!nodeType.isInstance(activatedNode) || ((ItemWsNode) activatedNode).getItem(itemType) == null) {
+            if (!NODE_TYPE.isInstance(activatedNode) || ((ItemWsNode) activatedNode).getItem(ITEM_TYPE) == null) {
                 return false;
             }
         }
@@ -82,17 +82,17 @@ public final class CreateSelectedMultidoc extends NodeAction {
         if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
             return;
         }
-        Map<String, List<SaItem>> map = new TreeMap<>();
+        new Thread(() -> {
+            Map<String, List<SaItem>> map = new TreeMap<>();
 
-        for (Node activatedNode : activatedNodes) {
-            WorkspaceItem<MultiProcessingDocument> item = ((ItemWsNode) activatedNode).getItem(itemType);
-            SaProcessing saProcessing = item.getElement().getCurrent();
-            map.put(item.getDisplayName(), saProcessing);
-        }
+            for (Node activatedNode : activatedNodes) {
+                WorkspaceItem<MultiProcessingDocument> item = ((ItemWsNode) activatedNode).getItem(ITEM_TYPE);
+                SaProcessing saProcessing = item.getElement().getCurrent();
+                map.put(item.getDisplayName(), saProcessing);
+            }
 
-        Processing p = new Processing();
-//        p.start(map);
-        p.process(map);
-
+            Processing p = new Processing();
+            p.process(map);
+        }).start();
     }
 }

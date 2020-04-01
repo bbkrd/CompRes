@@ -68,15 +68,23 @@ public class HTMLFiles {
 
         currentDir = null;
         Platform.runLater(() -> {
-            File file = directoryChooser.showDialog(null);
-            if (file != null) {
-                currentDir = file.getAbsolutePath();
-                NbPreferences.forModule(HTMLFiles.class).put(LAST_FOLDER, currentDir);
-                if (!Files.isWritable(file.toPath())) {
-                    errorMessage = "You do not have the right to write in " + currentDir;
+            File file = null;
+            try {
+                file = directoryChooser.showDialog(null);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
+                directoryChooser.setInitialDirectory(null);
+                file = directoryChooser.showDialog(null);
+            } finally {
+                if (file != null) {
+                    currentDir = file.getAbsolutePath();
+                    NbPreferences.forModule(HTMLFiles.class).put(LAST_FOLDER, currentDir);
+                    if (!Files.isWritable(file.toPath())) {
+                        errorMessage = "You do not have the right to write in " + currentDir;
+                    }
+                } else {
+                    currentDir = "";
                 }
-            } else {
-                currentDir = "";
             }
         });
 
@@ -102,14 +110,18 @@ public class HTMLFiles {
 
         filePath = null;
         Platform.runLater(() -> {
-            File tmp = fileChooser.showSaveDialog(null);
-            if (tmp != null) {
-                filePath = tmp.getAbsolutePath();
-                if (!Files.isWritable(tmp.toPath())) {
-                    errorMessage = "You do not have the right to write in " + filePath;
+            File tmp = null;
+            try {
+                tmp = fileChooser.showSaveDialog(null);
+            } finally {
+                if (tmp != null) {
+                    filePath = tmp.getAbsolutePath();
+                    if (!Files.isWritable(tmp.toPath())) {
+                        errorMessage = "You do not have the right to write in " + filePath;
+                    }
+                } else {
+                    filePath = "";
                 }
-            } else {
-                filePath = "";
             }
         });
 
@@ -189,7 +201,7 @@ public class HTMLFiles {
             } else {
                 errorMessage = "No path selected";
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             errorMessage = ex.getMessage();
             LOGGER.error(ex.getMessage());
 
