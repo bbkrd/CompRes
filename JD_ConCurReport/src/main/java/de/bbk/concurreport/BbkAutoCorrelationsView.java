@@ -20,9 +20,13 @@
  */
 package de.bbk.concurreport;
 
+import de.bbk.concurreport.options.ConCurReportOptionsPanel;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.AUTO_CORRELATION;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_AUTO_CORRELATION;
 import ec.ui.view.AutoCorrelationsView;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -38,8 +42,9 @@ public class BbkAutoCorrelationsView extends AutoCorrelationsView {
         JFreeChart chart = chartPanel.getChart();
         ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis();
         rangeAxis.setAutoRange(false);
-        rangeAxis.setLowerBound(-1);
-        rangeAxis.setUpperBound(1);
+        double autoCo = NbPreferences.forModule(ConCurReportOptionsPanel.class).getDouble(AUTO_CORRELATION, DEFAULT_AUTO_CORRELATION);
+        rangeAxis.setLowerBound(-1 * autoCo);
+        rangeAxis.setUpperBound(autoCo);
         return chart;
     }
 

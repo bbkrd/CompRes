@@ -8,6 +8,7 @@ package de.bbk.concurreport;
 import de.bbk.concurreport.html.graphic.HTMLBBKAutoRegressiveSpectrumView;
 import de.bbk.concurreport.html.graphic.HTMLBBKChartAutocorrelations;
 import de.bbk.concurreport.html.graphic.HTMLBBKPeriodogram;
+import de.bbk.concurreport.html.graphic.HTMLBBKSIRatioLastTwoPeriodView;
 import de.bbk.concurreport.html.graphic.HTMLBBKSIRatioView;
 import ec.satoolkit.ISaSpecification;
 import ec.tss.html.IHtmlElement;
@@ -22,7 +23,8 @@ public enum Graphic {
     PARTIAL_AUTOCORRELATION("Partial Autocorrelations (Full Residuals)"),
     AUTOREGRESSIVE_SPECTRUM("Auto-regressive spectrum (Series stationary)"),
     PERIODOGRAM("Periodogram (Seasonally Adjusted stationary)"),
-    S_I_RATIO("S-I-Ratio");
+    S_I_RATIO("S-I-Ratio"),
+    S_I_RATIO_LAST_TWO_PERIODS("S-I-Ratio (last two periods)");
 
     private final String displayName;
 
@@ -61,6 +63,9 @@ public enum Graphic {
                 break;
             case S_I_RATIO:
                 element = new HTMLBBKSIRatioView(doc);
+                break;
+            case S_I_RATIO_LAST_TWO_PERIODS:
+                element = new HTMLBBKSIRatioLastTwoPeriodView(doc);
                 break;
             default:
                 throw new AssertionError(this.name());

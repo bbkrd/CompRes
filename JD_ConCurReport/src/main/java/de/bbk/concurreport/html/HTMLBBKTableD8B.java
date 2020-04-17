@@ -24,6 +24,9 @@ import de.bbk.concur.FixedOutlier;
 import de.bbk.concur.TablesPercentageChange;
 import de.bbk.concur.util.D8BInfos;
 import de.bbk.concur.util.FixTimeDomain;
+import de.bbk.concurreport.options.ConCurReportOptionsPanel;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DECIMAL_PLACES;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_DECIMAL_PLACES;
 import ec.nbdemetra.ui.properties.l2fprod.ColorChooser;
 import ec.satoolkit.x11.DefaultSeasonalFilteringStrategy;
 import ec.satoolkit.x11.MsrTable;
@@ -48,6 +51,7 @@ import java.io.IOException;
 import java.util.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -55,7 +59,7 @@ import java.util.logging.Logger;
  */
 public class HTMLBBKTableD8B extends AbstractHtmlElement {
 
-    private final static String FMT = "%.2f";
+    private final String FMT = "%." + NbPreferences.forModule(ConCurReportOptionsPanel.class).getInt(DECIMAL_PLACES, DEFAULT_DECIMAL_PLACES) + "f";
 
     private final SaDocument document;
     private final D8BInfos d8BInfos;
@@ -185,7 +189,6 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
                     .title("new")
                     .includeHeader(false)
                     .includeTableTags(false)
-                    .numberFormat(FMT)
                     .build());
 
             TsData savedSeasonalFactor = d8BInfos.getSavedSeasonalFactor() != null ? d8BInfos.getSavedSeasonalFactor().getTsData() : new TsData(domain);
@@ -194,7 +197,6 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
                     .title("current")
                     .includeHeader(false)
                     .includeTableTags(false)
-                    .numberFormat(FMT)
                     .build());
 
             if (document.getMetaData() != null) {

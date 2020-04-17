@@ -62,13 +62,26 @@ public class FixTimeDomain {
      * @return reduce the domain to the min of the last 5 years or all
      */
     public static TsDomain domLastFiveYears(Ts ts) {
-        TsDomain domTsY = ts.getTsData().getDomain();
-        TsDomain domCharMax5years;
-        int int5year = domTsY.getFrequency().intValue() * 5;
-        domCharMax5years = new TsDomain(domTsY.getEnd().minus(int5year), int5year);
-        domCharMax5years = domCharMax5years.intersection(domTsY);
-        return domCharMax5years;
+        return domLastYears(ts, 5);
 
+    }
+
+    /**
+     *
+     * @param ts ts to get the domain from
+     * @param years how many years
+     *
+     * @return reduce the domain to the min of the years or all
+     */
+    public static TsDomain domLastYears(Ts ts, int years) {
+        if (ts.getTsData() != null) {
+            TsDomain domTsY = ts.getTsData().getDomain();
+            int int5year = domTsY.getFrequency().intValue() * years;
+            TsDomain domain = new TsDomain(domTsY.getEnd().minus(int5year), int5year);
+            domain = domain.intersection(domTsY);
+            return domain;
+        }
+        return null;
     }
 
     public static TsDomain domLastYear(TsDomain dom) {

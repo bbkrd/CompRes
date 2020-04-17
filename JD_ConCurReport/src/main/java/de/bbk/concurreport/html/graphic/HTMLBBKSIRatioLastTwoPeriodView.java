@@ -22,7 +22,6 @@ package de.bbk.concurreport.html.graphic;
 
 import de.bbk.concur.util.SIViewSaved;
 import de.bbk.concurreport.html.HTML2Div;
-import de.bbk.concurreport.html.HTMLBBKBox;
 import de.bbk.concurreport.html.HTMLByteArrayOutputStream;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
@@ -39,13 +38,21 @@ import javax.swing.JPanel;
  *
  * @author Christiane Hofer
  */
-public class HTMLBBKSIRatioView extends AbstractHtmlElement {
+public class HTMLBBKSIRatioLastTwoPeriodView extends AbstractHtmlElement {
 
     private final SaDocument doc;
     private static final int WIDTH = 450, HEIGHT = 250;
+    int lastPeriod = 0;
+    int forelastPeriod = 0;
 
-    public HTMLBBKSIRatioView(SaDocument doc) {
+    public HTMLBBKSIRatioLastTwoPeriodView(SaDocument doc) {
         this.doc = doc;
+        lastPeriod = doc.getSeries().getDomain().getLast().getPosition();
+        if (lastPeriod == 0) {
+            forelastPeriod = doc.getSeries().getFrequency().intValue() - 1;
+        } else {
+            forelastPeriod = lastPeriod - 1;
+        }
     }
 
     @Override
@@ -68,23 +75,15 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
         jPanel.setSize(WIDTH, HEIGHT);
         stream.write(HtmlTag.HEADER2, "S-I-Ratio");
         sIViewSaved.doLayout();
-        int frequency = doc.getSeries().getDomain().getFrequency().getAsInt();
-        HTMLBBKBox leftBox = new HTMLBBKBox();
-        HTMLBBKBox rightBox = new HTMLBBKBox();
+        ByteArrayOutputStream osLast = new ByteArrayOutputStream();
+        Charts.writeChartAsSVG(osLast, sIViewSaved.getDetailChart(lastPeriod), WIDTH, HEIGHT);
+        ByteArrayOutputStream osForelast = new ByteArrayOutputStream();
+        Charts.writeChartAsSVG(osForelast, sIViewSaved.getDetailChart(forelastPeriod), WIDTH, HEIGHT);
 
-        for (int i = 0; i < frequency; i++) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            Charts.writeChartAsSVG(os, sIViewSaved.getDetailChart(i), WIDTH, HEIGHT);
-            HTMLByteArrayOutputStream arrayOutputStream = new HTMLByteArrayOutputStream(os);
-            if (i % 2 == 0) {
-                leftBox.add(arrayOutputStream);
-            } else {
-                rightBox.add(arrayOutputStream);
-            }
+        HTMLByteArrayOutputStream lastArrayOutputStream = new HTMLByteArrayOutputStream(osLast);
+        HTMLByteArrayOutputStream forelastArrayOutputStream = new HTMLByteArrayOutputStream(osForelast);
 
-        }
-        HTML2Div div = new HTML2Div(leftBox, rightBox);
-
+        HTML2Div div = new HTML2Div(forelastArrayOutputStream, lastArrayOutputStream);
         div.write(stream);
 
         String description;
@@ -94,13 +93,11 @@ public class HTMLBBKSIRatioView extends AbstractHtmlElement {
             description = "Dots - SI, red - SF current, blue - SF new";
         }
 
-        stream.write(
-                "<p style='text-align:center; '>")
+        stream.write("<p style='text-align:center; '>")
                 .write(description)
                 .write("</p>")
                 .newLine();
         sIViewSaved.dispose();
-
         jPanel.removeAll();
     }
 }

@@ -6,8 +6,7 @@
 package de.bbk.concurreport.html;
 
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
-import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_TIMESPAN_TABLE;
-import static de.bbk.concurreport.options.ConCurReportOptionsPanel.TIMESPAN_TABLE;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.*;
 import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
@@ -37,7 +36,7 @@ public class HtmlTsData extends AbstractHtmlElement {
     @lombok.Builder.Default
     private final boolean dataItalic = false;
     @lombok.Builder.Default
-    private final String numberFormat = "%.2f";
+    private final String numberFormat = "%." + NbPreferences.forModule(ConCurReportOptionsPanel.class).getInt(DECIMAL_PLACES, DEFAULT_DECIMAL_PLACES) + "f";
     @lombok.Builder.Default
     private final int maxTimeInYears = NbPreferences.forModule(ConCurReportOptionsPanel.class).getInt(TIMESPAN_TABLE, DEFAULT_TIMESPAN_TABLE);
 

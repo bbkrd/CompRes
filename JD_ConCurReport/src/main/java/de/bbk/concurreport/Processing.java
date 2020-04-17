@@ -26,6 +26,8 @@ import de.bbk.concurreport.options.ConCurReportOptionsPanel;
 import de.bbk.concurreport.report.tramo.TramoSeatsReport;
 import de.bbk.concurreport.report.x13.X13Report;
 import de.bbk.concurreport.util.Frozen;
+import ec.nbdemetra.ws.Workspace;
+import ec.nbdemetra.ws.WorkspaceFactory;
 import ec.tss.html.HtmlStream;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
@@ -123,7 +125,8 @@ public class Processing {
         StringBuilder sbSuccessful = new StringBuilder();
 
         if (just_one_html) {
-            try (FileWriter writer = new FileWriter(htmlf.createHtmlFile("WS"), true)) {
+            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
+            try (FileWriter writer = new FileWriter(htmlf.createHtmlFile(workspace.getName()), true)) {
                 // alle
                 for (Map.Entry<String, List<SaItem>> entry : map.entrySet()) {
                     String saProcessingName = entry.getKey();
