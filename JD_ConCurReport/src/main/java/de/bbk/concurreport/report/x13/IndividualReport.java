@@ -63,14 +63,7 @@ public class IndividualReport implements IHtmlElement {
             String x13 = preferences.get(USER_DEFINED_REPORT_CONTENT_X13, "");
             if (!x13.isEmpty()) {
                 for (String name : x13.split(";")) {
-                    Ts ts = DocumentManager.instance.getTs(doc, name);
-                    if (ts.getTsData() != null) {
-                        stream.write(HtmlTsData.builder()
-                                .data(ts.getTsData())
-                                .title(name.toUpperCase())
-                                .build())
-                                .newLine();
-                    }
+                    writeTsData(doc, name, stream, name.toUpperCase(), 1);
                 }
             }
 
@@ -80,14 +73,7 @@ public class IndividualReport implements IHtmlElement {
                 int multiplier = multiplicative ? 100 : 1;
 
                 for (String name : x13Transformed.split(";")) {
-                    Ts ts = DocumentManager.instance.getTs(doc, name);
-                    if (ts.getTsData() != null) {
-                        stream.write(HtmlTsData.builder()
-                                .data(ts.getTsData().times(multiplier))
-                                .title(name.toUpperCase() + suffix)
-                                .build())
-                                .newLine();
-                    }
+                    writeTsData(doc, name, stream, name.toUpperCase() + suffix, multiplier);
                 }
             }
 
@@ -108,14 +94,7 @@ public class IndividualReport implements IHtmlElement {
                     if (table == null) {
                         continue;
                     }
-                    Ts ts = DocumentManager.instance.getTs(doc, table.getCompositeFormula());
-                    if (ts.getTsData() != null) {
-                        stream.write(HtmlTsData.builder()
-                                .data(ts.getTsData())
-                                .title(name)
-                                .build())
-                                .newLine();
-                    }
+                    writeTsData(doc, table.getCompositeFormula(), stream, name, 1);
                 }
             }
 
@@ -148,6 +127,19 @@ public class IndividualReport implements IHtmlElement {
             stream.write("The item doesn't contain a X13Specification!");
         }
         stream.write(new Pagebreak());
+    }
+
+    private void writeTsData(SaDocument<?> doc, String key, HtmlStream stream, String name, int multiplier) throws IOException {
+        Ts ts = DocumentManager.instance.getTs(doc, key);
+        if (ts.getTsData() != null) {
+            stream.write(HtmlTsData.builder()
+                    .data(ts.getTsData().times(multiplier))
+                    .title(name)
+                    .build())
+                    .newLine();
+        } else {
+            stream.write(name + " is not available.").newLine();
+        }
     }
 
     private void writeChart(String input, SaDocument<?> doc, int timespanGraphic, HtmlStream stream) throws IOException {
