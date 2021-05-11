@@ -50,8 +50,8 @@ public class FixTimeDomain {
         if (ts == null || ts.getTsData() == null || ts.getTsData().isEmpty()) {
             return ts;
         } else {
-            Ts t = TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(this.domMax5years));
-            return t;
+            TsDomain intersection = ts.getTsData().getDomain().intersection(domMax5years);
+            return TsFactory.instance.createTs(ts.getName(), null, ts.getMetaData(), ts.getTsData().fittoDomain(intersection));
         }
     }
 

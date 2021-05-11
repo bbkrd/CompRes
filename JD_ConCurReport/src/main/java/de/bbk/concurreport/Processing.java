@@ -149,6 +149,9 @@ public class Processing {
                                 sbSuccessful.append(name).append("\n");
                             } catch (ReportException ex) {
                                 sbError.append(name).append(": ").append(ex.getMessage()).append("\n");
+                            } catch (RuntimeException ex) {
+                                sbError.append(name).append(": Critical Error! ").append(ex.getMessage()).append("\n");
+                                LOGGER.error(name, ex);
                             }
                         } else {
                             sbError.append(name)
@@ -200,6 +203,9 @@ public class Processing {
                             }
                         } catch (ReportException ex) {
                             sbError.append(str).append(": ").append(ex.getMessage()).append("\n");
+                        } catch (RuntimeException ex) {
+                            sbError.append(str).append(": Critical Error! ").append(ex.getMessage()).append("\n");
+                            LOGGER.error(str, ex);
                         }
                     } else {
                         sbError.append(str)

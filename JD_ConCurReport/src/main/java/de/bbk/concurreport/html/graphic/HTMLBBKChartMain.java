@@ -60,7 +60,8 @@ public class HTMLBBKChartMain extends AbstractHtmlElement {
 
         Ts tsSASaved = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
         if (tsSASaved.getTsData() != null && !tsSASaved.getTsData().isEmpty()) {
-            tsSASaved.set(tsSASaved.getTsData().fittoDomain(domain));
+            TsDomain intersection = tsSASaved.getTsData().getDomain().intersection(domain);
+            tsSASaved.set(tsSASaved.getTsData().fittoDomain(intersection));
             tc.add(tsSASaved);
         }
 
