@@ -48,7 +48,11 @@ import ec.tstoolkit.timeseries.simplets.TsPeriod;
 import ec.tstoolkit.timeseries.simplets.YearIterator;
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbPreferences;
@@ -232,8 +236,24 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
 
         int nfreq = data.getFrequency().intValue();
         TsData replacementValues = d8BInfos.getReplacementValues();
-        OutlierEstimation[] both = d8BInfos.getBoth();
-        FixedOutlier[] fixedOutliers = d8BInfos.getFixedOutliers();
+        Map<TsPeriod, List<Object>> outlierMap = new HashMap<>();
+
+        if (d8BInfos.getBoth() != null) {
+            for (OutlierEstimation outlier : d8BInfos.getBoth()) {
+                TsPeriod position = outlier.getPosition();
+                List<Object> list = outlierMap.getOrDefault(position, new ArrayList<>());
+                list.add(outlier);
+                outlierMap.put(position, list);
+            }
+        }
+        if (d8BInfos.getFixedOutliers() != null) {
+            for (FixedOutlier fixedOutlier : d8BInfos.getFixedOutliers()) {
+                TsPeriod position = fixedOutlier.getPosition();
+                List<Object> list = outlierMap.getOrDefault(position, new ArrayList<>());
+                list.add(fixedOutlier);
+                outlierMap.put(position, list);
+            }
+        }
 
         YearIterator iter = new YearIterator(data);
         while (iter.hasMoreElements()) {
@@ -251,56 +271,39 @@ public class HTMLBBKTableD8B extends AbstractHtmlElement {
                     Formatter formatter = new Formatter();
                     formatter.format(FMT, block.data.get(i));
                     TsPeriod pointInTime = block.start.plus(i);
+                    List<Object> list = outlierMap.get(pointInTime);
 
                     CssStyle outlierColor = new CssStyle();
-                    if (both != null) {
-                        for (OutlierEstimation outlier : both) {
-                            if (outlier == null) {
-                                continue;
+                    if (list != null && !list.isEmpty()) {
+                        Color bgColor;
+                        Color textColor;
+                        if (list.size() > 1) {
+                            bgColor = Color.YELLOW;
+                            textColor = Color.BLACK;
+                        } else {
+                            String code;
+                            Object o = list.get(0);
+                            if (o instanceof OutlierEstimation) {
+                                code = ((OutlierEstimation) o).getCode();
+                            } else if (o instanceof FixedOutlier) {
+                                code = ((FixedOutlier) o).getCode();
+                            } else {
+                                code = "No Code";
                             }
-                            if (outlier.getPosition().equals(pointInTime)) {
-                                Color bgColor = ColorChooser.getColor(outlier.getCode());
-                                String bgColorString = new StringBuilder().append("rgb(")
-                                        .append(bgColor.getRed()).append(",")
-                                        .append(bgColor.getGreen()).append(",")
-                                        .append(bgColor.getBlue()).append(")").toString();
-                                outlierColor.add(CssProperty.BACKGROUND_COLOR, bgColorString);
-
-                                Color textColor = ColorChooser.getForeColor(outlier.getCode());
-                                String textColorString = new StringBuilder().append("rgb(")
-                                        .append(textColor.getRed()).append(",")
-                                        .append(textColor.getGreen()).append(",")
-                                        .append(textColor.getBlue()).append(")").toString();
-                                outlierColor.add(CssProperty.COLOR, textColorString);
-                                break;
-                            }
+                            bgColor = ColorChooser.getColor(code);
+                            textColor = ColorChooser.getForeColor(code);
                         }
-
+                        String bgColorString = new StringBuilder().append("rgb(")
+                                .append(bgColor.getRed()).append(",")
+                                .append(bgColor.getGreen()).append(",")
+                                .append(bgColor.getBlue()).append(")").toString();
+                        outlierColor.add(CssProperty.BACKGROUND_COLOR, bgColorString);
+                        String textColorString = new StringBuilder().append("rgb(")
+                                .append(textColor.getRed()).append(",")
+                                .append(textColor.getGreen()).append(",")
+                                .append(textColor.getBlue()).append(")").toString();
+                        outlierColor.add(CssProperty.COLOR, textColorString);
                     }
-                    if (fixedOutliers != null) {
-                        for (FixedOutlier fixedOutlier : fixedOutliers) {
-                            if (fixedOutlier == null) {
-                                continue;
-                            }
-                            if (fixedOutlier.getPosition().equals(pointInTime)) {
-                                Color bgColor = ColorChooser.getColor(fixedOutlier.getCode());
-                                String bgColorString = new StringBuilder().append("rgb(")
-                                        .append(bgColor.getRed()).append(",")
-                                        .append(bgColor.getGreen()).append(",")
-                                        .append(bgColor.getBlue()).append(")").toString();
-                                outlierColor.add(CssProperty.BACKGROUND_COLOR, bgColorString);
-
-                                Color textColor = ColorChooser.getForeColor(fixedOutlier.getCode());
-                                String textColorString = new StringBuilder().append("rgb(")
-                                        .append(textColor.getRed()).append(",")
-                                        .append(textColor.getGreen()).append(",")
-                                        .append(textColor.getBlue()).append(")").toString();
-                                outlierColor.add(CssProperty.COLOR, textColorString);
-                            }
-                            break;
-                        }
-                    }
-
                     stream.open(HtmlTag.TABLECELL, outlierColor);
                     if (replacementValues != null && replacementValues.getFrequency() == block.start.getFrequency() && Double.isFinite(replacementValues.get(block.start.plus(i)))) {
                         stream.write("*");

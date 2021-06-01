@@ -25,11 +25,17 @@ import ec.nbdemetra.ui.properties.l2fprod.ColorChooser;
 import ec.tss.tsproviders.utils.Formatters;
 import ec.tstoolkit.timeseries.regression.OutlierEstimation;
 import ec.tstoolkit.timeseries.simplets.TsData;
+import ec.tstoolkit.timeseries.simplets.TsPeriod;
 import ec.ui.grid.JTsGrid;
 import ec.ui.grid.TsGridObs;
 import ec.util.grid.CellIndex;
 import ec.util.various.swing.StandardSwingColor;
+import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JTable;
 import javax.swing.JToolTip;
 import static javax.swing.SwingConstants.TRAILING;
@@ -41,9 +47,8 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class JTsOutlierGrid extends JTsGrid {
 
-    private transient OutlierEstimation[] outliers;
-    private transient FixedOutlier[] fixedOutliers;
     private transient TsData d9;
+    private transient Map<TsPeriod, List<Object>> outlierMap = new HashMap<>();
 
     public JTsOutlierGrid() {
         super();
@@ -51,18 +56,24 @@ public class JTsOutlierGrid extends JTsGrid {
     }
 
     public void setOutliers(OutlierEstimation[] outliers) {
-        if (outliers == null) {
-            this.outliers = null;
-        } else {
-            this.outliers = outliers.clone();
+        if (outliers != null) {
+            for (OutlierEstimation outlier : outliers) {
+                TsPeriod position = outlier.getPosition();
+                List<Object> list = outlierMap.getOrDefault(position, new ArrayList<>());
+                list.add(outlier);
+                outlierMap.put(position, list);
+            }
         }
     }
 
     public void setFixedOutliers(FixedOutlier[] fixedOutliers) {
-        if (fixedOutliers == null) {
-            this.fixedOutliers = null;
-        } else {
-            this.fixedOutliers = fixedOutliers.clone();
+        if (fixedOutliers != null) {
+            for (FixedOutlier fixedOutlier : fixedOutliers) {
+                TsPeriod position = fixedOutlier.getPosition();
+                List<Object> list = outlierMap.getOrDefault(position, new ArrayList<>());
+                list.add(fixedOutlier);
+                outlierMap.put(position, list);
+            }
         }
     }
 
@@ -140,41 +151,42 @@ public class JTsOutlierGrid extends JTsGrid {
                         tooltipText.append("<html>");
                         String valueText = valueFormatter.formatAsString(obs.getValue());
 
-                        boolean found = false;
-                        for (OutlierEstimation outlier : outliers) {
-                            if (outlier == null) {
-                                continue;
-                            }
-                            if (outlier.getPosition().equals(obs.getPeriod())) {
-                                tooltipText.append("Outlier Value : ")
-                                        .append(valueFormatter.formatAsString(outlier.getValue())).append("<br>")
-                                        .append("TStat : ")
-                                        .append(valueFormatter.formatAsString(outlier.getTStat())).append("<br>")
-                                        .append("Outlier type : ")
-                                        .append(outlier.getCode()).append("<br>");
-                                setBackground(ColorChooser.getColor(outlier.getCode()));
-                                setForeground(ColorChooser.getForeColor(outlier.getCode()));
-                                found = true;
-                                break;
-                            }
-                        }
+                        List<Object> list = outlierMap.get(obs.getPeriod());
 
-                        if (!found) {
-                            for (FixedOutlier fixedOutlier : fixedOutliers) {
-                                if (fixedOutlier == null) {
-                                    continue;
-                                }
-                                if (fixedOutlier.getPosition().equals(obs.getPeriod())) {
+                        if (list != null) {
+                            for (Object object : list) {
+                                if (object instanceof OutlierEstimation) {
+                                    OutlierEstimation outlier = (OutlierEstimation) object;
+                                    tooltipText.append("Outlier Value : ")
+                                            .append(valueFormatter.formatAsString(outlier.getValue())).append("<br>")
+                                            .append("TStat : ")
+                                            .append(valueFormatter.formatAsString(outlier.getTStat())).append("<br>")
+                                            .append("Outlier type : ")
+                                            .append(outlier.getCode()).append("<br>");
+                                } else if (object instanceof FixedOutlier) {
+                                    FixedOutlier fixedOutlier = (FixedOutlier) object;
                                     tooltipText.append("Fixed Outlier Value : ")
                                             .append(valueFormatter.formatAsString(fixedOutlier.getValue())).append("<br>")
                                             .append("Outlier type : ")
                                             .append(fixedOutlier.getCode()).append("<br>");
-                                    setBackground(ColorChooser.getColor(fixedOutlier.getCode()));
-                                    setForeground(ColorChooser.getForeColor(fixedOutlier.getCode()));
-                                    break;
                                 }
                             }
-
+                            if (list.size() > 1) {
+                                setBackground(Color.YELLOW);
+                                setForeground(Color.BLACK);
+                            } else {
+                                String code;
+                                Object o = list.get(0);
+                                if (o instanceof OutlierEstimation) {
+                                    code = ((OutlierEstimation) o).getCode();
+                                } else if (o instanceof FixedOutlier) {
+                                    code = ((FixedOutlier) o).getCode();
+                                } else {
+                                    code = "No Code";
+                                }
+                                setBackground(ColorChooser.getColor(code));
+                                setForeground(ColorChooser.getForeColor(code));
+                            }
                         }
 
                         if (d9 != null && d9.getFrequency() == obs.getPeriod().getFrequency() && Double.isFinite(d9.get(obs.getPeriod()))) {

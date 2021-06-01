@@ -18,8 +18,8 @@ import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import ec.tstoolkit.utilities.NameManager;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 
 /**
@@ -121,13 +121,18 @@ public class HTMLRegressionModel extends AbstractHtmlElement {
             return;
         }
 
-        TreeSet<TsVariableSelection.Item<ITsVariable>> treeSet = new TreeSet<>((o1, o2) -> {
+        List<TsVariableSelection.Item<ITsVariable>> items = Arrays.asList(regs.elements());
+        Collections.sort(items, (o1, o2) -> {
             if (o1.variable instanceof IOutlierVariable && o2.variable instanceof IOutlierVariable) {
-                return ((IOutlierVariable) o1.variable).getPosition().compareTo(((IOutlierVariable) o2.variable).getPosition());
+                int i = ((IOutlierVariable) o1.variable).getPosition().compareTo(((IOutlierVariable) o2.variable).getPosition());
+                if (i == 0) {
+                    return ((IOutlierVariable) o1.variable).getCode().compareTo(((IOutlierVariable) o2.variable).getCode());
+                }
+                return i;
             }
             return 0;
         });
-        treeSet.addAll(Arrays.asList(regs.elements()));
+
         T t = new T();
         t.setDegreesofFreedom(concentratedLikelihood.getDegreesOfFreedom(true, freeParametersCount));
         double[] b = concentratedLikelihood.getB();
@@ -140,7 +145,7 @@ public class HTMLRegressionModel extends AbstractHtmlElement {
         stream.write(new HtmlTableHeader("P[|T| &gt t]"));
         stream.close(HtmlTag.TABLEROW);
         int start = preprocessingModel.description.getRegressionVariablesStartingPosition();
-        for (TsVariableSelection.Item<ITsVariable> reg : treeSet) {
+        for (TsVariableSelection.Item<ITsVariable> reg : items) {
             stream.open(HtmlTag.TABLEROW);
             stream.write(new HtmlTableHeader(reg.variable.getDescription(context)));
             stream.write(new HtmlTableCell(df4.format(b[start + reg.position])));
@@ -218,7 +223,7 @@ public class HTMLRegressionModel extends AbstractHtmlElement {
                     stream.write(HtmlTag.EMPHASIZED_TEXT, builder.toString());
                 }
                 stream.newLines(2);
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
             }
         }
     }
