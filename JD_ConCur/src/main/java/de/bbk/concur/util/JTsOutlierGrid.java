@@ -55,7 +55,21 @@ public class JTsOutlierGrid extends JTsGrid {
         setCellRenderer(new OutlierCellRenderer());
     }
 
-    public void setOutliers(OutlierEstimation[] outliers) {
+    public void setInfo(D8BInfos info) {
+        clear();
+        getTsCollection().add(info.getSi());
+        setSelection(getTsCollection().toArray());
+        setOutliers(info.getBoth());
+        setFixedOutliers(info.getFixedOutliers());
+        setD9(info.getReplacementValues());
+    }
+
+    private void clear() {
+        outlierMap.clear();
+        getTsCollection().clear();
+    }
+
+    private void setOutliers(OutlierEstimation[] outliers) {
         if (outliers != null) {
             for (OutlierEstimation outlier : outliers) {
                 TsPeriod position = outlier.getPosition();
@@ -66,7 +80,7 @@ public class JTsOutlierGrid extends JTsGrid {
         }
     }
 
-    public void setFixedOutliers(FixedOutlier[] fixedOutliers) {
+    private void setFixedOutliers(FixedOutlier[] fixedOutliers) {
         if (fixedOutliers != null) {
             for (FixedOutlier fixedOutlier : fixedOutliers) {
                 TsPeriod position = fixedOutlier.getPosition();

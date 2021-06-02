@@ -88,7 +88,6 @@ public final class JPanelCCA extends JPanel implements IDisposable {
 
     public void set(SaDocument doc) {
         this.d8BInfos = new D8BInfos(doc);
-        d8Grid.getTsCollection().clear();
         d10Grid.getTsCollection().clear();
         d10SavedGrid.getTsCollection().clear();
         if (!d8BInfos.isValid()) {
@@ -97,11 +96,7 @@ public final class JPanelCCA extends JPanel implements IDisposable {
             fixSize(d10aOldPane, 12, 1);
             return;
         }
-        d8Grid.getTsCollection().add(d8BInfos.getSi());
-        d8Grid.setSelection(d8Grid.getTsCollection().toArray());
-        d8Grid.setOutliers(d8BInfos.getBoth());
-        d8Grid.setFixedOutliers(d8BInfos.getFixedOutliers());
-        d8Grid.setD9(d8BInfos.getReplacementValues());
+        d8Grid.setInfo(d8BInfos);
         fixSize(d8Pane, d8BInfos.getFrequency(), d8BInfos.getSi().getTsData().getDomain().getYearsCount());
 
         if (d8BInfos.getSeasonalFactor() != null) {
