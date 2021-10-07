@@ -27,12 +27,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.openide.util.Exceptions;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +47,6 @@ public class HTMLFiles {
 
     private static final String LAST_FOLDER = "concurreport_lastfolder";
 
-    static {
-        new JFXPanel(); // this prepares FX environment
-    }
-
     public HTMLFiles() {
         currentDir = NbPreferences.forModule(HTMLFiles.class).get(LAST_FOLDER, null);
     }
@@ -61,40 +54,37 @@ public class HTMLFiles {
     @lombok.Synchronized
     public boolean selectFolder() {
         errorMessage = "";
-        DirectoryChooser directoryChooser = new DirectoryChooser();
+        JFileChooser fileChooser;
         if (currentDir != null && !currentDir.isEmpty()) {
-            directoryChooser.setInitialDirectory(new File(currentDir));
+            fileChooser = new JFileChooser(currentDir);
+        } else {
+            fileChooser = new JFileChooser();
         }
-
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         currentDir = null;
-        Platform.runLater(() -> {
-            File file = null;
-            try {
-                file = directoryChooser.showDialog(null);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-                directoryChooser.setInitialDirectory(null);
-                file = directoryChooser.showDialog(null);
-            } finally {
-                if (file != null) {
-                    currentDir = file.getAbsolutePath();
-                    NbPreferences.forModule(HTMLFiles.class).put(LAST_FOLDER, currentDir);
-                    if (!Files.isWritable(file.toPath())) {
-                        errorMessage = "You do not have the right to write in " + currentDir;
-                    }
-                } else {
-                    currentDir = "";
-                }
+        File file = null;
+        try {
+            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                file = fileChooser.getSelectedFile();
             }
-        });
-
-        while (currentDir == null) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                Exceptions.printStackTrace(ex);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            fileChooser = new JFileChooser();
+            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                file = fileChooser.getSelectedFile();
+            }
+        } finally {
+            if (file != null) {
+                currentDir = file.getAbsolutePath();
+                NbPreferences.forModule(HTMLFiles.class).put(LAST_FOLDER, currentDir);
+                if (!Files.isWritable(file.toPath())) {
+                    errorMessage = "You do not have the right to write in " + currentDir;
+                }
+            } else {
+                currentDir = "";
             }
         }
+
         if ("".equals(currentDir)) {
             return false;
         }
@@ -103,35 +93,27 @@ public class HTMLFiles {
     }
 
     private File selectFileName(File file) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(file.getParentFile());
-        fileChooser.setTitle("The file " + file.getName() + " already exists.");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML (*.html)", "*.html"));
+        JFileChooser fileChooser = new JFileChooser(file.getParentFile());
+        fileChooser.setDialogTitle("The file " + file.getName() + " already exists.");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("HTML (*.html)", "*.html"));
 
         filePath = null;
-        Platform.runLater(() -> {
-            File tmp = null;
-            try {
-                tmp = fileChooser.showSaveDialog(null);
-            } finally {
-                if (tmp != null) {
-                    filePath = tmp.getAbsolutePath();
-                    if (!Files.isWritable(tmp.toPath())) {
-                        errorMessage = "You do not have the right to write in " + filePath;
-                    }
-                } else {
-                    filePath = "";
-                }
+        File tmp = null;
+        try {
+            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                tmp = fileChooser.getSelectedFile();
             }
-        });
-
-        while (filePath == null) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                Exceptions.printStackTrace(ex);
+        } finally {
+            if (tmp != null) {
+                filePath = tmp.getAbsolutePath();
+                if (!Files.isWritable(tmp.toPath())) {
+                    errorMessage = "You do not have the right to write in " + filePath;
+                }
+            } else {
+                filePath = "";
             }
         }
+
         if ("".equals(filePath)) {
             errorMessage = "No file name selected";
             return null;
