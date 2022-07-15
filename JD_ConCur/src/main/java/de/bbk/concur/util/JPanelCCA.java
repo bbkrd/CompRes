@@ -20,9 +20,13 @@
  */
 package de.bbk.concur.util;
 
+import de.bbk.concur.TablesPercentageChange;
 import ec.nbdemetra.ui.NbComponents;
+import ec.tss.TsFactory;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
+import ec.tstoolkit.timeseries.simplets.TsData;
+import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -40,14 +44,17 @@ import javax.swing.JSplitPane;
 public final class JPanelCCA extends JPanel implements IDisposable {
 
     private final JTsOutlierGrid d8Grid;
-    private final JTsGrid d10Grid, d10SavedGrid;
+    private final JTsGrid d10Grid, d10SavedGrid, growthGrid, growthSavedGrid;
     private final JSplitPane d8Pane;
     private final JSplitPane d10aPane;
     private final JSplitPane d10aOldPane;
+    private final JSplitPane growthPane;
+    private final JSplitPane growthOldPane;
     private final JLabel lblD8;
     private static final int ROW_HEIGHT = 19;
     private static final int ROW_WIDTH = 70;
     private D8BInfos d8BInfos;
+    private TablesPercentageChange tpc;
 
     public JPanelCCA() {
 
@@ -62,6 +69,14 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         this.d10SavedGrid = new JTsGrid();
         d10SavedGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
         d10SavedGrid.setMode(ITsGrid.Mode.SINGLETS);
+
+        this.growthGrid = new JTsGrid();
+        growthGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
+        growthGrid.setMode(ITsGrid.Mode.SINGLETS);
+
+        this.growthSavedGrid = new JTsGrid();
+        growthSavedGrid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
+        growthSavedGrid.setMode(ITsGrid.Mode.SINGLETS);
 
         lblD8 = new JLabel("D8B", JLabel.CENTER);
         d8Pane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblD8, d8Grid);
@@ -80,10 +95,24 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d10aOldPane.setEnabled(false);
         d10aOldPane.setDividerSize(0);
 
+        JLabel lblGrowth = new JLabel("new GR", JLabel.CENTER);
+        growthPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowth, growthGrid);
+
+        growthPane.setEnabled(false);
+        growthPane.setDividerSize(0);
+
+        JLabel lblGrowthOld = new JLabel("old GR", JLabel.CENTER);
+        growthOldPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowthOld, growthSavedGrid);
+
+        growthOldPane.setEnabled(false);
+        growthOldPane.setDividerSize(0);
+
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(d8Pane);
         this.add(d10aPane);
         this.add(d10aOldPane);
+        this.add(growthPane);
+        this.add(growthOldPane);
     }
 
     public void set(SaDocument doc) {
@@ -120,6 +149,55 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         } else {
             lblD8.setText("Pseudo D8B");
         }
+
+        /* Growth Rates */
+        this.tpc = new TablesPercentageChange(doc);
+        growthGrid.getTsCollection().clear();
+        growthSavedGrid.getTsCollection().clear();
+
+        int freq = doc.getSeries().getFrequency().intValue();
+
+        if (tpc.getSeasonallyAdjusted() != null) {
+
+            growthGrid.getTsCollection().add(
+                    TsFactory.instance.createTs(
+                            tpc.getSeasonallyAdjusted().getName(),
+                            null,
+                            lastYearOfSeries(
+                                    doc.getSeries().getDomain(),
+                                    tpc.getSeasonallyAdjusted().getTsData()
+                            )
+                    )
+            );
+            growthGrid.setSelection(growthGrid.getTsCollection().toArray());
+            fixSize(growthPane, freq, 1);
+        } else {
+            fixSize(growthPane, freq, 1);
+        }
+
+        if (tpc.getSavedSeasonallyAdjusted() != null) {
+            growthSavedGrid.getTsCollection().add(
+                    TsFactory.instance.createTs(
+                            tpc.getSavedSeasonallyAdjusted().getName(),
+                            null,
+                            lastYearOfSeries(
+                                    doc.getSeries().getDomain(),
+                                    tpc.getSavedSeasonallyAdjusted().getTsData()
+                            )
+                    )
+            );
+            growthSavedGrid.setSelection(growthSavedGrid.getTsCollection().toArray());
+            if (tpc.getSavedSeasonallyAdjusted().getTsData() != null) {
+                fixSize(growthOldPane, freq, tpc.getSavedSeasonallyAdjusted().getTsData().getDomain().getYearsCount());
+            } else {
+                tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
+                fixSize(growthOldPane, freq, 1);
+            }
+        } else {
+            tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
+            fixSize(growthOldPane, freq, 1);
+        }
+
     }
 
     private void fixSize(JSplitPane pane, int periods, int years) {
@@ -136,7 +214,19 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d8Grid.dispose();
         d10Grid.dispose();
         d10SavedGrid.dispose();
+        growthGrid.dispose();
+        growthSavedGrid.dispose();
         removeAll();
         setLayout(null);
+    }
+
+    private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
+        dom = FixTimeDomain.domLastYear(dom);
+
+        if (tsData != null) {
+            TsDomain intersection = tsData.getDomain().intersection(dom);
+            return tsData.fittoDomain(intersection);
+        }
+        return new TsData(dom);
     }
 }
