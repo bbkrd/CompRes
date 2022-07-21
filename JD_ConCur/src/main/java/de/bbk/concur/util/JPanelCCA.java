@@ -155,8 +155,6 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         growthGrid.getTsCollection().clear();
         growthSavedGrid.getTsCollection().clear();
 
-        int freq = doc.getSeries().getFrequency().intValue();
-
         if (tpc.getSeasonallyAdjusted() != null) {
 
             growthGrid.getTsCollection().add(
@@ -170,9 +168,9 @@ public final class JPanelCCA extends JPanel implements IDisposable {
                     )
             );
             growthGrid.setSelection(growthGrid.getTsCollection().toArray());
-            fixSize(growthPane, freq, 1);
+            fixSize(growthPane, d8BInfos.getFrequency(), d8BInfos.getSeasonalFactor().getTsData().getDomain().getYearsCount());
         } else {
-            fixSize(growthPane, freq, 1);
+            fixSize(growthPane, d8BInfos.getFrequency(), 1);
         }
 
         if (tpc.getSavedSeasonallyAdjusted() != null) {
@@ -188,14 +186,14 @@ public final class JPanelCCA extends JPanel implements IDisposable {
             );
             growthSavedGrid.setSelection(growthSavedGrid.getTsCollection().toArray());
             if (tpc.getSavedSeasonallyAdjusted().getTsData() != null) {
-                fixSize(growthOldPane, freq, tpc.getSavedSeasonallyAdjusted().getTsData().getDomain().getYearsCount());
+                fixSize(growthOldPane, d8BInfos.getFrequency(), d8BInfos.getSeasonalFactor().getTsData().getDomain().getYearsCount());
             } else {
                 tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
-                fixSize(growthOldPane, freq, 1);
+                fixSize(growthOldPane, d8BInfos.getFrequency(), 1);
             }
         } else {
             tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
-            fixSize(growthOldPane, freq, 1);
+            fixSize(growthOldPane, d8BInfos.getFrequency(), 1);
         }
 
     }
