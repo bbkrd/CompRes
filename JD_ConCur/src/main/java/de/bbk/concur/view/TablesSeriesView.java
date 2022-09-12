@@ -28,6 +28,7 @@ import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.X13Document;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -76,6 +77,9 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         seriesGridContent.add(savedSeasonallyAdjusted.rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED));
 
         Ts seasonalFactor = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST, false);
+        if (doc instanceof X13Document) {
+            seasonalFactor = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10a");
+        }
         if (seasonalFactor.getTsData() != null) {
             seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactor, isMultiplicative);
         }

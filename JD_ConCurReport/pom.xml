@@ -4,12 +4,13 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>concur-parent</artifactId>
-        <version>1.0.20</version>
+        <version>1.0.21</version>
     </parent>
 
     <groupId>de.bbk</groupId>
     <artifactId>ConCurReport</artifactId>
     <packaging>nbm</packaging>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide/>

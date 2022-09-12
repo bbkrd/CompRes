@@ -92,6 +92,9 @@ public class D8BInfos {
             replacementValues = null;
         }
         Ts seasonalFactorTemp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL);
+        if (doc instanceof X13Document) {
+            seasonalFactorTemp = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10");
+        }
         if (seasonalFactorTemp != null && seasonalFactorTemp.getTsData() != null) {
             seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactorTemp, multiplicative);
             seasonalFactor.set(seasonalFactor.getTsData().fittoDomain(domain));

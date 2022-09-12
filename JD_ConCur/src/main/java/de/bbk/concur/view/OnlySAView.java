@@ -27,6 +27,7 @@ import ec.tss.TsCollection;
 import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -70,7 +71,9 @@ public class OnlySAView extends JComponent implements IDisposable {
 
             TsData y = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
             TsData s_cmp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
-
+            if (doc instanceof X13Document) {
+                s_cmp = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10a").getTsData();
+            }
             TsData onlySAData;
             if (doc.getFinalDecomposition().getMode() != DecompositionMode.Additive) {
                 onlySAData = y.div(s_cmp);

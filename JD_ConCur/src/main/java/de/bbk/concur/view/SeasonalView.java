@@ -28,6 +28,7 @@ import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.X13Document;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -62,6 +63,9 @@ public class SeasonalView extends JComponent implements IDisposable {
             DecompositionMode mode = doc.getFinalDecomposition().getMode();
 
             Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST);
+            if (doc instanceof X13Document) {
+                seasonalFactor = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10a");
+            }
             if (seasonalFactor != null && seasonalFactor.getTsData() != null) {
                 seasonalFactor = convertTsInPercentIfMult(seasonalFactor, mode.isMultiplicative());
                 chartContent.add(seasonalFactor);
