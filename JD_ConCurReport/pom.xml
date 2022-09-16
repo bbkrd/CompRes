@@ -162,7 +162,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-io</artifactId>
-            <version>RELEASE112</version>
+            <version>RELEASE82</version>
             <type>jar</type>
         </dependency>
         <dependency>
