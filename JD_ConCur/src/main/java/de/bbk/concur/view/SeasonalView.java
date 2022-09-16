@@ -24,11 +24,13 @@ import static de.bbk.concur.util.InPercent.convertTsInPercentIfMult;
 import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
+import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
+import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -64,7 +66,9 @@ public class SeasonalView extends JComponent implements IDisposable {
 
             Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST);
             if (doc instanceof X13Document) {
-                seasonalFactor = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10a");
+                TsData d10 = doc.getDecompositionPart().getData(X11Kernel.D10, TsData.class);
+                TsData d10a = doc.getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
+                seasonalFactor.set(d10.update(d10a));
             }
             if (seasonalFactor != null && seasonalFactor.getTsData() != null) {
                 seasonalFactor = convertTsInPercentIfMult(seasonalFactor, mode.isMultiplicative());
@@ -75,7 +79,7 @@ public class SeasonalView extends JComponent implements IDisposable {
             savedSeasonalfactor = savedSeasonalfactor.rename(NAME_SEASONAL_FACTOR_SAVED);
             chartContent.add(savedSeasonalfactor);
 
-            chart.setTitle(((Ts) doc.getInput()).getRawName());
+            chart.setTitle(((Ts) doc.getInput()).getRawName()); // Ueberschrift
         }
 
     }

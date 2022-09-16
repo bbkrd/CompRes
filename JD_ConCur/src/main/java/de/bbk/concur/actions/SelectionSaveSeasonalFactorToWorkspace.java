@@ -27,6 +27,7 @@ import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
 import ec.satoolkit.DecompositionMode;
+import ec.satoolkit.x11.X11Kernel;
 import ec.satoolkit.x13.X13Specification;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.SaItem;
@@ -91,7 +92,9 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
                 TsData seasonalFactor = DocumentManager.instance.getTs(item.toDocument(), SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
                 if (item.toDocument().getSpecification() instanceof X13Specification) {
-                    seasonalFactor = DocumentManager.instance.getTs(item.toDocument(), "decomposition.d-tables.d10a").getTsData();
+                    TsData d10 = item.toDocument().getDecompositionPart().getData(X11Kernel.D10, TsData.class);
+                    TsData d10a = item.toDocument().getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
+                    seasonalFactor = d10.update(d10a);
                 }
                 if (seasonalFactor != null) {
 

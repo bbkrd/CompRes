@@ -22,6 +22,7 @@ package de.bbk.concur.view;
 
 import de.bbk.concur.util.SavedTables;
 import ec.satoolkit.DecompositionMode;
+import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.TsFactory;
@@ -72,7 +73,9 @@ public class OnlySAView extends JComponent implements IDisposable {
             TsData y = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
             TsData s_cmp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
             if (doc instanceof X13Document) {
-                s_cmp = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10a").getTsData();
+                TsData d10 = doc.getDecompositionPart().getData(X11Kernel.D10, TsData.class);
+                TsData d10a = doc.getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
+                s_cmp = d10.update(d10a);
             }
             TsData onlySAData;
             if (doc.getFinalDecomposition().getMode() != DecompositionMode.Additive) {
