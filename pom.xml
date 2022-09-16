@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.bundesbank</groupId>
     <artifactId>concur-parent</artifactId>
-    <version>1.0.21</version>
+    <version>1.0.21-RC2</version>
     <packaging>pom</packaging>
     <name>ConCur - Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
-        <netbeans.version>RELEASE112</netbeans.version>
+        <netbeans.version>RELEASE82</netbeans.version>
         <brandingToken>bundesbank</brandingToken>
-        <jdemetra.version>2.2.3</jdemetra.version>
+        <jdemetra.version>2.2.2</jdemetra.version>
         <jdemetra.groupid>eu.europa.ec.joinup.sat</jdemetra.groupid>
         <!-- plugins versions > -->
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
