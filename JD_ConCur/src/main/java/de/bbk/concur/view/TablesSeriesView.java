@@ -22,15 +22,13 @@ package de.bbk.concur.view;
 
 import de.bbk.concur.util.InPercent;
 import de.bbk.concur.util.SavedTables;
+import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import de.bbk.concur.util.TsData_Saved;
-import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
-import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -78,12 +76,8 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         Ts savedSeasonallyAdjusted = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
         seriesGridContent.add(savedSeasonallyAdjusted.rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED));
 
-        Ts seasonalFactor = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST, false);
-        if (doc instanceof X13Document) {
-            TsData d10 = doc.getDecompositionPart().getData(X11Kernel.D10, TsData.class);
-            TsData d10a = doc.getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
-            seasonalFactor.set(d10.update(d10a));
-        }
+        Ts seasonalFactor = SavedTables.getSeasonalFactorWithForecast(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST);
+
         if (seasonalFactor.getTsData() != null) {
             seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactor, isMultiplicative);
         }

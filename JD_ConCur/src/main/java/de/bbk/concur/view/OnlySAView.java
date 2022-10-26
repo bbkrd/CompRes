@@ -21,14 +21,13 @@
 package de.bbk.concur.view;
 
 import de.bbk.concur.util.SavedTables;
+import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST;
 import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
 import ec.tss.TsFactory;
 import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
-import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -71,12 +70,7 @@ public class OnlySAView extends JComponent implements IDisposable {
             chart.getTsCollection().append(items);
 
             TsData y = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
-            TsData s_cmp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
-            if (doc instanceof X13Document) {
-                TsData d10 = doc.getDecompositionPart().getData(X11Kernel.D10, TsData.class);
-                TsData d10a = doc.getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
-                s_cmp = d10.update(d10a);
-            }
+            TsData s_cmp = SavedTables.getSeasonalFactorWithForecast(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST).getTsData();
             TsData onlySAData;
             if (doc.getFinalDecomposition().getMode() != DecompositionMode.Additive) {
                 onlySAData = y.div(s_cmp);

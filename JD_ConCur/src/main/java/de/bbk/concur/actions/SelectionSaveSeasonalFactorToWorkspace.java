@@ -22,14 +22,12 @@ package de.bbk.concur.actions;
 
 import static de.bbk.concur.util.InPercent.convertTsDataInPercentIfMult;
 import de.bbk.concur.util.SavedTables;
+import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST;
 import de.bbk.concur.util.TsData_MetaDataConverter;
 import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
 import ec.satoolkit.DecompositionMode;
-import ec.satoolkit.x11.X11Kernel;
-import ec.satoolkit.x13.X13Specification;
-import ec.tss.documents.DocumentManager;
 import ec.tss.sa.SaItem;
 import ec.tstoolkit.MetaData;
 import ec.tstoolkit.algorithm.CompositeResults;
@@ -90,12 +88,8 @@ public class SelectionSaveSeasonalFactorToWorkspace extends AbstractViewAction<S
             }
             if (results != null) {
                 DecompositionMode mode = results.getData("mode", DecompositionMode.class);
-                TsData seasonalFactor = DocumentManager.instance.getTs(item.toDocument(), SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST).getTsData();
-                if (item.toDocument().getSpecification() instanceof X13Specification) {
-                    TsData d10 = item.toDocument().getDecompositionPart().getData(X11Kernel.D10, TsData.class);
-                    TsData d10a = item.toDocument().getDecompositionPart().getData(X11Kernel.D10a, TsData.class);
-                    seasonalFactor = d10.update(d10a);
-                }
+                TsData seasonalFactor = SavedTables.getSeasonalFactorWithForecast(item.toDocument(), COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST).getTsData();
+
                 if (seasonalFactor != null) {
 
                     seasonalFactor = convertTsDataInPercentIfMult(seasonalFactor, mode.isMultiplicative());
