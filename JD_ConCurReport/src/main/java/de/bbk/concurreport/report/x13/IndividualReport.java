@@ -94,7 +94,7 @@ public class IndividualReport implements IHtmlElement {
                     if (table == null) {
                         continue;
                     }
-                    writeTsData(doc, table.getCompositeFormula(), stream, name, 1);
+                    writeTsData(doc, table.getFunction().apply(doc), stream, name, 1);
                 }
             }
 

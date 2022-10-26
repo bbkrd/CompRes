@@ -91,7 +91,7 @@ public class D8BInfos {
             //TODO
             replacementValues = null;
         }
-        Ts seasonalFactorTemp = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL);
+        Ts seasonalFactorTemp = DocumentManager.instance.getTs(doc, SavedTables.pickSeasonalCompositeFor(doc));
         if (doc instanceof X13Document) {
             seasonalFactorTemp = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d10");
         }

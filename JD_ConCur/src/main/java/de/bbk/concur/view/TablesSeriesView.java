@@ -22,7 +22,6 @@ package de.bbk.concur.view;
 
 import de.bbk.concur.util.InPercent;
 import de.bbk.concur.util.SavedTables;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST;
 import de.bbk.concur.util.SeasonallyAdjusted_Saved;
 import de.bbk.concur.util.TsData_Saved;
 import ec.tss.Ts;
@@ -76,7 +75,7 @@ public class TablesSeriesView extends JComponent implements IDisposable {
         Ts savedSeasonallyAdjusted = SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc);
         seriesGridContent.add(savedSeasonallyAdjusted.rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED));
 
-        Ts seasonalFactor = SavedTables.getSeasonalFactorWithForecast(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST);
+        Ts seasonalFactor = DocumentManager.instance.getTs(doc, SavedTables.pickSeasonalWithForecastCompositeFor(doc), false);
 
         if (seasonalFactor.getTsData() != null) {
             seasonalFactor = InPercent.convertTsInPercentIfMult(seasonalFactor, isMultiplicative);

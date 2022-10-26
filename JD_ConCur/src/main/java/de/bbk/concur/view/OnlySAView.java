@@ -21,7 +21,6 @@
 package de.bbk.concur.view;
 
 import de.bbk.concur.util.SavedTables;
-import static de.bbk.concur.util.SavedTables.COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST;
 import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
@@ -70,7 +69,7 @@ public class OnlySAView extends JComponent implements IDisposable {
             chart.getTsCollection().append(items);
 
             TsData y = DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SERIES_WITH_FORECAST).getTsData();
-            TsData s_cmp = SavedTables.getSeasonalFactorWithForecast(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST).getTsData();
+            TsData s_cmp = DocumentManager.instance.getTs(doc, SavedTables.pickSeasonalWithForecastCompositeFor(doc)).getTsData();
             TsData onlySAData;
             if (doc.getFinalDecomposition().getMode() != DecompositionMode.Additive) {
                 onlySAData = y.div(s_cmp);

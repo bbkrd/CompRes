@@ -21,12 +21,12 @@
 package de.bbk.concur.view;
 
 import static de.bbk.concur.util.InPercent.convertTsInPercentIfMult;
-import de.bbk.concur.util.SavedTables;
 import static de.bbk.concur.util.SavedTables.*;
 import de.bbk.concur.util.TsData_Saved;
 import ec.satoolkit.DecompositionMode;
 import ec.tss.Ts;
 import ec.tss.TsCollection;
+import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
 import ec.ui.chart.JTsChart;
 import ec.ui.interfaces.IDisposable;
@@ -61,7 +61,7 @@ public class SeasonalView extends JComponent implements IDisposable {
         if (doc.getFinalDecomposition() != null) {
             DecompositionMode mode = doc.getFinalDecomposition().getMode();
 
-            Ts seasonalFactor = SavedTables.getSeasonalFactorWithForecast(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST);
+            Ts seasonalFactor = DocumentManager.instance.getTs(doc, pickSeasonalWithForecastCompositeFor(doc));
 
             if (seasonalFactor != null && seasonalFactor.getTsData() != null) {
                 seasonalFactor = convertTsInPercentIfMult(seasonalFactor, mode.isMultiplicative());

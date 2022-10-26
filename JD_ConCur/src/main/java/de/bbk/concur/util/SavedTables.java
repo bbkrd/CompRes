@@ -20,11 +20,8 @@
  */
 package de.bbk.concur.util;
 
-import ec.tss.Ts;
-import ec.tss.documents.DocumentManager;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsData;
 
 /**
  *
@@ -72,24 +69,14 @@ public class SavedTables {
     public static final String COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST = "@composite@" + NAME_CALENDAR_FACTOR + "=,cal,cal_f";
     public static final String COMPOSITE_RESULTS_SEASONAL = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,";
     public static final String COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST = "@composite@" + NAME_SEASONAL_FACTOR + "=,s_cmp,s_cmp_f";
-    public static final String COMPOSITE_RESULTS_SEASONAL_D10 = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d10,";
-    public static final String COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d10,decomposition.d10a";
+    public static final String COMPOSITE_RESULTS_SEASONAL_X13 = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d-tables.d10,";
+    public static final String COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST_X13 = "@composite@" + NAME_SEASONAL_FACTOR + "=,decomposition.d-tables.d10,decomposition.d-tables.d10a";
 
-    public static Ts getSeasonalFactorWithForecast(SaDocument doc, String composite_result) {
-        Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST);
-        if (doc instanceof X13Document) {
-            TsData d10 = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_D10_WITH_FORECAST).getTsData();
-            TsData d10a = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_D10).getTsData();
-            seasonalFactor.set(d10.update(d10a));
-        }
-        return seasonalFactor;
+    public static final String pickSeasonalCompositeFor(SaDocument doc) {
+        return doc instanceof X13Document ? SavedTables.COMPOSITE_RESULTS_SEASONAL_X13 : SavedTables.COMPOSITE_RESULTS_SEASONAL;
     }
 
-    public static Ts getSeasonalFactor(SaDocument doc, String composite_result) {
-        Ts seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST);
-        if (doc instanceof X13Document) {
-            seasonalFactor = DocumentManager.instance.getTs(doc, COMPOSITE_RESULTS_SEASONAL_D10);
-        }
-        return seasonalFactor;
+    public static final String pickSeasonalWithForecastCompositeFor(SaDocument doc) {
+        return doc instanceof X13Document ? SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST_X13 : SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST;
     }
 }

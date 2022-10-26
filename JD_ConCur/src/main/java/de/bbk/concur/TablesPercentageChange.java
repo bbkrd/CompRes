@@ -41,7 +41,7 @@ public class TablesPercentageChange {
         trend = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_TREND_WITH_FORECAST));
         irregular = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_IRREGULAR_WITH_FORECAST));
         seasonallyAdjusted = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONALLY_ADJUSTED_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED);
-        seasonalFactor = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_SEASONAL_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR);
+        seasonalFactor = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.pickSeasonalWithForecastCompositeFor(doc))).rename(SavedTables.NAME_SHORT_SEASONAL_FACTOR);
         calendarFactor = percentageChange(DocumentManager.instance.getTs(doc, SavedTables.COMPOSITE_RESULTS_CALENDAR_WITH_FORECAST)).rename(SavedTables.NAME_SHORT_CALENDAR_FACTOR);
 
         savedSeasonallyAdjusted = percentageChange(SeasonallyAdjusted_Saved.calcSeasonallyAdjusted(doc)).rename(SavedTables.NAME_SHORT_SEASONALLY_ADJUSTED_SAVED);
