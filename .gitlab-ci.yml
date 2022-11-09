@@ -1,0 +1,65 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: never
+    - if: $CI_COMMIT_BRANCH   
+
+stages:
+  - process-checks
+  - build
+  - test
+  - deploy
+  - update
+
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  DEPLOYMENT_REPOSITORY: $DEPLOYMENT_REPOSITORY
+
+cache:
+  paths:
+    - .m2/repository
+
+merge_fail:
+  stage: process-checks
+  rules:
+     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "develop"
+  script:
+    - exit 1
+
+build:
+  stage: build
+  script:
+    - mvn clean install
+
+deploy:
+  stage: deploy  
+  only:
+       - master
+  script:
+    - mvn install org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy "-DaltDeploymentRepository=$DEPLOYMENT_REPOSITORY" "-DskipTests=true"
+
+trigger_UpdateCenter_ConCur:
+  variables:
+    GROUP_ID: de.bbk
+    ARTIFACT_ID: ConCur
+  stage: update  
+  only:
+       - master
+  trigger:
+    project: statistik/jdemetra/UpdateCenter
+    branch: ci/cd
+
+trigger_UpdateCenter_ConCurReport:
+  variables:
+    GROUP_ID: de.bbk
+    ARTIFACT_ID: ConCurReport
+  stage: update  
+  only:
+       - master
+  trigger:
+    project: statistik/jdemetra/UpdateCenter
+    branch: ci/cd
