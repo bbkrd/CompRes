@@ -35,6 +35,17 @@ build:
   script:
     - mvn clean install
 
+ui-test:
+  stage: test
+  rules:
+     - if:  $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+  variables:
+    TESTSUITEID: 2458
+  trigger:
+    project: statistik/jdemetra/ui-test
+    branch: main
+    strategy: depend
+
 deploy:
   stage: deploy  
   only:
