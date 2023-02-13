@@ -20,7 +20,10 @@
  */
 package de.bbk.concurreport.files;
 
+import de.bbk.concurreport.options.ConCurReportOptionsPanel;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 import de.bbk.concurreport.util.Frozen;
+import ec.nbdemetra.ws.FileRepository;
 import ec.nbdemetra.ws.WorkspaceFactory;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +36,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 
 /**
  *
@@ -55,7 +59,12 @@ public class HTMLFiles {
     public boolean selectFolder() {
         errorMessage = "";
         JFileChooser fileChooser;
-        if (currentDir != null && !currentDir.isEmpty()) {
+        String fileName = WorkspaceFactory.getInstance().getActiveWorkspace().getDataSource().getParams().get(FileRepository.FILENAME);
+        boolean isWorkspaceInitialSaveLocation = NbPreferences.forModule(ConCurReportOptionsPanel.class)
+                .getBoolean(IS_WORKSPACE_INITIAL_SAVE_LOCATION, DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION);
+        if (isWorkspaceInitialSaveLocation && fileName != null) {
+            fileChooser = new JFileChooser(fileName);
+        } else if (currentDir != null && !currentDir.isEmpty()) {
             fileChooser = new JFileChooser(currentDir);
         } else {
             fileChooser = new JFileChooser();

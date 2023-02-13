@@ -91,7 +91,8 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup = new javax.swing.ButtonGroup();
+        buttonGroupHtmlCount = new javax.swing.ButtonGroup();
+        buttonGroupInitialSaveFolder = new javax.swing.ButtonGroup();
         reportPanel = new javax.swing.JPanel();
         reportStyle = new javax.swing.JComboBox<>(de.bbk.concurreport.ReportStyle.values());
         userDefineTabs = new javax.swing.JTabbedPane();
@@ -105,9 +106,13 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
         tableSpinner = new javax.swing.JSpinner();
         graphicSpinner = new javax.swing.JSpinner();
+        jPanel2 = new javax.swing.JPanel();
         javax.swing.JPanel hTMLOptionPanel = new javax.swing.JPanel();
         buttonOneHTML = new javax.swing.JRadioButton();
         buttonHTMLforEach = new javax.swing.JRadioButton();
+        initialSavePanel = new javax.swing.JPanel();
+        buttonWorkspace = new javax.swing.JRadioButton();
+        buttonLastFolder = new javax.swing.JRadioButton();
 
         setMinimumSize(new java.awt.Dimension(389, 100));
 
@@ -135,7 +140,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
                     .addGroup(reportPanelLayout.createSequentialGroup()
                         .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(includeShortReport, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
+                        .addComponent(includeShortReport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(userDefineTabs, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
@@ -147,7 +152,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
                     .addComponent(reportStyle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(includeShortReport))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(userDefineTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                .addComponent(userDefineTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -193,7 +198,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(tableSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
                     .addComponent(graphicSpinner))
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,12 +218,14 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel2.setLayout(new java.awt.GridLayout());
+
         hTMLOptionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.hTMLOptionPanel.border.title"))); // NOI18N
         hTMLOptionPanel.setMinimumSize(new java.awt.Dimension(300, 100));
-        hTMLOptionPanel.setPreferredSize(new java.awt.Dimension(300, 100));
-        hTMLOptionPanel.setLayout(new java.awt.GridLayout(1, 0));
+        hTMLOptionPanel.setPreferredSize(new java.awt.Dimension(300, 69));
+        hTMLOptionPanel.setLayout(new java.awt.GridLayout(2, 0));
 
-        buttonGroup.add(buttonOneHTML);
+        buttonGroupHtmlCount.add(buttonOneHTML);
         org.openide.awt.Mnemonics.setLocalizedText(buttonOneHTML, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonOneHTML.text")); // NOI18N
         buttonOneHTML.setBorder(null);
         buttonOneHTML.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -227,7 +234,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         buttonOneHTML.setPreferredSize(new java.awt.Dimension(100, 10));
         hTMLOptionPanel.add(buttonOneHTML);
 
-        buttonGroup.add(buttonHTMLforEach);
+        buttonGroupHtmlCount.add(buttonHTMLforEach);
         org.openide.awt.Mnemonics.setLocalizedText(buttonHTMLforEach, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonHTMLforEach.text")); // NOI18N
         buttonHTMLforEach.setBorder(null);
         buttonHTMLforEach.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -236,22 +243,39 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         buttonHTMLforEach.setPreferredSize(new java.awt.Dimension(100, 10));
         hTMLOptionPanel.add(buttonHTMLforEach);
 
+        jPanel2.add(hTMLOptionPanel);
+
+        initialSavePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.initialSavePanel.border.title"))); // NOI18N
+        initialSavePanel.setPreferredSize(new java.awt.Dimension(300, 69));
+        initialSavePanel.setLayout(new java.awt.GridLayout(2, 0));
+
+        buttonGroupInitialSaveFolder.add(buttonWorkspace);
+        org.openide.awt.Mnemonics.setLocalizedText(buttonWorkspace, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonWorkspace.text")); // NOI18N
+        initialSavePanel.add(buttonWorkspace);
+
+        buttonGroupInitialSaveFolder.add(buttonLastFolder);
+        org.openide.awt.Mnemonics.setLocalizedText(buttonLastFolder, org.openide.util.NbBundle.getMessage(ConCurReportOptionsPanel.class, "ConCurReportOptionsPanel.buttonLastFolder.text")); // NOI18N
+        initialSavePanel.add(buttonLastFolder);
+
+        jPanel2.add(initialSavePanel);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(hTMLOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
+                .addComponent(reportPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -268,6 +292,10 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
         boolean oneHTML = preferences.getBoolean(JUST_ONE_HTML, DEFAULT_JUST_ONE_HTML);
         buttonOneHTML.setSelected(oneHTML);
         buttonHTMLforEach.setSelected(!oneHTML);
+
+        boolean isWorkspaceInitialSaveLocation = preferences.getBoolean(IS_WORKSPACE_INITIAL_SAVE_LOCATION, DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION);
+        buttonWorkspace.setSelected(isWorkspaceInitialSaveLocation);
+        buttonLastFolder.setSelected(!isWorkspaceInitialSaveLocation);
 
         String reportStyleName = preferences.get(REPORT_STYLE, DEFAULT_REPORT_STYLE);
         ReportStyle style = ReportStyle.valueOf(reportStyleName);
@@ -314,6 +342,9 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
 
         boolean oneHTML = buttonOneHTML.isSelected();
         preferences.putBoolean(JUST_ONE_HTML, oneHTML);
+
+        boolean workspaceInitial = buttonWorkspace.isSelected();
+        preferences.putBoolean(IS_WORKSPACE_INITIAL_SAVE_LOCATION, workspaceInitial);
 
         ReportStyle selectedReportStyle = (ReportStyle) reportStyle.getSelectedItem();
         preferences.put(REPORT_STYLE, selectedReportStyle.name());
@@ -377,6 +408,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
     }
 
     public static final String JUST_ONE_HTML = "oneHTML";
+    public static final String IS_WORKSPACE_INITIAL_SAVE_LOCATION = "is_workspace_initial_save_location";
     public static final String REPORT_STYLE = "reportStyle";
     public static final String INCLUDE_SHORT_REPORT = "include_short_report";
     public static final String AUTO_CORRELATION = "auto_correlation";
@@ -395,6 +427,7 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
     public static final String DEFAULT_REPORT_STYLE = ReportStyle.SHORT.name();
     public static final boolean DEFAULT_INCLUDE_SHORT_REPORT = false;
     public static final boolean DEFAULT_JUST_ONE_HTML = true;
+    public static final boolean DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION = true;
     public static final double DEFAULT_AUTO_CORRELATION = 1;
     public static final int DEFAULT_DECIMAL_PLACES = 2;
     public static final int DEFAULT_TIMESPAN_TABLE = 10;
@@ -411,12 +444,17 @@ public final class ConCurReportOptionsPanel extends javax.swing.JPanel {
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner autoCorrelation;
-    private javax.swing.ButtonGroup buttonGroup;
+    private javax.swing.ButtonGroup buttonGroupHtmlCount;
+    private javax.swing.ButtonGroup buttonGroupInitialSaveFolder;
     private javax.swing.JRadioButton buttonHTMLforEach;
+    private javax.swing.JRadioButton buttonLastFolder;
     private javax.swing.JRadioButton buttonOneHTML;
+    private javax.swing.JRadioButton buttonWorkspace;
     private javax.swing.JSpinner decimalsTables;
     private javax.swing.JSpinner graphicSpinner;
     private javax.swing.JCheckBox includeShortReport;
+    private javax.swing.JPanel initialSavePanel;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel reportPanel;
     private javax.swing.JComboBox<de.bbk.concurreport.ReportStyle> reportStyle;
     private javax.swing.JSpinner tableSpinner;
