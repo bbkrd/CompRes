@@ -185,11 +185,9 @@ public final class JPanelCCA extends JPanel implements IDisposable {
                     )
             );
             growthSavedGrid.setSelection(growthSavedGrid.getTsCollection().toArray());
-            if (tpc.getSavedSeasonallyAdjusted().getTsData() != null) {
-                fixSize(growthOldPane, d8BInfos.getFrequency(), d8BInfos.getSeasonalFactor().getTsData().getDomain().getYearsCount());
-            } else {
+            fixSize(growthOldPane, d8BInfos.getFrequency(), d8BInfos.getSeasonalFactor().getTsData().getDomain().getYearsCount());
+            if (tpc.getSavedSeasonallyAdjusted().getTsData() == null) {
                 tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
-                fixSize(growthOldPane, d8BInfos.getFrequency(), 1);
             }
         } else {
             tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");

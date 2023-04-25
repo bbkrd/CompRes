@@ -27,7 +27,6 @@ import ec.tss.html.AbstractHtmlElement;
 import ec.tss.html.HtmlStream;
 import ec.tss.html.HtmlTag;
 import ec.tss.html.implementation.HtmlProcessingInformation;
-import ec.tss.html.implementation.HtmlRegArima;
 import ec.tss.sa.documents.SaDocument;
 import ec.tstoolkit.algorithm.IProcResults;
 import ec.tstoolkit.modelling.ModellingDictionary;
@@ -78,7 +77,7 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
             stream.write(HtmlTag.HEADER2, "No pre-processing").newLine();
         } else {
             stream.write(HtmlTag.HEADER2, "Pre-processing").newLine();
-            stream.write(new HtmlRegArima(model, true));
+            stream.write(new HtmlRegArimaBBK(model));
         }
     }
 
@@ -89,7 +88,7 @@ public class HtmlBBKSummary extends AbstractHtmlElement {
     }
 
     private void writeDetails(HtmlStream stream) throws IOException {
-        HtmlRegArima htmlRegArima = new HtmlRegArima(model, true);
+        HtmlRegArimaBBK htmlRegArima = new HtmlRegArimaBBK(model);
         stream.write(HtmlTag.HEADER2, "Regression model");
         htmlRegArima.writeRegression(stream);
         stream.write(HtmlTag.LINEBREAK);
