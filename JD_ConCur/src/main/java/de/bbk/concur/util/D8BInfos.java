@@ -34,6 +34,10 @@ public class D8BInfos {
     private final boolean valid;
 
     public D8BInfos(SaDocument doc) {
+        this(doc, 10);
+    }
+
+    public D8BInfos(SaDocument doc, int maxYears) {
         IProcResults decomposition = doc.getDecompositionPart();
         if (decomposition == null || doc.getFinalDecomposition() == null) {
             this.frequency = 0;
@@ -63,10 +67,9 @@ public class D8BInfos {
             }
         }
         siData = InPercent.convertTsDataInPercentIfMult(siData, multiplicative);
-
-        if (siData.getDomain().getYearsCount() > 10) {
-            TsDomain domMax10years = new TsDomain(siData.getEnd().minus(frequency * 10), frequency * 10);
-            siData = siData.fittoDomain(domMax10years);
+        if (siData.getDomain().getYearsCount() > maxYears) {
+            TsDomain domMaxYears = new TsDomain(siData.getEnd().minus(frequency * maxYears), frequency * maxYears);
+            siData = siData.fittoDomain(domMaxYears);
         }
         TsDomain domain = new TsDomain(siData.getEnd().minus(frequency), frequency);
         si = TsFactory.instance.createTs("SI", null, siData);

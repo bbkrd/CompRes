@@ -22,6 +22,7 @@ package de.bbk.concur.util;
 
 import ec.tss.Ts;
 import ec.tss.TsFactory;
+import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
 
 /**
@@ -87,6 +88,16 @@ public class FixTimeDomain {
     public static TsDomain domLastYear(TsDomain dom) {
         int int1Year = dom.getFrequency().intValue();
         return new TsDomain(dom.getEnd().minus(int1Year), int1Year);
+    }
+
+    public static TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
+        dom = FixTimeDomain.domLastYear(dom);
+
+        if (tsData != null) {
+            TsDomain intersection = tsData.getDomain().intersection(dom);
+            return tsData.fittoDomain(intersection);
+        }
+        return new TsData(dom);
     }
 
 }

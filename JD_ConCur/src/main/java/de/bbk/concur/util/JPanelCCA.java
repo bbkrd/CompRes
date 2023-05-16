@@ -21,12 +21,11 @@
 package de.bbk.concur.util;
 
 import de.bbk.concur.TablesPercentageChange;
+import static de.bbk.concur.util.FixTimeDomain.lastYearOfSeries;
 import ec.nbdemetra.ui.NbComponents;
 import ec.tss.TsFactory;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
-import ec.tstoolkit.timeseries.simplets.TsData;
-import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.ui.grid.JTsGrid;
 import ec.ui.interfaces.IDisposable;
 import ec.ui.interfaces.ITsCollectionView;
@@ -53,10 +52,19 @@ public final class JPanelCCA extends JPanel implements IDisposable {
     private final JLabel lblD8;
     private static final int ROW_HEIGHT = 19;
     private static final int ROW_WIDTH = 70;
+    private final boolean renderGrowthRates;
+    private final int yearsInDB8;
+
     private D8BInfos d8BInfos;
     private TablesPercentageChange tpc;
 
     public JPanelCCA() {
+        this(10, true);
+    }
+
+    public JPanelCCA(int yearsInDB8, boolean renderGrowthRates) {
+        this.renderGrowthRates = renderGrowthRates;
+        this.yearsInDB8 = yearsInDB8;
 
         this.d8Grid = new JTsOutlierGrid();
         d8Grid.setTsUpdateMode(ITsCollectionView.TsUpdateMode.None);
@@ -95,28 +103,33 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d10aOldPane.setEnabled(false);
         d10aOldPane.setDividerSize(0);
 
-        JLabel lblGrowth = new JLabel("new GR", JLabel.CENTER);
-        growthPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowth, growthGrid);
-
-        growthPane.setEnabled(false);
-        growthPane.setDividerSize(0);
-
-        JLabel lblGrowthOld = new JLabel("old GR", JLabel.CENTER);
-        growthOldPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowthOld, growthSavedGrid);
-
-        growthOldPane.setEnabled(false);
-        growthOldPane.setDividerSize(0);
-
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(d8Pane);
         this.add(d10aPane);
         this.add(d10aOldPane);
-        this.add(growthPane);
-        this.add(growthOldPane);
+
+        if (renderGrowthRates) {
+            JLabel lblGrowth = new JLabel("new GR", JLabel.CENTER);
+            growthPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowth, growthGrid);
+
+            growthPane.setEnabled(false);
+            growthPane.setDividerSize(0);
+
+            JLabel lblGrowthOld = new JLabel("old GR", JLabel.CENTER);
+            growthOldPane = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblGrowthOld, growthSavedGrid);
+
+            growthOldPane.setEnabled(false);
+            growthOldPane.setDividerSize(0);
+            this.add(growthPane);
+            this.add(growthOldPane);
+        } else {
+            growthPane = null;
+            growthOldPane = null;
+        }
     }
 
     public void set(SaDocument doc) {
-        this.d8BInfos = new D8BInfos(doc);
+        this.d8BInfos = new D8BInfos(doc, yearsInDB8);
         d10Grid.getTsCollection().clear();
         d10SavedGrid.getTsCollection().clear();
         if (!d8BInfos.isValid()) {
@@ -151,6 +164,12 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         }
 
         /* Growth Rates */
+        if (renderGrowthRates) {
+            renderGrowthRates(doc);
+        }
+    }
+
+    private void renderGrowthRates(SaDocument doc) {
         this.tpc = new TablesPercentageChange(doc);
         growthGrid.getTsCollection().clear();
         growthSavedGrid.getTsCollection().clear();
@@ -193,7 +212,6 @@ public final class JPanelCCA extends JPanel implements IDisposable {
             tpc.getSavedSeasonallyAdjusted().setInvalidDataCause("NO DATA");
             fixSize(growthOldPane, d8BInfos.getFrequency(), 1);
         }
-
     }
 
     private void fixSize(JSplitPane pane, int periods, int years) {
@@ -210,19 +228,12 @@ public final class JPanelCCA extends JPanel implements IDisposable {
         d8Grid.dispose();
         d10Grid.dispose();
         d10SavedGrid.dispose();
-        growthGrid.dispose();
-        growthSavedGrid.dispose();
+        if (renderGrowthRates) {
+            growthGrid.dispose();
+            growthSavedGrid.dispose();
+        }
         removeAll();
         setLayout(null);
     }
 
-    private TsData lastYearOfSeries(TsDomain dom, TsData tsData) {
-        dom = FixTimeDomain.domLastYear(dom);
-
-        if (tsData != null) {
-            TsDomain intersection = tsData.getDomain().intersection(dom);
-            return tsData.fittoDomain(intersection);
-        }
-        return new TsData(dom);
-    }
 }

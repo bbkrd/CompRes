@@ -20,12 +20,13 @@
  */
 package de.bbk.concur.util;
 
+import de.bbk.concur.TablesPercentageChange;
+import static de.bbk.concur.util.FixTimeDomain.lastYearOfSeries;
 import static de.bbk.concur.util.InPercent.convertTsDataInPercentIfMult;
 import ec.nbdemetra.ui.DemetraUI;
 import ec.satoolkit.DecompositionMode;
 import ec.satoolkit.x11.X11Kernel;
 import ec.tss.Ts;
-import ec.tss.TsInformation;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.X13Document;
 import ec.tstoolkit.algorithm.IProcResults;
@@ -50,8 +51,7 @@ import java.awt.geom.GeneralPath;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -88,7 +88,7 @@ public class SIViewSaved extends ATsView {
     private static final Paint MARKER_PAINT = Color.DARK_GRAY;
     private static final float MARKER_ALPHA = .8f;
     // OTHER
-    private final Map<Bornes, Graphs> graphs_;
+    private final SortedMap<Bornes, Graphs> graphs_;
     private final JChartPanel chartPanel;
     private final XYLineAndShapeRenderer sRenderer;
     private final XYLineAndShapeRenderer tRenderer;
@@ -96,6 +96,7 @@ public class SIViewSaved extends ATsView {
     private final XYLineAndShapeRenderer siMasterRenderer;
     private final XYLineAndShapeRenderer cRenderer;
     private final JFreeChart masterChart;
+    private final boolean renderGrowthRates;
 
     public JFreeChart getJFreeChart() {
         return masterChart;
@@ -203,7 +204,13 @@ public class SIViewSaved extends ATsView {
     }
 
     public SIViewSaved() {
-        this.graphs_ = new HashMap<>();
+        this(false);
+    }
+
+    public SIViewSaved(boolean renderGrowthRates) {
+        this.graphs_ = new TreeMap<>((o1, o2) -> {
+            return Double.compare(o1.min_, o2.min_);
+        });
         highlight = null;
         this.revealObs = new RevealObs();
         this.sRenderer = new LineRenderer(S_INDEX, true, false);
@@ -215,6 +222,7 @@ public class SIViewSaved extends ATsView {
         this.detailChart = createDetailChart(sRenderer, tRenderer, siDetailRenderer, cRenderer);
         this.chartPanel = new JChartPanel(null);
         this.numberFormat = DemetraUI.getDefault().getDataFormat().newNumberFormat();
+        this.renderGrowthRates = renderGrowthRates;
         initComponents();
     }
 
@@ -320,8 +328,6 @@ public class SIViewSaved extends ATsView {
 
     @Override
     protected void onTsChange() {
-        TsInformation ts = getTsInformation();
-        setData(ts != null ? ts.data : null);
     }
 
     @Override
@@ -394,18 +400,6 @@ public class SIViewSaved extends ATsView {
         onColorSchemeChange();
     }
 
-    public void setSiData(TsData seas, TsData si, TsData seas_saved, TsData correctionValues) {
-
-        setData(seas, si, seas_saved, correctionValues);
-    }
-
-    public void setData(TsData seas) {
-        reset();
-        if (seas != null) {
-            displayData(seas, null, null, null);
-        }
-    }
-
     public boolean setDoc(SaDocument doc) {
         if (doc == null || doc.getDecompositionPart() == null || doc.getFinalDecomposition() == null) {
             reset();
@@ -446,8 +440,36 @@ public class SIViewSaved extends ATsView {
         if (correctionValues != null) {
             correctionValues = convertTsDataInPercentIfMult(correctionValues, mode.isMultiplicative());
         }
-        this.setSiData(seas, si, seasonalfactor.getTsData(), correctionValues);
+
+        int freq = seas.getFrequency().intValue();
+        double[] growthRateSA = null;
+        double[] growthRateSavedSA = null;
+        if (renderGrowthRates) {
+            TablesPercentageChange tpc = new TablesPercentageChange(doc);
+            TsDomain dom = doc.getSeries().getDomain();
+
+            growthRateSA = orderGrowthRate(freq, dom, tpc.getSeasonallyAdjusted().getTsData());
+            growthRateSavedSA = orderGrowthRate(freq, dom, tpc.getSavedSeasonallyAdjusted().getTsData());
+        }
+
+        this.setData(seas, si, seasonalfactor.getTsData(), correctionValues, growthRateSA, growthRateSavedSA);
+
         return true;
+    }
+
+    private double[] orderGrowthRate(int freq, TsDomain dom, TsData tsData) {
+        TsData lastYearData = lastYearOfSeries(dom, tsData);
+        double[] retValue = new double[freq];
+        for (int i = 0; i < retValue.length; i++) {
+            retValue[i] = Double.NaN;
+        }
+        if (lastYearData != null) {
+            for (TsObservation tsObservation : lastYearData) {
+                int pos = tsObservation.getPeriod().getPosition();
+                retValue[pos] = tsObservation.getValue();
+            }
+        }
+        return retValue;
     }
 
     /**
@@ -458,16 +480,16 @@ public class SIViewSaved extends ATsView {
      * @param seas_saved D10_saved
      * @param correctionValues D9
      */
-    public void setData(TsData seas, TsData si, TsData seas_saved, TsData correctionValues) {
+    private void setData(TsData seas, TsData si, TsData seas_saved, TsData correctionValues, double[] growthRateSA, double[] growthRateSavedSA) {
         reset();
         if (seas == null || si == null) {
             return;
         }
-        displayData(seas, si, seas_saved, correctionValues);
+        displayData(seas, si, seas_saved, correctionValues, growthRateSA, growthRateSavedSA);
 
     }
 
-    private void displayData(TsData seas, TsData irr, TsData seas_saved, TsData correctionValues) {
+    private void displayData(TsData seas, TsData irr, TsData seas_saved, TsData correctionValues, double[] growthRateSA, double[] growthRateSavedSA) {
         TsFrequency freq = seas.getFrequency();
         if (freq == TsFrequency.Undefined) {
             return;
@@ -558,7 +580,13 @@ public class SIViewSaved extends ATsView {
                 BasicXYDataset.Series c2 = BasicXYDataset.Series.of(key, sX2, corrected);
 
                 SIViewSaved.Bornes b = new SIViewSaved.Bornes(xstart, xend);
-                SIViewSaved.Graphs g = new SIViewSaved.Graphs(t2, s2, si2, c2, TsPeriod.formatPeriod(freq, il));
+                String label = TsPeriod.formatPeriod(freq, il);
+                if (renderGrowthRates) {
+                    String oldGrowthRate = String.format("%,.2f", growthRateSavedSA[il]);
+                    String newGrowthRate = String.format("%,.2f", growthRateSA[il]);
+                    label = "Old GR: " + oldGrowthRate + "   " + label + "   New GR: " + newGrowthRate;
+                }
+                SIViewSaved.Graphs g = new SIViewSaved.Graphs(t2, s2, si2, c2, label);
                 graphs_.put(b, g);
 
                 sDataset.addSeries(s);
@@ -582,7 +610,7 @@ public class SIViewSaved extends ATsView {
         showMain();
     }
 
-    public void reset() {
+    private void reset() {
         graphs_.clear();
         chartPanel.setChart(null);
     }

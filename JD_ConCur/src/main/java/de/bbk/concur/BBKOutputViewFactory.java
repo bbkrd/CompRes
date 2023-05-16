@@ -43,6 +43,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
 
     public static final String BBK = "ConCur";
+    public static final String CCA_JA = "CCA-JA";
     public static final String CCA = "CCA";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
@@ -56,6 +57,7 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
     public static final Id BBK_CHARTS_ONLYSA = new LinearId(BBK, CHARTS, ONLYSA);
     public static final Id BBK_CHARTS_SIRATIO = new LinearId(BBK, CHARTS, SI_RATIO);
     public static final Id BBK_CHARTS_SEASONAL = new LinearId(BBK, CHARTS, SEASONAL);
+    public static final Id BBK_CCA_JA = new LinearId(BBK, CCA_JA);
     public static final Id BBK_CCA = new LinearId(BBK, CCA);
     public static final Id BBK_TABLE = new LinearId(BBK, TABLE);
     public static final Id BBK_TABLE_SERIES = new LinearId(BBK, TABLE, SERIES);
@@ -189,12 +191,12 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="REGISTER CCA">
+    //<editor-fold defaultstate="collapsed" desc="REGISTER CCA_JA">
     @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220020)
-    public static class CCAFactory extends ItemFactory<X13Document> {
+    public static class CCA_JA_Factory extends ItemFactory<X13Document> {
 
-        public CCAFactory() {
-            super(BBK_CCA, new DefaultInformationExtractor<X13Document, X13Document>() {
+        public CCA_JA_Factory() {
+            super(BBK_CCA_JA, new DefaultInformationExtractor<X13Document, X13Document>() {
                 @Override
                 public X13Document retrieve(X13Document source) {
                     return source;
@@ -209,9 +211,28 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
         }
     }
 
+    //<editor-fold defaultstate="collapsed" desc="REGISTER CCA">
+    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220023)
+    public static class CCAFactory extends ItemFactory<X13Document> {
+
+        public CCAFactory() {
+            super(BBK_CCA, new DefaultInformationExtractor<X13Document, X13Document>() {
+                @Override
+                public X13Document retrieve(X13Document source) {
+                    return source;
+                }
+            }, new PooledItemUI<View, X13Document, CCAShortView>(CCAShortView.class) {
+                @Override
+                protected void init(CCAShortView c, View host, X13Document information) {
+                    c.set(information);
+                }
+            });
+        }
+    }
+
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="REGISTER TablesSeries">
-    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220020)
+    @ServiceProvider(service = ProcDocumentItemFactory.class, position = 220025)
     public static class TablesSeriesViewFactory extends ItemFactory<X13Document> {
 
         public TablesSeriesViewFactory() {
