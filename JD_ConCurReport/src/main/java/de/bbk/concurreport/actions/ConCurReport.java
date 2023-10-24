@@ -24,11 +24,6 @@ import de.bbk.concurreport.Processing;
 import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
-import ec.tss.sa.SaItem;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import static javax.swing.Action.NAME;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -45,8 +40,8 @@ import org.openide.util.NbBundle.Messages;
 )
 
 @ActionReferences({
-    @ActionReference(path = MultiProcessingManager.CONTEXTPATH, position = 2260)
-    ,@ActionReference(path = MultiProcessingManager.LOCALPATH, position = 2260)
+    @ActionReference(path = MultiProcessingManager.CONTEXTPATH, position = 2260),
+    @ActionReference(path = MultiProcessingManager.LOCALPATH, position = 2260)
 })
 
 @Messages("CTL_ConCurReport=Create HTML")
@@ -64,14 +59,7 @@ public final class ConCurReport extends AbstractViewAction<SaBatchUI> {
 
     @Override
     protected void process(SaBatchUI cur) {
-        new Thread(() -> {
-            SaItem[] selection = cur.getSelection();
-
-            Map<String, List<SaItem>> map = new TreeMap<>();
-            map.put(cur.getName(), Arrays.asList(selection));
-            Processing p = new Processing();
-            p.process(map);
-        }).start();
+        ConCurReportExecutor.executeAfterConfirmation(null, new Processing(cur));
     }
 
 }

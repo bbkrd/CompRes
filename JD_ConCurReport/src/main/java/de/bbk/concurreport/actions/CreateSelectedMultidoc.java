@@ -22,15 +22,7 @@ package de.bbk.concurreport.actions;
 
 import de.bbk.concurreport.Processing;
 import ec.nbdemetra.sa.MultiProcessingDocument;
-import ec.nbdemetra.ws.WorkspaceItem;
 import ec.nbdemetra.ws.nodes.ItemWsNode;
-import ec.tss.sa.SaItem;
-import ec.tss.sa.SaProcessing;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -78,21 +70,6 @@ public final class CreateSelectedMultidoc extends NodeAction {
 
     @Override
     protected void performAction(Node[] activatedNodes) {
-        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(Bundle.CTL_CreateSelectedMultidoc_Message(), NotifyDescriptor.OK_CANCEL_OPTION);
-        if (DialogDisplayer.getDefault().notify(nd) != NotifyDescriptor.OK_OPTION) {
-            return;
-        }
-        new Thread(() -> {
-            Map<String, List<SaItem>> map = new TreeMap<>();
-
-            for (Node activatedNode : activatedNodes) {
-                WorkspaceItem<MultiProcessingDocument> item = ((ItemWsNode) activatedNode).getItem(ITEM_TYPE);
-                SaProcessing saProcessing = item.getElement().getCurrent();
-                map.put(item.getDisplayName(), saProcessing);
-            }
-
-            Processing p = new Processing();
-            p.process(map);
-        }).start();
+        ConCurReportExecutor.executeAfterConfirmation(Bundle.CTL_CreateSelectedMultidoc_Message(), new Processing(activatedNodes));
     }
 }

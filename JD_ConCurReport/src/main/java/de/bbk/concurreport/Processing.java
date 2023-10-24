@@ -26,22 +26,32 @@ import de.bbk.concurreport.options.ConCurReportOptionsPanel;
 import de.bbk.concurreport.report.tramo.TramoSeatsReport;
 import de.bbk.concurreport.report.x13.X13Report;
 import de.bbk.concurreport.util.Frozen;
+import ec.nbdemetra.sa.MultiProcessingDocument;
+import ec.nbdemetra.sa.MultiProcessingManager;
+import ec.nbdemetra.sa.SaBatchUI;
+import ec.nbdemetra.ws.IWorkspaceItemManager;
 import ec.nbdemetra.ws.Workspace;
 import ec.nbdemetra.ws.WorkspaceFactory;
+import ec.nbdemetra.ws.WorkspaceItem;
+import ec.nbdemetra.ws.nodes.ItemWsNode;
 import ec.tss.html.HtmlStream;
 import ec.tss.sa.SaItem;
+import ec.tss.sa.SaProcessing;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tss.sa.documents.X13Document;
-import java.awt.Dimension;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
+import org.openide.nodes.Node;
 import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +60,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christieane Hofer
  */
-public class Processing {
+public class Processing implements Callable<ReportMessages> {
 
     private static final String OLD_STYLE = "<h1 style=\"font-weight:bold;font-size:110%;text-decoration:underline;\">";
     private static final String NEW_STYLE = "<h1 style=\"font-weight:bold;font-size:100%;text-decoration:underline;\">";
@@ -58,6 +68,41 @@ public class Processing {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
     private final ProgressHandle progressHandle = ProgressHandle.createHandle("Creating report");
     private HTMLFiles htmlf;
+    private final Map<String, List<SaItem>> map;
+
+    private static final Class<MultiProcessingDocument> ITEM_TYPE = MultiProcessingDocument.class;
+
+    public Processing() {
+        this.map = new TreeMap<>();
+        Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
+        IWorkspaceItemManager mgr = WorkspaceFactory.getInstance().getManager(MultiProcessingManager.ID);
+        if (mgr != null) {
+            List<WorkspaceItem<MultiProcessingDocument>> list = workspace.searchDocuments(mgr.getItemClass());
+            list.stream().forEach((item) -> {
+                SaProcessing saProcessing = item.getElement().getCurrent();
+                map.put(item.getDisplayName(), saProcessing);
+            });
+        }
+    }
+
+    public Processing(Map<String, List<SaItem>> map) {
+        this.map = map;
+    }
+
+    public Processing(Node[] activatedNodes) {
+        this.map = new TreeMap<>();
+
+        for (Node activatedNode : activatedNodes) {
+            WorkspaceItem<MultiProcessingDocument> item = ((ItemWsNode) activatedNode).getItem(ITEM_TYPE);
+            SaProcessing saProcessing = item.getElement().getCurrent();
+            map.put(item.getDisplayName(), saProcessing);
+        }
+    }
+
+    public Processing(SaBatchUI cur) {
+        this.map = new TreeMap<>();
+        map.put(cur.getName(), Arrays.asList(cur.getSelection()));
+    }
 
     private boolean makeHtmlf() {
         htmlf = new HTMLFiles();
@@ -105,132 +150,116 @@ public class Processing {
         return writer.toString();
     }
 
-    public void process(Map<String, List<SaItem>> map) {
+    @Override
+    public ReportMessages call() {
         try {
             progressHandle.start();
-            run(map);
+            if (!makeHtmlf() || !checkLookAndFeel()) {
+                return ReportMessages.EMPTY;
+            }
+
+            boolean just_one_html = NbPreferences.forModule(ConCurReportOptionsPanel.class).getBoolean(ConCurReportOptionsPanel.JUST_ONE_HTML, true);
+
+            StringBuilder sbError = new StringBuilder();
+            StringBuilder sbSuccessful = new StringBuilder();
+
+            if (just_one_html) {
+                Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
+                try (FileWriter writer = new FileWriter(htmlf.createHtmlFile(workspace.getName()), true)) {
+                    // alle
+                    for (Map.Entry<String, List<SaItem>> entry : map.entrySet()) {
+                        String saProcessingName = entry.getKey();
+                        List<SaItem> items = entry.getValue();
+                        for (SaItem item : items) {
+                            item.process();
+                            StringBuilder str = new StringBuilder();
+                            str.append(Frozen.removeFrozen(item.getName()))
+                                    .append("in Multi-doc ")
+                                    .append(saProcessingName);
+                            String name = str.toString().replace("\n", "-");
+
+                            if (item.getStatus() == SaItem.Status.Valid) {
+                                try {
+                                    String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
+                                            .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                            .replace("▶", "&#9654;");
+                                    writer.append(output).append('\n');
+                                    writer.flush();
+                                    sbSuccessful.append(name).append("\n");
+                                } catch (ReportException ex) {
+                                    sbError.append(name).append(": ").append(ex.getMessage()).append("\n");
+                                } catch (RuntimeException ex) {
+                                    sbError.append(name).append(": Critical Error! ").append(ex.getMessage()).append("\n");
+                                    LOGGER.error(name, ex);
+                                }
+                            } else {
+                                sbError.append(name)
+                                        .append(":\nIt is not possible to create the output because it is not valid\n");
+                            }
+                            item.compress();
+                        }
+                    }
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Processing.class.getName()).log(Level.SEVERE, null, ex);
+                    sbError.append(":\n")
+                            .append("- It is not possible to create the file:\n")
+                            .append(htmlf.getFilePath())
+                            .append("\n because ")
+                            .append(htmlf.getErrorMessage())
+                            .append("\n");
+                }
+
+            } else {
+                // einzeln
+                map.keySet().stream().forEach((saProcessingName) -> {
+                    List<SaItem> items = map.get(saProcessingName);
+
+                    for (SaItem item : items) {
+                        item.process();
+                        String str = Frozen.removeFrozen(item.getName())
+                                + "in Multi-doc " + saProcessingName;
+                        str = str.replace("\n", "-");
+
+                        if (item.getStatus() == SaItem.Status.Valid) {
+                            try {
+                                String output = createOutput(item);
+                                output = output.replace(OLD_STYLE, NEW_STYLE)
+                                        .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
+                                        .replace("▶", "&#9654;");
+                                if (!htmlf.writeHTMLFile(output, item.getName())) {
+                                    sbError.append(str)
+                                            .append(":\n")
+                                            .append("It is not possible to create the file\n");
+                                    if (!htmlf.getFilePath().isEmpty()) {
+                                        sbError.append(htmlf.getFilePath())
+                                                .append("\n");
+                                    }
+                                    sbError.append("Reason: ")
+                                            .append(htmlf.getErrorMessage())
+                                            .append("\n");
+                                } else {
+                                    sbSuccessful.append(str).append("\n");
+                                }
+                            } catch (ReportException ex) {
+                                sbError.append(str).append(": ").append(ex.getMessage()).append("\n");
+                            } catch (RuntimeException ex) {
+                                sbError.append(str).append(": Critical Error! ").append(ex.getMessage()).append("\n");
+                                LOGGER.error(str, ex);
+                            }
+                        } else {
+                            sbError.append(str)
+                                    .append(":\nIt is not possible to create the output because it is not valid\n");
+                        }
+                        item.compress();
+                    }
+                });
+
+            }
+
+            return new ReportMessages(sbSuccessful.toString(), sbError.toString());
         } finally {
             progressHandle.finish();
         }
     }
 
-    private void run(Map<String, List<SaItem>> map) {
-        if (!makeHtmlf() || !checkLookAndFeel()) {
-            return;
-        }
-
-        boolean just_one_html = NbPreferences.forModule(ConCurReportOptionsPanel.class).getBoolean(ConCurReportOptionsPanel.JUST_ONE_HTML, true);
-
-        StringBuilder sbError = new StringBuilder();
-        StringBuilder sbSuccessful = new StringBuilder();
-
-        if (just_one_html) {
-            Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
-            try (FileWriter writer = new FileWriter(htmlf.createHtmlFile(workspace.getName()), true)) {
-                // alle
-                for (Map.Entry<String, List<SaItem>> entry : map.entrySet()) {
-                    String saProcessingName = entry.getKey();
-                    List<SaItem> items = entry.getValue();
-                    for (SaItem item : items) {
-                        item.process();
-                        StringBuilder str = new StringBuilder();
-                        str.append(Frozen.removeFrozen(item.getName()))
-                                .append("in Multi-doc ")
-                                .append(saProcessingName);
-                        String name = str.toString().replace("\n", "-");
-
-                        if (item.getStatus() == SaItem.Status.Valid) {
-                            try {
-                                String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
-                                        .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                        .replace("▶", "&#9654;");
-                                writer.append(output).append('\n');
-                                writer.flush();
-                                sbSuccessful.append(name).append("\n");
-                            } catch (ReportException ex) {
-                                sbError.append(name).append(": ").append(ex.getMessage()).append("\n");
-                            } catch (RuntimeException ex) {
-                                sbError.append(name).append(": Critical Error! ").append(ex.getMessage()).append("\n");
-                                LOGGER.error(name, ex);
-                            }
-                        } else {
-                            sbError.append(name)
-                                    .append(":\nIt is not possible to create the output because it is not valid\n");
-                        }
-                        item.compress();
-                    }
-                }
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Processing.class.getName()).log(Level.SEVERE, null, ex);
-                sbError.append(":\n")
-                        .append("- It is not possible to create the file:\n")
-                        .append(htmlf.getFilePath())
-                        .append("\n because ")
-                        .append(htmlf.getErrorMessage())
-                        .append("\n");
-            }
-
-        } else {
-            // einzeln
-            map.keySet().stream().forEach((saProcessingName) -> {
-                List<SaItem> items = map.get(saProcessingName);
-
-                for (SaItem item : items) {
-                    item.process();
-                    String str = Frozen.removeFrozen(item.getName())
-                            + "in Multi-doc " + saProcessingName;
-                    str = str.replace("\n", "-");
-
-                    if (item.getStatus() == SaItem.Status.Valid) {
-                        try {
-                            String output = createOutput(item);
-                            output = output.replace(OLD_STYLE, NEW_STYLE)
-                                    .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
-                                    .replace("▶", "&#9654;");
-                            if (!htmlf.writeHTMLFile(output, item.getName())) {
-                                sbError.append(str)
-                                        .append(":\n")
-                                        .append("It is not possible to create the file\n");
-                                if (!htmlf.getFilePath().isEmpty()) {
-                                    sbError.append(htmlf.getFilePath())
-                                            .append("\n");
-                                }
-                                sbError.append("Reason: ")
-                                        .append(htmlf.getErrorMessage())
-                                        .append("\n");
-                            } else {
-                                sbSuccessful.append(str).append("\n");
-                            }
-                        } catch (ReportException ex) {
-                            sbError.append(str).append(": ").append(ex.getMessage()).append("\n");
-                        } catch (RuntimeException ex) {
-                            sbError.append(str).append(": Critical Error! ").append(ex.getMessage()).append("\n");
-                            LOGGER.error(str, ex);
-                        }
-                    } else {
-                        sbError.append(str)
-                                .append(":\nIt is not possible to create the output because it is not valid\n");
-                    }
-                    item.compress();
-                }
-            });
-
-        }
-
-        if (!sbError.toString().isEmpty()) {
-            JTextArea jta = new JTextArea(sbError.toString());
-            jta.setEditable(false);
-            JScrollPane jsp = new JScrollPane(jta);
-            jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-        if (!sbSuccessful.toString().isEmpty()) {
-            JTextArea jta = new JTextArea(sbSuccessful.toString());
-            jta.setEditable(false);
-            JScrollPane jsp = new JScrollPane(jta);
-            jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
 }

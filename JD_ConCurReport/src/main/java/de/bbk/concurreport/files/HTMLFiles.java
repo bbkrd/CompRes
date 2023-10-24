@@ -21,6 +21,7 @@
 package de.bbk.concurreport.files;
 
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
+import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 import static de.bbk.concurreport.options.ConCurReportOptionsPanel.IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 import de.bbk.concurreport.util.Frozen;
 import ec.nbdemetra.ws.FileRepository;
@@ -36,7 +37,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 
 /**
  *
