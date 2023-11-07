@@ -19,15 +19,17 @@ import java.io.IOException;
  */
 public class D8BReport implements IHtmlElement {
 
+    private final String saProcessingName;
     private final SaItem item;
 
-    public D8BReport(SaItem item) {
+    public D8BReport(String saProcessingName, SaItem item) {
+        this.saProcessingName = saProcessingName;
         this.item = item;
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
+        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(saProcessingName, item.getRawName(), item.getTs());
         stream.write(headerbbk)
                 .newLine();
         SaDocument<?> doc = item.toDocument();

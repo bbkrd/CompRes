@@ -21,9 +21,11 @@ import org.openide.util.NbPreferences;
  */
 public class TramoSeatsReport implements IHtmlElement {
 
+    private final String saProcessingName;
     private final SaItem item;
 
-    public TramoSeatsReport(SaItem item) {
+    public TramoSeatsReport(String saProcessingName, SaItem item) {
+        this.saProcessingName = saProcessingName;
         this.item = item;
     }
 
@@ -35,12 +37,12 @@ public class TramoSeatsReport implements IHtmlElement {
 
         switch (reportStyle) {
             case SHORT:
-                report = new ShortReport(item);
+                report = new ShortReport(saProcessingName, item);
                 break;
             case LONG:
                 throw new ReportException("Long reports for TramoSeats are not supported yet.");
             case D8B:
-                report = new D8BReport(item);
+                report = new D8BReport(saProcessingName, item);
                 break;
             case INDIVIDUAL:
                 throw new ReportException("Userdefined reports for TramoSeats are not supported yet.");

@@ -24,17 +24,19 @@ import java.io.IOException;
  */
 public class LongReport implements IHtmlElement {
 
+    private final String saProcessingName;
     private final SaItem item;
     private final CompositeResults compositeResults;
 
-    public LongReport(SaItem item) {
+    public LongReport(String saProcessingName, SaItem item) {
+        this.saProcessingName = saProcessingName;
         this.item = item;
         this.compositeResults = item.toDocument().getResults();
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
-        stream.write(new ShortReport(item));
+        stream.write(new ShortReport(saProcessingName, item));
         SaDocument<?> doc = item.toDocument();
         if (compositeResults == null) {
             return;

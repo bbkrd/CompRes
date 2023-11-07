@@ -38,9 +38,11 @@ import org.openide.util.NbPreferences;
  */
 public class IndividualReport implements IHtmlElement {
 
+    private final String saProcessingName;
     private final SaItem item;
 
-    public IndividualReport(SaItem item) {
+    public IndividualReport(String saProcessingName, SaItem item) {
+        this.saProcessingName = saProcessingName;
         this.item = item;
     }
 
@@ -49,11 +51,11 @@ public class IndividualReport implements IHtmlElement {
         Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
 
         if (preferences.getBoolean(INCLUDE_SHORT_REPORT, DEFAULT_INCLUDE_SHORT_REPORT)) {
-            new ShortReport(item).write(stream);
+            new ShortReport(saProcessingName, item).write(stream);
         }
 
         int timespanGraphic = preferences.getInt(TIMESPAN_GRAPHIC, DEFAULT_TIMESPAN_GRAPHIC);
-        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(item.getRawName(), item.getTs());
+        final HTMLBBkHeader headerbbk = new HTMLBBkHeader(saProcessingName, item.getRawName(), item.getTs());
         stream.write(headerbbk)
                 .newLine();
         SaDocument<?> doc = item.toDocument();

@@ -129,7 +129,7 @@ public class Processing implements Callable<ReportMessages> {
         return true;
     }
 
-    private String createOutput(SaItem item) {
+    private String createOutput(String saProcessingName, SaItem item) {
         StringWriter writer = new StringWriter();
         SaDocument<?> doc = item.toDocument();
         try {
@@ -138,9 +138,9 @@ public class Processing implements Callable<ReportMessages> {
             stream.open();
             stream.write(HTMLStyle.STYLE);
             if (doc instanceof X13Document) {
-                stream.write(new X13Report(item));
+                stream.write(new X13Report(saProcessingName, item));
             } else if (doc instanceof TramoSeatsDocument) {
-                stream.write(new TramoSeatsReport(item));
+                stream.write(new TramoSeatsReport(saProcessingName, item));
             }
 
             stream.close();
@@ -180,7 +180,7 @@ public class Processing implements Callable<ReportMessages> {
 
                             if (item.getStatus() == SaItem.Status.Valid) {
                                 try {
-                                    String output = createOutput(item).replace(OLD_STYLE, NEW_STYLE)
+                                    String output = createOutput(saProcessingName, item).replace(OLD_STYLE, NEW_STYLE)
                                             .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
                                             .replace("▶", "&#9654;");
                                     writer.append(output).append('\n');
@@ -222,7 +222,7 @@ public class Processing implements Callable<ReportMessages> {
 
                         if (item.getStatus() == SaItem.Status.Valid) {
                             try {
-                                String output = createOutput(item);
+                                String output = createOutput(saProcessingName, item);
                                 output = output.replace(OLD_STYLE, NEW_STYLE)
                                         .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
                                         .replace("▶", "&#9654;");

@@ -20,9 +20,11 @@ import org.openide.util.NbPreferences;
  */
 public class X13Report implements IHtmlElement {
 
+    private final String saProcessingName;
     private final SaItem item;
 
-    public X13Report(SaItem item) {
+    public X13Report(String saProcessingName, SaItem item) {
+        this.saProcessingName = saProcessingName;
         this.item = item;
     }
 
@@ -34,16 +36,16 @@ public class X13Report implements IHtmlElement {
 
         switch (reportStyle) {
             case SHORT:
-                report = new ShortReport(item);
+                report = new ShortReport(saProcessingName, item);
                 break;
             case LONG:
-                report = new LongReport(item);
+                report = new LongReport(saProcessingName, item);
                 break;
             case D8B:
-                report = new D8BReport(item);
+                report = new D8BReport(saProcessingName, item);
                 break;
             case INDIVIDUAL:
-                report = new IndividualReport(item);
+                report = new IndividualReport(saProcessingName, item);
                 break;
             default:
                 throw new AssertionError(reportStyle.name());
