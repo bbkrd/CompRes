@@ -3,16 +3,14 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
-    - if: $CI_COMMIT_BRANCH == "develop"
-      when: never
     - if: $CI_COMMIT_BRANCH   
 
 stages:
   - process-checks
-  - build
-  - test
+  - build  
   - deploy
   - update
+  - ui-test
 
 variables:
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
@@ -36,7 +34,7 @@ build:
     - mvn clean install
 
 ui-test:
-  stage: test
+  stage: ui-test
   rules:
      - if:  $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
   variables:
@@ -48,29 +46,61 @@ ui-test:
 
 deploy:
   stage: deploy  
-  only:
-       - master
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      variables:
+        DEPLOYMENT: $DEPLOYMENT_REPOSITORY_TEST
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        DEPLOYMENT: $DEPLOYMENT_REPOSITORY_ABNAHME
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        DEPLOYMENT: $DEPLOYMENT_REPOSITORY
+    - if: $CI_COMMIT_BRANCH
+      when: never
   script:
-    - mvn install org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy "-DaltDeploymentRepository=$DEPLOYMENT_REPOSITORY" "-DskipTests=true"
+    - mvn install org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy "-DaltDeploymentRepository=$DEPLOYMENT" "-DskipTests=true"
 
 trigger_UpdateCenter_ConCur:
   variables:
     GROUP_ID: de.bbk
     ARTIFACT_ID: ConCur
   stage: update  
-  only:
-       - master
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      variables:
+        BRANCH: test
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        BRANCH: abnahme
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        BRANCH: ci/cd
+    - if: $CI_COMMIT_BRANCH
+      when: never
   trigger:
     project: statistik/jdemetra/UpdateCenter
-    branch: ci/cd
+    branch: $BRANCH
+    strategy: depend
 
 trigger_UpdateCenter_ConCurReport:
   variables:
     GROUP_ID: de.bbk
     ARTIFACT_ID: ConCurReport
   stage: update  
-  only:
-       - master
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      variables:
+        BRANCH: test
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        BRANCH: abnahme
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        BRANCH: ci/cd
+    - if: $CI_COMMIT_BRANCH
+      when: never
   trigger:
     project: statistik/jdemetra/UpdateCenter
-    branch: ci/cd
+    branch: $BRANCH
+    strategy: depend
