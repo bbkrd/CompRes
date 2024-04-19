@@ -20,7 +20,7 @@
  */
 package de.bbk.concur.view;
 
-import de.bbk.concur.html.HtmlCCA;
+import de.bbk.concur.html.HtmlAutomised;
 import de.bbk.concur.util.JPanelCCA;
 import de.bbk.concur.util.SIViewSaved;
 import ec.nbdemetra.ui.NbComponents;
@@ -93,8 +93,9 @@ public class CCAView extends JComponent implements IDisposable {
             return;
         }
 
-        HtmlCCA summary = new HtmlCCA(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
-        Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(summary));
+        //HtmlCCA summary = new HtmlCCA(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
+        HtmlAutomised automised = new HtmlAutomised(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
+        Disposables.disposeAndRemoveAll(document).add(toolkit.getHtmlViewer(automised));
 
         jPanelCCA.set(doc);
         int forelastPeriod;

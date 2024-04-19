@@ -58,6 +58,7 @@ public class HtmlCCA extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         writeTitle(stream);
+        new HtmlAutomised(title, doc).write(stream);
         if (spec != null) {
             writeSpecification(stream);
         }

@@ -4,12 +4,13 @@
     <parent>
         <groupId>de.bundesbank</groupId>
         <artifactId>concur-parent</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.1</version>
     </parent>
 
 
     <groupId>de.bbk</groupId>
     <artifactId>ConCur</artifactId>
+    <name>CompRes</name>
     <packaging>nbm</packaging>
 
     <organization>
@@ -31,6 +32,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
+                        <publicPackage>de.bbk.autoconcur</publicPackage>
                         <publicPackage>de.bbk.concur</publicPackage>
                         <publicPackage>de.bbk.concur.html</publicPackage>
                         <publicPackage>de.bbk.concur.servicedefinition</publicPackage>
@@ -244,5 +246,4 @@
             <type>jar</type>
         </dependency>
     </dependencies>
-
 </project>

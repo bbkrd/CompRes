@@ -20,14 +20,18 @@
  */
 package de.bbk.concur.view;
 
+import de.bbk.concur.html.HtmlAutomised;
 import de.bbk.concur.util.JPanelCCA;
 import de.bbk.concur.util.SIViewSaved;
 import ec.nbdemetra.ui.NbComponents;
+import ec.tss.Ts;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.ui.interfaces.IDisposable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
@@ -37,6 +41,7 @@ import javax.swing.JSplitPane;
  */
 public class CCAShortView extends JComponent implements IDisposable {
 
+    private final JLabel lblACC;
     private static final int WIDTH_SIVIEWS = 450, HEIGHT_SIVIEWS = 250;
     private final JPanelCCA jPanelCCA;
     private final SIViewSaved siViewSavedForelast;
@@ -59,9 +64,14 @@ public class CCAShortView extends JComponent implements IDisposable {
         siViewSplit.setEnabled(false);
         siViewSplit.setResizeWeight(0.5);
 
+        lblACC = new JLabel("", JLabel.LEFT);
+        lblACC.setMinimumSize(new Dimension(0, 60));
+        JSplitPane autoSplit = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, lblACC, siViewSplit);
+        autoSplit.setDividerLocation(60);
+
         JScrollPane mainscroll = NbComponents.newJScrollPane(jPanelCCA);
 
-        JSplitPane graphicsSplit = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, mainscroll, siViewSplit);
+        JSplitPane graphicsSplit = NbComponents.newJSplitPane(JSplitPane.VERTICAL_SPLIT, mainscroll, autoSplit);
         graphicsSplit.setOneTouchExpandable(true);
         graphicsSplit.setDividerSize(10);
         graphicsSplit.setDividerLocation(200);
@@ -75,6 +85,8 @@ public class CCAShortView extends JComponent implements IDisposable {
             return;
         }
         jPanelCCA.set(doc);
+        HtmlAutomised automised = new HtmlAutomised(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
+        lblACC.setText(automised.writeText());
         int forelastPeriod;
         int lastPeriod = doc.getSeries().getDomain().getLast().getPosition();
         if (lastPeriod == 0) {

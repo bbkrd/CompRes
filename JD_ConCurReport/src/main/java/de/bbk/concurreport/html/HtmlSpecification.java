@@ -5,6 +5,7 @@
  */
 package de.bbk.concurreport.html;
 
+import de.bbk.concur.html.HtmlAutomised;
 import ec.satoolkit.seats.SeatsSpecification;
 import ec.satoolkit.tramoseats.TramoSeatsSpecification;
 import ec.satoolkit.x11.SeasonalFilterOption;
@@ -16,6 +17,7 @@ import ec.tss.html.HtmlTag;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tss.sa.documents.X13Document;
+import ec.tss.tsproviders.utils.MultiLineNameUtil;
 import ec.tstoolkit.modelling.arima.tramo.CalendarSpec;
 import ec.tstoolkit.modelling.arima.tramo.TramoSpecification;
 import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
@@ -47,6 +49,7 @@ public class HtmlSpecification extends AbstractHtmlElement {
     }
 
     private void writeX13Specification(HtmlStream stream) throws IOException {
+        new HtmlAutomised(MultiLineNameUtil.join(((X13Document) doc).getInput().getName()), doc).write(stream);
         stream.write(HtmlTag.HEADER2, "Specification");
         X13Specification specification = ((X13Document) doc).getSpecification();
         RegArimaSpecification regSpec = specification.getRegArimaSpecification();

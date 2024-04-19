@@ -50,7 +50,7 @@ public final class JPanelCCA extends JPanel implements IDisposable {
     private final JSplitPane growthPane;
     private final JSplitPane growthOldPane;
     private final JLabel lblD8;
-    private static final int ROW_HEIGHT = 19;
+    private static final int ROW_HEIGHT = 25;
     private static final int ROW_WIDTH = 70;
     private final boolean renderGrowthRates;
     private final int yearsInDB8;
