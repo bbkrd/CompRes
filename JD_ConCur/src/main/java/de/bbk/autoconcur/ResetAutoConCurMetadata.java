@@ -48,7 +48,7 @@ import org.openide.util.NbBundle;
 @ActionReference(path = MultiProcessingManager.LOCALPATH + AutoConCurMetadata.PATH, position = 1898)
 @NbBundle.Messages({
     "CTL_ResetAutoConCurMetadata=Reset Metadata",
-    "CTL_ConfirmResetAutoConCurMetadata=Are you sure you want to reset the new autoconcur metadata? (This will restore the default settings.)"})
+    "CTL_ConfirmResetAutoConCurMetadata=Are you sure you want to reset the compRes Recommendation metadata? (This will restore the default settings.)"})
 
 public class ResetAutoConCurMetadata extends AbstractViewAction<SaBatchUI> {
 

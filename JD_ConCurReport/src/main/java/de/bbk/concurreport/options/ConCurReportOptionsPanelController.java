@@ -15,15 +15,15 @@ import org.openide.util.Lookup;
 
 @OptionsPanelController.SubRegistration(
         location = "Demetra",
-        displayName = "#AdvancedOption_DisplayName_ConCurReport",
-        keywords = "#AdvancedOption_Keywords_ConCurReport",
-        keywordsCategory = "Advanced/ConCurReport",
+        displayName = "#AdvancedOption_DisplayName_CompResReport",
+        keywords = "#AdvancedOption_Keywords_CompResReport",
+        keywordsCategory = "Advanced/CompResReport",
         id = ConCurReportOptionsPanelController.ID
 )
-@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_ConCurReport=ConCurReport", "AdvancedOption_Keywords_ConCurReport=ConCurReport"})
+@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_CompResReport=CompResReport", "AdvancedOption_Keywords_CompResReport=CompResReport"})
 public final class ConCurReportOptionsPanelController extends OptionsPanelController {
 
-    public static final String ID = "Demetra/ConCurReport";
+    public static final String ID = "Demetra/CompResReport";
     private ConCurReportOptionsPanel panel;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;

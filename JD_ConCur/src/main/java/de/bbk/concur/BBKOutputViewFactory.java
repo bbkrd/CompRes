@@ -42,7 +42,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification, X13Document> {
 
-    public static final String BBK = "compRes";
+    public static final String BBK = "CompRes";
     //public static final String CCA_JA = "CCA-JA";
     public static final String CCA = "CCA";
     public static final String SA = "SA";

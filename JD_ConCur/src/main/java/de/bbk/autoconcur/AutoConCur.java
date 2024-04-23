@@ -7,6 +7,7 @@ package de.bbk.autoconcur;
 
 import static de.bbk.autoconcur.Calculations.growthRate;
 import static de.bbk.autoconcur.Calculations.quantiles;
+import de.bbk.concur.options.DatasourceUpdateOptionsPanel;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.util.TsData_Saved;
 import ec.nbdemetra.sa.MultiProcessingDocument;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  */
 public class AutoConCur {
 
-    public static final String ND8 = "autoconcur.nd8", NGROWTH = "autoconcur.ngrowth", TRIM = "autoconcur.trim", TOLGROWTH = "autoconcur.tolgrowth";
+    public static final String ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TRIM = "compres.trim", TOLGROWTH = "compres.tolgrowth";
     public static final String ND8DEFAULT = "3", NGROWTHDEFAULT = "10", TRIMDEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0";
     private final Map<String, List<SaItem>> map;
 
@@ -83,10 +85,6 @@ public class AutoConCur {
         } catch (Exception e) {
             return DecisionBean.ErrorBean(title, e.getMessage());
         }
-    }
-
-    private DecisionBean decision(SaItem saItem, int n, int m, double w, double tolerance) {
-        return decision(saItem.getName(), saItem.toDocument(), n, m, w, tolerance);
     }
 
     private static DecisionBean decision(String title, SaDocument doc, int n, int m, double w, double t) {
@@ -152,7 +150,22 @@ public class AutoConCur {
             d10 = checkTsData(d10, preperiod, name + " contains empty time series D10 in the decomposition.");
             d11 = checkTsData(d11, preperiod, name + " contains empty time series D11 in the decomposition.");
             tsSeasonsalFactor = checkTsData(tsSeasonsalFactor, preperiod, name + " contains no seasonal factors.");
-            tsCalendarFactor = checkTsData(tsCalendarFactor, preperiod, name + " contains no calendar factors.");
+            if (NbPreferences.forModule(DatasourceUpdateOptionsPanel.class).getBoolean(DatasourceUpdateOptionsPanel.CONST_SF, false)
+                    && tsSeasonsalFactor.stream().mapToDouble(x -> x.getValue()).distinct().count() == 1) {
+                bean.setDecision(Decision.KEEP);
+                bean.setGrowthNew(Double.NaN);
+                bean.setGrowthOld(Double.NaN);
+                bean.setLastSF(tsSeasonsalFactor.get(0));
+                bean.setIntervalSF(new double[]{tsSeasonsalFactor.get(0), tsSeasonsalFactor.get(0)});
+                return bean;
+            }
+
+            boolean multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
+            if (NbPreferences.forModule(DatasourceUpdateOptionsPanel.class).getBoolean(DatasourceUpdateOptionsPanel.MISSING_CF, false) && tsCalendarFactor == null) {
+                tsCalendarFactor = new TsData(a1.getDomain(), multiplicative ? 100 : 0);
+            } else {
+                tsCalendarFactor = checkTsData(tsCalendarFactor, preperiod, name + " contains no calendar factors.");
+            }
 
             if (a1.getLength() != d8.getLength()
                     || a1.getLength() != d9.getLength()
@@ -164,7 +177,6 @@ public class AutoConCur {
             }
 
             int frequency = d8.getFrequency().intValue();
-            boolean multiplicative = doc.getFinalDecomposition().getMode().isMultiplicative();
 
             TsData d11Old;      //calendar factors are longer than a1, so intersection will be used, which is a1's domain.
             if (multiplicative) {

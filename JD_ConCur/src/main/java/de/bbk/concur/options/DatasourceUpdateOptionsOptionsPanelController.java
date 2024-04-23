@@ -29,15 +29,15 @@ import org.openide.util.Lookup;
 
 @OptionsPanelController.SubRegistration(
         location = "Demetra",
-        displayName = "#AdvancedOption_DisplayName_ConCur",
-        keywords = "#AdvancedOption_Keywords_ConCur",
-        keywordsCategory = "Advanced/ConCur",
+        displayName = "#AdvancedOption_DisplayName_CompRes",
+        keywords = "#AdvancedOption_Keywords_CompRes",
+        keywordsCategory = "Advanced/CompRes",
         id = DatasourceUpdateOptionsOptionsPanelController.ID
 )
-@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_ConCur=ConCur", "AdvancedOption_Keywords_ConCur=ConCur"})
+@org.openide.util.NbBundle.Messages({"AdvancedOption_DisplayName_CompRes=CompRes", "AdvancedOption_Keywords_CompRes=CompRes"})
 public final class DatasourceUpdateOptionsOptionsPanelController extends OptionsPanelController {
 
-    public static final String ID = "Demetra/ConCur";
+    public static final String ID = "Demetra/CompRes";
     private DatasourceUpdateOptionsPanel panel;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private boolean changed;

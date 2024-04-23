@@ -45,7 +45,7 @@ import org.openide.util.actions.Presenter;
         lazy = false
 )
 @ActionReference(path = MultiProcessingManager.LOCALPATH, position = 1)
-@NbBundle.Messages({"CTL_AutoConCurMetadata=AutoConCur"})
+@NbBundle.Messages({"CTL_AutoConCurMetadata=CompRes Recommendations"})
 public class AutoConCurMetadata extends AbstractViewAction<SaBatchUI> implements Presenter.Popup {
 
     public static final String PATH = "/AutoConCurMetadata";

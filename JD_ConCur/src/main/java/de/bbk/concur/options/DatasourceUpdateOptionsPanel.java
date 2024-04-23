@@ -43,6 +43,8 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
 
     public static final String USEDEFAULT = "useDefault",
             PROVIDERNAME = "providerName",
+            CONST_SF = "const_SF",
+            MISSING_CF = "missing_CF",
             MATRIX_VIEW_ONE = "matrixViewOne",
             MATRIX_VIEW_ONE_DEFAULT = "a1;b1;d11;d12",
             MATRIX_VIEW_TWO = "matrixViewTwo",
@@ -82,9 +84,41 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        matrixTabs = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        checkBoxConstantSF = new javax.swing.JCheckBox();
+        checkBoxMissingCF = new javax.swing.JCheckBox();
+        jPanel2 = new javax.swing.JPanel();
         checkBoxDefaultDataSource = new javax.swing.JCheckBox();
         providerBox = new javax.swing.JComboBox();
-        matrixTabs = new javax.swing.JTabbedPane();
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.jPanel1.border.title"))); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(checkBoxConstantSF, org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxConstantSF.text")); // NOI18N
+        checkBoxConstantSF.setToolTipText(org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxConstantSF.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(checkBoxMissingCF, org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxMissingCF.text")); // NOI18N
+        checkBoxMissingCF.setToolTipText(org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxMissingCF.toolTipText")); // NOI18N
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkBoxConstantSF)
+                    .addComponent(checkBoxMissingCF))
+                .addGap(0, 142, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(checkBoxConstantSF)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 3, Short.MAX_VALUE)
+                .addComponent(checkBoxMissingCF))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.jPanel2.border.title"))); // NOI18N
 
         checkBoxDefaultDataSource.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(checkBoxDefaultDataSource, org.openide.util.NbBundle.getMessage(DatasourceUpdateOptionsPanel.class, "DatasourceUpdateOptionsPanel.checkBoxDefaultDataSource.text")); // NOI18N
@@ -99,30 +133,48 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         providerBox.setModel(new javax.swing.DefaultComboBoxModel(names));
         providerBox.setEnabled(false);
 
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkBoxDefaultDataSource, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                    .addComponent(providerBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(checkBoxDefaultDataSource)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(providerBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(matrixTabs)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(checkBoxDefaultDataSource, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(providerBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 121, Short.MAX_VALUE)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(checkBoxDefaultDataSource)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(providerBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(matrixTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                .addComponent(matrixTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -139,6 +191,12 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         boolean b = preferences.getBoolean(USEDEFAULT, true);
         checkBoxDefaultDataSource.setSelected(b || providerBox.getItemCount() == 0);
         checkBoxDefaultDataSource.setEnabled(providerBox.getItemCount() != 0);
+
+        b = preferences.getBoolean(CONST_SF, false);
+        checkBoxConstantSF.setSelected(b);
+
+        b = preferences.getBoolean(MISSING_CF, false);
+        checkBoxMissingCF.setSelected(b);
 
         String mvo = preferences.get(MATRIX_VIEW_ONE, MATRIX_VIEW_ONE_DEFAULT);
         final List<String> rightElements = Arrays.asList(mvo.split(";"));
@@ -164,6 +222,8 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
         } else {
             preferences.remove(PROVIDERNAME);
         }
+        preferences.putBoolean(CONST_SF, checkBoxConstantSF.isSelected());
+        preferences.putBoolean(MISSING_CF, checkBoxMissingCF.isSelected());
 
         String mvo = Arrays.stream(matrixOneSelection.getTargetModel().toArray())
                 .map(x -> x.toString())
@@ -191,7 +251,11 @@ public final class DatasourceUpdateOptionsPanel extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox checkBoxConstantSF;
     private javax.swing.JCheckBox checkBoxDefaultDataSource;
+    private javax.swing.JCheckBox checkBoxMissingCF;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane matrixTabs;
     private javax.swing.JComboBox providerBox;
     // End of variables declaration//GEN-END:variables

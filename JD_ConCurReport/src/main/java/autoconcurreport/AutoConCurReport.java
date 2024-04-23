@@ -117,7 +117,7 @@ public class AutoConCurReport {
             HtmlStream stream = new HtmlStream(writer);
             stream.open();
             stream.write(STYLE);
-            stream.write(HtmlTag.HEADER2, "AutoConCur Recommendations for WS " + WorkspaceFactory.getInstance().getActiveWorkspace().getName());
+            stream.write(HtmlTag.HEADER2, "compRes Recommendations for WS " + WorkspaceFactory.getInstance().getActiveWorkspace().getName());
             stream.open(new HtmlTable());
             initTable(stream);
 
@@ -238,8 +238,9 @@ public class AutoConCurReport {
                 stream.write(new HtmlTableCell("NO DATA"));
                 stream.write(new HtmlTableCell("NO DATA"));
             }
-            stream.write(new HtmlTableCell(DF.format(bean.getGrowthNew())));
-            stream.write(new HtmlTableCell(DF.format(bean.getGrowthOld())));
+
+            stream.write(new HtmlTableCell(Double.isNaN(bean.getGrowthNew()) ? "NOT CALCULATED" : DF.format(bean.getGrowthNew())));
+            stream.write(new HtmlTableCell(Double.isNaN(bean.getGrowthOld()) ? "NOT CALCULATED" : DF.format(bean.getGrowthNew())));
             if (bean.getErrortext() == null) {
                 stream.write(new HtmlTableCell(""));
             } else {
