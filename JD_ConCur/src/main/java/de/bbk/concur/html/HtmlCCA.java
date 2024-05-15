@@ -29,7 +29,9 @@ import ec.tstoolkit.algorithm.IProcResults;
 import ec.tstoolkit.algorithm.IProcSpecification;
 import ec.tstoolkit.modelling.arima.x13.RegArimaSpecification;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -93,6 +95,21 @@ public class HtmlCCA extends AbstractHtmlElement {
         if (title != null) {
             stream.write(HtmlTag.HEADER1, title).newLine();
         }
+    }
+
+    public String writeFilters() {
+        StringWriter sbuilder = new StringWriter();
+        HtmlStream stream = new HtmlStream(sbuilder);
+
+        try {
+            stream.open();
+            writeFinalFilters(stream);
+            stream.close();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
+        return sbuilder.toString();
     }
 
     private void writeFinalFilters(HtmlStream stream) throws IOException {

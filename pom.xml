@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.bundesbank</groupId>
     <artifactId>concur-parent</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
     <packaging>pom</packaging>
     <name>CompRes - Parent</name>
 

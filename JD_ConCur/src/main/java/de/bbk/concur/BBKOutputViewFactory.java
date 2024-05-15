@@ -20,7 +20,6 @@
  */
 package de.bbk.concur;
 
-import de.bbk.concur.util.SIViewSaved;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.view.*;
 import ec.satoolkit.x13.X13Specification;
@@ -164,9 +163,9 @@ public class BBKOutputViewFactory extends SaDocumentViewFactory<X13Specification
                 public X13Document retrieve(X13Document source) {
                     return source;
                 }
-            }, new PooledItemUI<View, X13Document, SIViewSaved>(SIViewSaved.class) {
+            }, new PooledItemUI<View, X13Document, SIRatioView>(SIRatioView.class) {
                 @Override
-                protected void init(SIViewSaved c, View host, X13Document information) {
+                protected void init(SIRatioView c, View host, X13Document information) {
                     c.setDoc(information);
                 }
             });
