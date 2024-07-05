@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.swing.JFileChooser;
 import org.openide.util.NbPreferences;
+import org.openide.windows.WindowManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,13 +56,13 @@ public class HTMLAutoConCurSummary {
         currentDir = null;
         File file = null;
         try {
-            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 file = fileChooser.getSelectedFile();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             fileChooser = new JFileChooser();
-            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 file = fileChooser.getSelectedFile();
             }
         } finally {

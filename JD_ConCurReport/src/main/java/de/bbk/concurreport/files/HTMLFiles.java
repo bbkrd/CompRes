@@ -35,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
+import org.openide.windows.WindowManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,13 +74,13 @@ public class HTMLFiles {
         currentDir = null;
         File file = null;
         try {
-            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 file = fileChooser.getSelectedFile();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             fileChooser = new JFileChooser();
-            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 file = fileChooser.getSelectedFile();
             }
         } finally {
@@ -109,7 +110,7 @@ public class HTMLFiles {
         filePath = null;
         File tmp = null;
         try {
-            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
                 tmp = fileChooser.getSelectedFile();
             }
         } finally {
@@ -156,7 +157,7 @@ public class HTMLFiles {
                 int option;
                 switch (override) {
                     case ASK:
-                        option = JOptionPane.showOptionDialog(null, "The file for " + saItemName + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                        option = JOptionPane.showOptionDialog(WindowManager.getDefault().getMainWindow(), "The file for " + saItemName + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                                 new Object[]{"Yes", "Yes to all", "Select new name", "No", "No to all"}, "");
                         break;
                     case YES:

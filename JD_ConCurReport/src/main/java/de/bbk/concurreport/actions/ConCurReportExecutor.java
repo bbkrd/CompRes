@@ -13,6 +13,7 @@ import lombok.experimental.UtilityClass;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
+import org.openide.windows.WindowManager;
 
 @UtilityClass
 public class ConCurReportExecutor {
@@ -40,7 +41,7 @@ public class ConCurReportExecutor {
             jta.setEditable(false);
             JScrollPane jsp = new JScrollPane(jta);
             jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), jsp, "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         if (!o.getSuccessMessages().isEmpty()) {
@@ -48,7 +49,7 @@ public class ConCurReportExecutor {
             jta.setEditable(false);
             JScrollPane jsp = new JScrollPane(jta);
             jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

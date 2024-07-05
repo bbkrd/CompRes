@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -87,9 +88,9 @@ public class AutoConCurReport {
         if (htmlf.selectFolder()) {
             return true;
         } else if (!htmlf.getErrorMessage().isEmpty()) {
-            JOptionPane.showMessageDialog(null, htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), "The HTML is not generated, you haven't selected a folder. ");
         }
         return false;
     }
@@ -109,11 +110,11 @@ public class AutoConCurReport {
             sbError.append("No recommendations are given.");
             return new ReportMessages(sbSuccessful.toString(), sbError.toString());
         }
-        HTMLAutoConCurSummary autoConCurfile = new HTMLAutoConCurSummary();
+        //HTMLAutoConCurSummary autoConCurfile = new HTMLAutoConCurSummary();
         if (!makeHtmlf()) {
             return ReportMessages.EMPTY;
         }
-        try (FileWriter writer = new FileWriter(autoConCurfile.createHTMLAutoConCurSummaryFile("Summary_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName()), true)) {
+        try (FileWriter writer = new FileWriter(htmlf.createHTMLAutoConCurSummaryFile("Summary_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName()), true)) {
             HtmlStream stream = new HtmlStream(writer);
             stream.open();
             stream.write(STYLE);
@@ -142,10 +143,10 @@ public class AutoConCurReport {
                     .append(System.lineSeparator())
                     .append("- It is not possible to create the file:")
                     .append(System.lineSeparator())
-                    .append(autoConCurfile.getFilePath())
+                    .append(htmlf.getFilePath())
                     .append(System.lineSeparator())
                     .append(" because ")
-                    .append(autoConCurfile.getErrorMessage())
+                    .append(htmlf.getErrorMessage())
                     .append(System.lineSeparator());
         }
         return new ReportMessages(sbSuccessful.toString(), sbError.toString());
@@ -157,7 +158,7 @@ public class AutoConCurReport {
             jta.setEditable(false);
             JScrollPane jsp = new JScrollPane(jta);
             jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), jsp, "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         if (!o.getSuccessMessages().isEmpty()) {
@@ -165,7 +166,7 @@ public class AutoConCurReport {
             jta.setEditable(false);
             JScrollPane jsp = new JScrollPane(jta);
             jsp.setPreferredSize(new Dimension(480, 120));
-            JOptionPane.showMessageDialog(null, jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), jsp, "The output is available for: ", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

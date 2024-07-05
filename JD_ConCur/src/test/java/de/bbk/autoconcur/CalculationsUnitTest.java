@@ -5,10 +5,12 @@
  */
 package de.bbk.autoconcur;
 
+import static de.bbk.autoconcur.Calculations.quantiles;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
 import org.junit.Assert;
+import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
 
 /**
@@ -81,6 +83,38 @@ public class CalculationsUnitTest {
     public void testquantilesWithValues3() {
         double[] values = new double[]{1.2, -8.9, -16.5, 7.9, Double.NaN, 6.3, -5.2, Double.NEGATIVE_INFINITY, -20.11, 14.7, -8.9, -0.2, Double.POSITIVE_INFINITY, -0.997, 111.1, 1 / 3, -5 / 9, -16 / 11, 7.89};
         Assert.assertArrayEquals(new double[]{-17.583, 43.62}, Calculations.quantiles(values, 0.10), eps);
+    }
+
+    @Test
+
+    public void testQuantilesWithValidInput() {
+
+        double[] values = {1.0, 2.0, 3.0, 4.0, 5.0};
+
+        double w = 0.25; // 25th percentile and 75th percentile
+
+        double[] expectedQuants = {2.0, 4.0}; // Expected quantiles for the given array and weight
+
+        double[] actualQuants = quantiles(values, w);
+
+        assertArrayEquals(expectedQuants, actualQuants, 0.001); // Delta is the tolerance for comparing double values
+
+    }
+
+    @Test
+
+    public void testQuantilesWithNaNValues() {
+
+        double[] values = {Double.NaN, 2.0, Double.NaN, 4.0, 5.0};
+
+        double w = 0.5; // 50th percentile (median)
+
+        double[] expectedQuants = {4.0, 4.0}; // Expected quantiles for the given array and weight
+
+        double[] actualQuants = quantiles(values, w);
+
+        assertArrayEquals(expectedQuants, actualQuants, 0.001); // Delta is the tolerance for comparing double values
+
     }
 
 }

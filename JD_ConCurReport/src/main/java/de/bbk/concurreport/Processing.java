@@ -53,6 +53,7 @@ import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.nodes.Node;
 import org.openide.util.NbPreferences;
+import org.openide.windows.WindowManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,9 +110,9 @@ public class Processing implements Callable<ReportMessages> {
         if (htmlf.selectFolder()) {
             return true;
         } else if (!htmlf.getErrorMessage().isEmpty()) {
-            JOptionPane.showMessageDialog(null, htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(null, "The HTML is not generated, you haven't selected a folder. ");
+            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), "The HTML is not generated, you haven't selected a folder. ");
         }
         return false;
     }
@@ -120,7 +121,7 @@ public class Processing implements Callable<ReportMessages> {
         LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
         if (!"Windows".equals(lookAndFeel.getName())) {
             int n = JOptionPane.showConfirmDialog(
-                    null, "You have selected the LookAndFeel Option " + lookAndFeel.getName() + ".\nTherefore the ConCur Report is"
+                    WindowManager.getDefault().getMainWindow(), "You have selected the LookAndFeel Option " + lookAndFeel.getName() + ".\nTherefore the ConCur Report is"
                     + " not optimized.\nThis might cause problems.\nWould you like to continue anyway?",
                     "Warning",
                     JOptionPane.YES_NO_OPTION);
