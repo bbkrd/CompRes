@@ -42,7 +42,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 public class BbkSeatsViewFactory extends SaDocumentViewFactory<TramoSeatsSpecification, TramoSeatsDocument> {
 
-    public static final String BBK = "ConCur";
+    public static final String BBK = "CompRes";
     public static final String CCA = "CCA";
     public static final String SA = "SA";
     public static final String ONLYSA = "Only SA";
@@ -195,10 +195,10 @@ public class BbkSeatsViewFactory extends SaDocumentViewFactory<TramoSeatsSpecifi
                 public TramoSeatsDocument retrieve(TramoSeatsDocument source) {
                     return source;
                 }
-            }, new PooledItemUI<View, TramoSeatsDocument, CCAView>(CCAView.class) {
+            }, new PooledItemUI<View, TramoSeatsDocument, CCAShortView>(CCAShortView.class) {
                 @Override
-                protected void init(CCAView c, View host, TramoSeatsDocument information) {
-                    c.setTsToolkit(host.getToolkit());
+                protected void init(CCAShortView c, View host, TramoSeatsDocument information) {
+                    //c.setTsToolkit(host.getToolkit());
                     c.set(information);
                 }
             });

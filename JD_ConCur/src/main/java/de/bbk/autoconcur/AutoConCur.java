@@ -20,6 +20,7 @@ import ec.tss.documents.DocumentManager;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.SaProcessing;
 import ec.tss.sa.documents.SaDocument;
+import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tstoolkit.MetaData;
 import ec.tstoolkit.timeseries.TsPeriodSelector;
 import ec.tstoolkit.timeseries.simplets.TsData;
@@ -72,6 +73,9 @@ public class AutoConCur {
         try {
             if (MetaData.isNullOrEmpty(doc.getMetaData())) {
                 throw new IllegalArgumentException(title + " does not contain any metadata.");
+            }
+            if (doc instanceof TramoSeatsDocument) {
+                return DecisionBean.ErrorBean(title, "Recommendation not implemented for TramoSeats.");
             }
             int nD8 = Integer.parseInt(doc.getMetaData().getOrDefault(ND8, ND8DEFAULT));
             int nGrowth = Integer.parseInt(doc.getMetaData().getOrDefault(NGROWTH, NGROWTHDEFAULT));
