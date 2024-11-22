@@ -34,17 +34,23 @@ import java.io.IOException;
 public class HTMLBBKText1 extends AbstractHtmlElement {
 
     private final SaDocument doc;
+    private final String rawName;
     private final PreprocessingModel model;
 
     public HTMLBBKText1(SaDocument doc) {
+        this(doc, "");
+    }
+
+    public HTMLBBKText1(SaDocument doc, String rawName) {
         this.doc = doc;
+        this.rawName = rawName;
         this.model = doc.getPreprocessingPart();
     }
 
     @Override
     public void write(HtmlStream stream) throws IOException {
         if (model != null) {
-            stream.write(new HtmlSpecification(doc)).newLines(2)
+            stream.write(new HtmlSpecification(doc, rawName)).newLines(2)
                     .write(new HtmlRegArima(model, true)).newLine()
                     .write(new HTMLRegressionModel(model)).newLine()
                     .write(new HtmlWrapperARIMA(model)).newLine()

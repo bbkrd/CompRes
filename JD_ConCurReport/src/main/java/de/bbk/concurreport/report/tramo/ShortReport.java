@@ -25,6 +25,7 @@ import de.bbk.concurreport.util.Pagebreak;
 import ec.tss.Ts;
 import ec.tss.documents.DocumentManager;
 import ec.tss.html.HtmlStream;
+import ec.tss.html.HtmlTag;
 import ec.tss.html.IHtmlElement;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.documents.SaDocument;
@@ -52,12 +53,15 @@ public class ShortReport implements IHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         final HTMLBBkHeader headerbbk = new HTMLBBkHeader(saProcessingName, item.getRawName(), item.getTs());
+        if (!item.getRawName().isBlank()) {
+            stream.open(HtmlTag.DIV, "id", item.getRawName()).close(HtmlTag.DIV);
+        }
         stream.write(headerbbk)
                 .newLine();
         SaDocument<?> doc = item.toDocument();
         if (doc instanceof TramoSeatsDocument) {
             TramoSeatsDocument tramoSeatsDocument = (TramoSeatsDocument) doc;
-            stream.write(createDiv(tramoSeatsDocument))
+            stream.write(createDiv(tramoSeatsDocument, item.getRawName()))
                     .write(new Pagebreak())
                     .write(headerbbk)
                     .write(new HtmlCalendar(tramoSeatsDocument))
@@ -73,13 +77,13 @@ public class ShortReport implements IHtmlElement {
         }
     }
 
-    private HTML2Div createDiv(TramoSeatsDocument doc) {
+    private HTML2Div createDiv(TramoSeatsDocument doc, String rawName) {
         Preferences preferences = NbPreferences.forModule(ConCurReportOptionsPanel.class);
         Ts tsY = DocumentManager.instance.getTs(doc, ModellingDictionary.Y);
         TsDomain domain = FixTimeDomain.domLastYears(tsY, preferences.getInt(TIMESPAN_GRAPHIC, DEFAULT_TIMESPAN_GRAPHIC));
 
         HTMLBBKBox leftBox = new HTMLBBKBox();
-        leftBox.add(new HTMLBBKText1(doc));
+        leftBox.add(new HTMLBBKText1(doc, rawName));
         //leftBox.add(new HTMLWrapperCCA(MultiLineNameUtil.join(doc.getInput().getName()), doc));
 
         HTMLBBKBox rightBox = new HTMLBBKBox();

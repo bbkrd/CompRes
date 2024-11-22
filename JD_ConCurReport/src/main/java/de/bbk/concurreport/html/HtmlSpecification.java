@@ -33,9 +33,15 @@ import java.util.Arrays;
 public class HtmlSpecification extends AbstractHtmlElement {
 
     private final SaDocument doc;
+    private final String rawName;
 
     public HtmlSpecification(SaDocument doc) {
+        this(doc, "");
+    }
+
+    public HtmlSpecification(SaDocument doc, String rawName) {
         this.doc = doc;
+        this.rawName = rawName;
     }
 
     @Override
@@ -49,7 +55,11 @@ public class HtmlSpecification extends AbstractHtmlElement {
     }
 
     private void writeX13Specification(HtmlStream stream) throws IOException {
-        new HtmlAutomised(MultiLineNameUtil.join(((X13Document) doc).getInput().getName()), doc).write(stream);
+        if (rawName == null || rawName.isBlank()) {
+            new HtmlAutomised(MultiLineNameUtil.join(((X13Document) doc).getInput().getName()), doc).write(stream);
+        } else {
+            new HtmlAutomised(rawName, doc).write(stream);
+        }      
         stream.write(HtmlTag.HEADER2, "Specification");
         X13Specification specification = ((X13Document) doc).getSpecification();
         RegArimaSpecification regSpec = specification.getRegArimaSpecification();

@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package autoconcurreport;
+package de.bbk.autoconcurreport;
 
+import de.bbk.concurreport.files.HTMLFiles;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
 import static de.bbk.concurreport.options.ConCurReportOptionsPanel.DEFAULT_IS_WORKSPACE_INITIAL_SAVE_LOCATION;
 import static de.bbk.concurreport.options.ConCurReportOptionsPanel.IS_WORKSPACE_INITIAL_SAVE_LOCATION;
@@ -32,10 +33,10 @@ public class HTMLAutoConCurSummary {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
     //private OverrideOption override = OverrideOption.ASK; //
 
-    private static final String LAST_FOLDER = "concurreport_lastfolder";
+    //private static final String LAST_FOLDER = "concurreport_lastfolder";
 
     public HTMLAutoConCurSummary() {
-        currentDir = NbPreferences.forModule(HTMLAutoConCurSummary.class).get(LAST_FOLDER, null);
+        currentDir = NbPreferences.forModule(HTMLFiles.class).get(HTMLFiles.LAST_FOLDER, null);
     }
 
     @lombok.Synchronized
@@ -68,7 +69,7 @@ public class HTMLAutoConCurSummary {
         } finally {
             if (file != null) {
                 currentDir = file.getAbsolutePath();
-                NbPreferences.forModule(HTMLAutoConCurSummary.class).put(LAST_FOLDER, currentDir);
+                NbPreferences.forModule(HTMLFiles.class).put(HTMLFiles.LAST_FOLDER, currentDir);
                 if (!Files.isWritable(file.toPath())) {
                     errorMessage = "You do not have the right to write in " + currentDir;
                 }

@@ -76,10 +76,14 @@ public class ResetAutoConCurMetadata extends AbstractViewAction<SaBatchUI> {
             if (meta == null) {
                 meta = new MetaData();
             }
+            meta.put(AutoConCur.MANUAL, AutoConCur.MANUALDEFAULT);
+            meta.put(AutoConCur.CHECKSIGN, AutoConCur.CHECKSIGNDEFAULT);
+            meta.put(AutoConCur.NSD, AutoConCur.NSDDEFAULT);
             meta.put(AutoConCur.ND8, AutoConCur.ND8DEFAULT);
             meta.put(AutoConCur.NGROWTH, AutoConCur.NGROWTHDEFAULT);
-            meta.put(AutoConCur.TRIM, AutoConCur.TRIMDEFAULT);
+            meta.put(AutoConCur.TOLD8, AutoConCur.TOLD8DEFAULT);
             meta.put(AutoConCur.TOLGROWTH, AutoConCur.TOLGROWTHDEFAULT);
+            meta.put(AutoConCur.TRIM, AutoConCur.TRIMDEFAULT);
             item.setMetaData(meta);
         }
         cur.setSelection(new SaItem[0]);

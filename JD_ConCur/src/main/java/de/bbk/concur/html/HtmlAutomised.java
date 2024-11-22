@@ -30,6 +30,7 @@ public class HtmlAutomised extends AbstractHtmlElement {
     private final static CssStyle STYLEERRORCHANGE = new CssStyle();
     private final static CssStyle STYLEUPDATE = new CssStyle();
     private final static CssStyle STYLEKEEP = new CssStyle();
+    private final static CssStyle STYLEMANUAL = new CssStyle();
 
     static {
         STYLEERRORCHANGE.add(CssProperty.BACKGROUND_COLOR, "RED");
@@ -44,6 +45,11 @@ public class HtmlAutomised extends AbstractHtmlElement {
     static {
         STYLEKEEP.add(CssProperty.BACKGROUND_COLOR, "GREEN");
         STYLEKEEP.add(CssProperty.COLOR, "WHITE");
+    }
+
+    static {
+        STYLEMANUAL.add(CssProperty.BACKGROUND_COLOR, "BLACK");
+        STYLEMANUAL.add(CssProperty.COLOR, "WHITE");
     }
 
     public HtmlAutomised(String title, SaDocument doc) {
@@ -69,26 +75,29 @@ public class HtmlAutomised extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         if (bean != null) {
-            switch (bean.getDecision()) {
-                case UNKNOWN:
-                    stream.write(HtmlTag.IMPORTANT_TEXT, STYLEERRORCHANGE, bean.getErrortext()).newLine();
-                    return;
-                case CHECK:
-                    stream.write(HtmlTag.IMPORTANT_TEXT, STYLEERRORCHANGE, "Recommendation: " + Decision.CHECK.toString() + " ");
-                    break;
-
-                case UPDATE:
-                    stream.write(HtmlTag.IMPORTANT_TEXT, STYLEUPDATE, "Recommendation: " + Decision.UPDATE.toString() + " ");
-                    break;
-                case KEEP:
-                    stream.write(HtmlTag.IMPORTANT_TEXT, STYLEKEEP, "Recommendation: " + Decision.KEEP.toString() + " ");
-                    break;
+            if (bean.isManual()) {
+                stream.write(HtmlTag.IMPORTANT_TEXT, STYLEMANUAL, "Recommendation: " + bean.getDecision().toString() + " ");
+            } else {
+                switch (bean.getDecision()) {
+                    case UNKNOWN:
+                        stream.write(HtmlTag.IMPORTANT_TEXT, STYLEERRORCHANGE, bean.getErrortext()).newLine();
+                        return;
+                    case CHECK:
+                        stream.write(HtmlTag.IMPORTANT_TEXT, STYLEERRORCHANGE, "Recommendation: " + Decision.CHECK.toString() + " ");
+                        break;
+                    case UPDATE:
+                        stream.write(HtmlTag.IMPORTANT_TEXT, STYLEUPDATE, "Recommendation: " + Decision.UPDATE.toString() + " ");
+                        break;
+                    case KEEP:
+                        stream.write(HtmlTag.IMPORTANT_TEXT, STYLEKEEP, "Recommendation: " + Decision.KEEP.toString() + " ");
+                        break;
+                }
             }
             stream.write("  |   ");
             writeMeta(stream);
-            if (bean.isDevelopment()) {
-                stream.write(HtmlTag.EMPHASIZED_TEXT, "Large movement detected. ");
-            }
+//            if (bean.isDevelopment()) {
+//                stream.write(HtmlTag.EMPHASIZED_TEXT, "Large movement detected. ");
+//            }
             if (bean.isExtremevalue()) {
                 stream.write(HtmlTag.EMPHASIZED_TEXT, "Extreme value detected.");
             }
@@ -103,17 +112,29 @@ public class HtmlAutomised extends AbstractHtmlElement {
 
     private String writeMeta() {
         StringBuilder sbuilder = new StringBuilder()
+                .append("check sign=")
+                .append(bean.isCheckSign())
+                .append("  |  ")
+                .append("manual Check=")
+                .append(bean.isManual())
+                .append("  |  ")
+                .append("nSD=")
+                .append(bean.getNSD())
+                .append("  |  ")
                 .append("nD8=")
                 .append(bean.getND8())//.append((meta.get(AutoConCur.N) != null) ? meta.get(AutoConCur.N) : AutoConCur.NDEFAULT)
                 .append("  |  ")
                 .append("nGrowth=")
                 .append(bean.getNGrowth())//.append((meta.get(AutoConCur.M) != null) ? meta.get(AutoConCur.M) : AutoConCur.MDEFAULT)
                 .append("  |  ")
-                .append("Trim=")
-                .append(bean.getTrim())
+                .append("tolD8=")
+                .append(bean.getTolD8())
                 .append("  |  ")
                 .append("tolGrowth=")
-                .append(bean.getToleranceGrowth());
+                .append(bean.getToleranceGrowth())
+                .append("  |  ")
+                .append("Trim=")
+                .append(bean.getTrim());
         return sbuilder.toString();
     }
 }

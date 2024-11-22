@@ -56,7 +56,7 @@ public class HTMLBBkHeader extends AbstractHtmlElement {
         stream.write(" <p style='text-align:right; '>");
         stream.write(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + " " + System.getProperty("user.name"));
         stream.write("</p>");
-        if (!nameSAItem.isEmpty()) {
+        if (!nameSAItem.isEmpty()) {            
             stream.write(nameSAItem, HtmlStyle.Bold).write(" - ");
         }
         stream.write(workspaceName).write(" - ").write(saProcessingName).newLine();

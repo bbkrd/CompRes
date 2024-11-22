@@ -12,19 +12,31 @@ package de.bbk.autoconcur;
 @lombok.Data
 public class DecisionBean {
 
+    private String file;
+
     private String title;
+
+    private boolean manual = "1".equals(AutoConCur.MANUALDEFAULT);
+    private boolean checkSign = "1".equals(AutoConCur.CHECKSIGNDEFAULT);
+    private int nSD = Integer.valueOf(AutoConCur.NSDDEFAULT);
     private int nD8 = Integer.valueOf(AutoConCur.ND8DEFAULT);
     private int nGrowth = Integer.valueOf(AutoConCur.NGROWTHDEFAULT);
-    private double trim = Double.valueOf(AutoConCur.TRIMDEFAULT);
+    private double tolD8 = Double.valueOf(AutoConCur.TOLD8DEFAULT);
     private double toleranceGrowth = Double.valueOf(AutoConCur.TOLGROWTHDEFAULT);
+    private double trim = Double.valueOf(AutoConCur.TRIMDEFAULT);
 
     private Decision decision = Decision.UNKNOWN;
-    private boolean development;
+
+    private boolean classic;
+    private boolean growthRate;
+    private boolean signChange;
     private boolean extremevalue;
+    private boolean fixOutlier;
+
     private String errortext;
     private DecisionBean preperiodbean;
 
-    private double[] quantsGrowth;
+    //private double[] quantsGrowth;
     private double lastGrowth;
 
     private double[] intervalSF;
@@ -38,12 +50,16 @@ public class DecisionBean {
         decision = Decision.UNKNOWN;
     }
 
-    public DecisionBean(String title, int nD8, int nGrowth, double trim, double tolerance) {
+    public DecisionBean(String title, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double toleranceD8, double toleranceGrowth, double trim) {
         this.title = title;
+        this.manual = manual;
+        this.checkSign = checkSign;
+        this.nSD = nSD;
         this.nD8 = nD8;
         this.nGrowth = nGrowth;
+        this.tolD8 = toleranceD8;
+        this.toleranceGrowth = toleranceGrowth;
         this.trim = trim;
-        this.toleranceGrowth = tolerance;
         decision = Decision.UNKNOWN;
     }
 

@@ -6,9 +6,14 @@
 package de.bbk.autoconcur;
 
 import static de.bbk.autoconcur.Calculations.quantiles;
+import static de.bbk.autoconcur.Calculations.truncDouble;
+import static de.bbk.autoconcur.Calculations.truncStDev;
+import static de.bbk.autoconcur.Calculations.truncMean;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
+import ec.tstoolkit.timeseries.simplets.TsPeriod;
+import java.util.Arrays;
 import org.junit.Assert;
 import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
@@ -86,7 +91,6 @@ public class CalculationsUnitTest {
     }
 
     @Test
-
     public void testQuantilesWithValidInput() {
 
         double[] values = {1.0, 2.0, 3.0, 4.0, 5.0};
@@ -102,7 +106,6 @@ public class CalculationsUnitTest {
     }
 
     @Test
-
     public void testQuantilesWithNaNValues() {
 
         double[] values = {Double.NaN, 2.0, Double.NaN, 4.0, 5.0};
@@ -115,6 +118,38 @@ public class CalculationsUnitTest {
 
         assertArrayEquals(expectedQuants, actualQuants, 0.001); // Delta is the tolerance for comparing double values
 
+    }
+
+    private TsData values() {
+        double[] vals = new double[]{1.2, -8.9, -16.5, 7.9, 7.7, 6.3, -5.2, 90.5, -20.11, 14.7, -8.9, -0.2, -3.4, -0.997, 111.1, 1 / 3, -5 / 9, -16 / 11, 7.89};
+        return new TsData(new TsPeriod(TsFrequency.Monthly), vals, true);
+    }
+
+    @Test
+    public void testTruncDouble() {
+        TsData data = values();
+        double[] expectedDoubles = new double[]{1.2, -8.9, -16.5, 7.9, 7.7, 6.3, -5.2, 22.28, -16.861, 14.7, -8.9, -0.2, -3.4, -0.997, 1 / 3, -5 / 9, -16 / 11, 7.89};
+        Arrays.sort(expectedDoubles);
+        double[] actualDoubles = truncDouble(data.internalStorage().clone(), 0.05);
+        assertArrayEquals(expectedDoubles, actualDoubles, eps);
+    }
+
+    @Test
+    public void testTruncMean() {
+        TsData data = values();
+
+        double expectedMean = 0.334;
+        double actualMean = truncMean(data, 0.05);
+        Assert.assertEquals(expectedMean, actualMean, eps);
+    }
+
+    @Test
+    public void testTruncStDev() {
+        TsData data = values();
+
+        double expectedStDev = 9.97397;
+        double actualStDev = truncStDev(data, 0.05);
+        Assert.assertEquals(expectedStDev, actualStDev, eps);
     }
 
 }

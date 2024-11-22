@@ -20,6 +20,8 @@
  */
 package de.bbk.concurreport;
 
+import de.bbk.autoconcur.AutoConCur;
+import de.bbk.autoconcur.BeanCollector;
 import de.bbk.concurreport.files.HTMLFiles;
 import de.bbk.concurreport.html.*;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
@@ -40,6 +42,7 @@ import ec.tss.sa.SaProcessing;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tss.sa.documents.X13Document;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -166,7 +169,8 @@ public class Processing implements Callable<ReportMessages> {
 
             if (just_one_html) {
                 Workspace workspace = WorkspaceFactory.getInstance().getActiveWorkspace();
-                try (FileWriter writer = new FileWriter(htmlf.createHtmlFile(workspace.getName()), true)) {
+                File file;
+                try (FileWriter writer = new FileWriter(file = htmlf.createHtmlFile(workspace.getName()), true)) {
                     // alle
                     for (Map.Entry<String, List<SaItem>> entry : map.entrySet()) {
                         String saProcessingName = entry.getKey();
@@ -181,6 +185,7 @@ public class Processing implements Callable<ReportMessages> {
 
                             if (item.getStatus() == SaItem.Status.Valid) {
                                 try {
+                                    item.getMetaData().put(AutoConCur.OUTPUTFILE, file.getName());
                                     String output = createOutput(saProcessingName, item).replace(OLD_STYLE, NEW_STYLE)
                                             .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
                                             .replace("▶", "&#9654;");
@@ -197,6 +202,7 @@ public class Processing implements Callable<ReportMessages> {
                                 sbError.append(name)
                                         .append(":\nIt is not possible to create the output because it is not valid\n");
                             }
+                            item.getMetaData().remove(AutoConCur.OUTPUTFILE);
                             item.compress();
                         }
                     }
@@ -223,11 +229,13 @@ public class Processing implements Callable<ReportMessages> {
 
                         if (item.getStatus() == SaItem.Status.Valid) {
                             try {
+                                File file = htmlf.createHtmlFileForSaItem(item.getName());
+                                item.getMetaData().put(AutoConCur.OUTPUTFILE, file.getName());
                                 String output = createOutput(saProcessingName, item);
                                 output = output.replace(OLD_STYLE, NEW_STYLE)
                                         .replaceAll("<\\s*hr\\s*\\/\\s*>", "")
                                         .replace("▶", "&#9654;");
-                                if (!htmlf.writeHTMLFile(output, item.getName())) {
+                                if (!htmlf.writeHTMLFile(output, file)) {
                                     sbError.append(str)
                                             .append(":\n")
                                             .append("It is not possible to create the file\n");
@@ -246,11 +254,14 @@ public class Processing implements Callable<ReportMessages> {
                             } catch (RuntimeException ex) {
                                 sbError.append(str).append(": Critical Error! ").append(ex.getMessage()).append("\n");
                                 LOGGER.error(str, ex);
+                            } catch (Exception ex) {
+                                sbError.append(str).append(": Error! ").append(ex.getMessage()).append("\n");
                             }
                         } else {
                             sbError.append(str)
                                     .append(":\nIt is not possible to create the output because it is not valid\n");
                         }
+                        item.getMetaData().remove(AutoConCur.OUTPUTFILE);
                         item.compress();
                     }
                 });

@@ -6,7 +6,6 @@
 package de.bbk.autoconcur;
 
 import static de.bbk.autoconcur.Calculations.growthRate;
-import static de.bbk.autoconcur.Calculations.quantiles;
 import de.bbk.concur.options.DatasourceUpdateOptionsPanel;
 import de.bbk.concur.util.SavedTables;
 import de.bbk.concur.util.TsData_Saved;
@@ -22,8 +21,14 @@ import ec.tss.sa.SaProcessing;
 import ec.tss.sa.documents.SaDocument;
 import ec.tss.sa.documents.TramoSeatsDocument;
 import ec.tstoolkit.MetaData;
+import ec.tstoolkit.modelling.arima.ModelDescription;
 import ec.tstoolkit.timeseries.TsPeriodSelector;
+import ec.tstoolkit.timeseries.regression.IOutlierVariable;
+import ec.tstoolkit.timeseries.regression.ITsVariable;
+import ec.tstoolkit.timeseries.regression.TsVariableSelection;
 import ec.tstoolkit.timeseries.simplets.TsData;
+import ec.tstoolkit.timeseries.simplets.TsFrequency;
+import ec.tstoolkit.timeseries.simplets.TsPeriod;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +43,8 @@ import org.openide.util.NbPreferences;
  */
 public class AutoConCur {
 
-    public static final String ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TRIM = "compres.trim", TOLGROWTH = "compres.tolgrowth";
-    public static final String ND8DEFAULT = "3", NGROWTHDEFAULT = "10", TRIMDEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0";
+    public static final String OUTPUTFILE = "compres.outputfile", MANUAL = "compres.manual", CHECKSIGN = "compres.checksign", NSD = "compres.nsd", ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TOLD8 = "compres.told8", TOLGROWTH = "compres.tolgrowth", TRIM = "compres.trim";
+    public static final String MANUALDEFAULT = "0", CHECKSIGNDEFAULT = "0", NSDDEFAULT = "2", ND8DEFAULT = "3", NGROWTHDEFAULT = "5", TOLD8DEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0", TRIMDEFAULT = "0.05";
     private final Map<String, List<SaItem>> map;
 
     public AutoConCur() {
@@ -63,9 +68,10 @@ public class AutoConCur {
         List<DecisionBean> decisionBeans = new ArrayList<>();
         map.values().forEach(itemlist -> {
             itemlist.forEach(item -> {
-                decisionBeans.add(decision(item.getName(), item.toDocument()));
+                decisionBeans.add(decision(item.getRawName(), item.toDocument()));
             });
         });
+        Collections.sort(decisionBeans, (DecisionBean bean1, DecisionBean bean2) -> bean1.getTitle().compareToIgnoreCase(bean2.getTitle()));
         return decisionBeans;
     }
 
@@ -77,11 +83,22 @@ public class AutoConCur {
             if (doc instanceof TramoSeatsDocument) {
                 return DecisionBean.ErrorBean(title, "Recommendation not implemented for TramoSeats.");
             }
+            boolean manual = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(MANUAL, MANUALDEFAULT).trim())
+                    || "TRUE".equalsIgnoreCase(doc.getMetaData().getOrDefault(MANUAL, MANUALDEFAULT).trim());
+            boolean checkSign = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(CHECKSIGN, CHECKSIGNDEFAULT).trim())
+                    || "TRUE".equalsIgnoreCase(doc.getMetaData().getOrDefault(CHECKSIGN, CHECKSIGNDEFAULT).trim());
+            int nSD = Integer.parseInt(doc.getMetaData().getOrDefault(NSD, NSDDEFAULT));
             int nD8 = Integer.parseInt(doc.getMetaData().getOrDefault(ND8, ND8DEFAULT));
             int nGrowth = Integer.parseInt(doc.getMetaData().getOrDefault(NGROWTH, NGROWTHDEFAULT));
+            double tolD8 = Double.parseDouble(doc.getMetaData().getOrDefault(TOLD8, TOLD8DEFAULT));
+            double tolGrowth = Double.parseDouble(doc.getMetaData().getOrDefault(TOLGROWTH, TOLGROWTHDEFAULT));
             double trim = Double.parseDouble(doc.getMetaData().getOrDefault(TRIM, TRIMDEFAULT));
-            double tolerance = Double.parseDouble(doc.getMetaData().getOrDefault(TOLGROWTH, TOLGROWTHDEFAULT));
-            return decision(title, doc, nD8, nGrowth, trim, tolerance);
+            DecisionBean bean = decision(title, doc, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim);
+            if(doc.getMetaData().containsKey(OUTPUTFILE)){
+                bean.setFile(doc.getMetaData().getOrDefault(OUTPUTFILE, "").trim());
+            }
+            BeanCollector.add(bean);
+            return bean;
         } catch (NumberFormatException e) {
             return DecisionBean.ErrorBean(title, "Incorrect metadata. " + e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -91,7 +108,10 @@ public class AutoConCur {
         }
     }
 
-    private static DecisionBean decision(String title, SaDocument doc, int n, int m, double w, double t) {
+    private static DecisionBean decision(String title, SaDocument doc, boolean manual, boolean checkSign, int nSD, int n, int m, double w, double t, double trim) {
+        if (nSD <= 0) {
+            return DecisionBean.ErrorBean(title, "nSD must be positive.");
+        }
         if (n <= 0) {
             return DecisionBean.ErrorBean(title, "nD8 must be positive.");
         }
@@ -99,14 +119,17 @@ public class AutoConCur {
             return DecisionBean.ErrorBean(title, "nGrowth must be positive.");
         }
         if (w < 0 || w > 1) {
-            return DecisionBean.ErrorBean(title, "trim must be between 0 and 1.");
+            return DecisionBean.ErrorBean(title, "tolD8 must be between 0 and 1.");
         }
         if (t <= 0) {
             return DecisionBean.ErrorBean(title, "tolGrowth must be positive.");
         }
-        DecisionBean bean0 = decide(doc, title, n, m, w, t, 0);
+        if (trim < 0 || trim >= 0.5) {
+            return DecisionBean.ErrorBean(title, "trim must be non-negative and smaller 0.5.");
+        }
+        DecisionBean bean0 = decide(doc, title, manual, checkSign, nSD, n, m, w, t, trim, 0);
         if (bean0.getDecision() != Decision.UNKNOWN) {
-            DecisionBean bean1 = decide(doc, title, n, m, w, t, 1);
+            DecisionBean bean1 = decide(doc, title, manual, checkSign, nSD, n, m, w, t, trim, 1);
             switch (bean1.getDecision()) {
                 case UNKNOWN:
                     return bean1;
@@ -134,10 +157,11 @@ public class AutoConCur {
         }
     }
 
-    private static DecisionBean decide(SaDocument doc, String name, int n, int m, double w, double t, int preperiod) {
+    private static DecisionBean decide(SaDocument doc, String name, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double tolD8, double trim, double tolGrowth, int preperiod) {
         try {
-            DecisionBean bean = new DecisionBean(name, n, m, w, t);
-            //Get Tables: A1, D8, D9, D10, Seasonal Factors, Calendar Factors, Growth rates(old), Growth rates(new)
+            DecisionBean bean = new DecisionBean(name, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim);
+            //Get Tables: 
+            //A1(unadjusted ts), D8(SI ratios), D9(extreme values), D10(new SF), D11(seasonally adjusted ts), Seasonal Factors, Calendar Factors, Growth rates(old), Growth rates(new)
             TsData a1, d8, d9, d10, d11, tsSeasonsalFactor, tsCalendarFactor;
             a1 = DocumentManager.instance.getTs(doc, "decomposition.a-tables.a1").getTsData();
             d8 = DocumentManager.instance.getTs(doc, "decomposition.d-tables.d8").getTsData();
@@ -180,8 +204,10 @@ public class AutoConCur {
                 throw new Exception(name + " contains empty time series in the decomposition.");
             }
 
-            int frequency = d8.getFrequency().intValue();
+            TsFrequency freq = d8.getFrequency();
+            int frequency = freq.intValue();
 
+            //old seasonally adjusted ts
             TsData d11Old;      //calendar factors are longer than a1, so intersection will be used, which is a1's domain.
             if (multiplicative) {
                 tsCalendarFactor = tsCalendarFactor.div(100);
@@ -195,26 +221,49 @@ public class AutoConCur {
             TsData growthNew = growthRate(d11);
             bean.setGrowthOld(growthOld.get(growthOld.getLength() - 1));
             bean.setGrowthNew(growthNew.get(growthNew.getLength() - 1));
-            double diffGrowth = Math.abs(growthOld.get(growthOld.getLength() - 1) - growthNew.get(growthNew.getLength() - 1));
+            double diffGrowth = Math.abs(bean.getGrowthOld() - bean.getGrowthNew());
 
+            //1. Fixed outlier
+            boolean fixedOutlier = false;
+            ModelDescription description = doc.getPreprocessingPart().description;
+            TsVariableSelection.Item<ITsVariable>[] select = description.buildRegressionVariables().select(var -> var instanceof IOutlierVariable
+                    && description.isPrespecified((IOutlierVariable) var)).elements();
+            TsPeriod last = a1.getDomain().getLast();
+            for (TsVariableSelection.Item<ITsVariable> var : select) {
+                if (last.equals(new TsPeriod(freq, ((IOutlierVariable) var.variable).getPosition()))) {
+                    fixedOutlier = true;
+                    break;
+                }
+            }
+            bean.setFixOutlier(fixedOutlier);
+
+//            //Large Movement
+            //double lastGrowth = growthOld.internalStorage()[growthOld.getLength() - 1];
+            //bean.setLastGrowth(lastGrowth);
+            //double[] quantiles = Calculations.quantiles(lastMYears, tolD8);
+            //bean.setQuantsGrowth(quantiles);
+            //boolean largeMovement = lastGrowth > quantiles[1] || lastGrowth < quantiles[0];
+            //bean.setDevelopment(largeMovement);
+            //2. Extreme Value
+            bean.setExtremevalue(!Double.isNaN(d9.internalStorage()[d9.getLength() - 1]));
+
+            //3. sign change
+            bean.setSignChange(Math.signum(bean.getGrowthNew()) != Math.signum(bean.getGrowthOld()));
+
+            //4. GrowthRate
             TsPeriodSelector selector = new TsPeriodSelector();
-            selector.last(m * frequency);
+            selector.last(nGrowth * frequency);
             TsData lastMYears = growthOld.select(selector);
-            double[] quantiles = quantiles(lastMYears, w);
-            bean.setQuantsGrowth(quantiles);
+            double meanTruncGrowthOld = Calculations.truncMean(lastMYears, trim);
+            double stDevTruncGrowthOld = Calculations.truncStDev(lastMYears, trim);
+            //ToDo: include mean and stDev in bean?
+            if (bean.getGrowthOld() > (meanTruncGrowthOld + nSD * stDevTruncGrowthOld) && bean.getGrowthOld() < (meanTruncGrowthOld - nSD * stDevTruncGrowthOld)) {
+                bean.setGrowthRate(true);
+            }
 
-            //Set development and extreme value for bean
-            double lastGrowth = growthOld.internalStorage()[growthOld.getLength() - 1];
-            bean.setLastGrowth(lastGrowth);
-            boolean largeMovement = lastGrowth > quantiles[1] || lastGrowth < quantiles[0];
-            boolean extremeValue = !Double.isNaN(d9.internalStorage()[d9.getLength() - 1]);
-
-            bean.setDevelopment(largeMovement);
-            bean.setExtremevalue(extremeValue);
-
+            //Last nD8 non-extreme SI-ratios (seasonal D8)
             List<Double> seasonD8 = new ArrayList<>();
-
-            for (int i = d8.getLength() - 1; i >= 0 && seasonD8.size() < n; i -= frequency) {
+            for (int i = d8.getLength() - 1; i >= 0 && seasonD8.size() < nD8; i -= frequency) {
                 if (Double.isNaN(d9.get(i))) {
                     seasonD8.add(d8.get(i));
                 }
@@ -233,26 +282,37 @@ public class AutoConCur {
             }
             bean.setIntervalSF(new double[]{minSF, maxSF});
             bean.setLastSF(lastSF);
-            if (lastSF <= maxSF && lastSF >= minSF) {
-                bean.setDecision(Decision.KEEP);
-                return bean;
-            }
-
             bean.setLastD10(lastD10);
-            if (lastD10 > maxSF || lastD10 < minSF) {
+            if (lastSF > maxSF + tolD8 || lastSF < minSF - tolD8) {
+                if ((lastD10 <= maxSF + tolD8 && lastD10 >= minSF - tolD8)) {
+                    if (diffGrowth >= tolGrowth) {
+                        if (isGrowthRateOrSign(bean) || bean.isExtremevalue() || bean.isFixOutlier()) {
+                            bean.setDecision(Decision.CHECK);
+                            return bean;
+                        } else {
+                            bean.setDecision(Decision.UPDATE);
+                            return bean;
+                        }
+                    }
+                } else {
+                    bean.setClassic(true);
+                    bean.setDecision(Decision.CHECK);
+                    return bean;
+                }
+            }
+            if (isGrowthRateOrSign(bean)) {
                 bean.setDecision(Decision.CHECK);
-                return bean;
-            }
-
-            if (diffGrowth < t) {
-                bean.setDecision(Decision.KEEP);
-                return bean;
             } else {
-                bean.setDecision(Decision.UPDATE);
-                return bean;
+                bean.setDecision(Decision.KEEP);
             }
+            return bean;
+
         } catch (Exception e) {
             return DecisionBean.ErrorBean(name, e.getMessage());
         }
+    }
+
+    private static boolean isGrowthRateOrSign(DecisionBean bean) {
+        return bean.isGrowthRate() || (bean.isCheckSign() && bean.isSignChange());
     }
 }

@@ -16,11 +16,16 @@ public class HTMLWrapperCCA extends HtmlCCA {
     private String trend = "";
 
     public HTMLWrapperCCA(String title, SaDocument doc) {
-        super(title, doc);
+        this(title, "", doc);
+    }
+    
+    public HTMLWrapperCCA(String title, String rawName, SaDocument doc) {
+        super(title, rawName, doc);
         if (doc instanceof X13Document && doc.getDecompositionPart() != null) {
             trend = ((X13Document) doc).getDecompositionPart().getFinalTrendFilter();
         }
     }
+    
 
     @Override
     public void write(HtmlStream stream) throws IOException {

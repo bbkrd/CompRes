@@ -40,13 +40,19 @@ import org.openide.util.Exceptions;
 public class HtmlCCA extends AbstractHtmlElement {
 
     private final String title;
+    private final String rawName;
     private final IProcSpecification spec;
     private final IProcResults decomposition;
     private final Mstatistics stats;
     private final SaDocument doc;
 
     public HtmlCCA(String title, SaDocument doc) {
+        this(title, "", doc);
+    }
+
+    public HtmlCCA(String title, String rawName, SaDocument doc) {
         this.title = title;
+        this.rawName = rawName;
         this.spec = doc.getSpecification();
         this.decomposition = doc.getDecompositionPart();
         if (doc instanceof X13Document) {
@@ -60,7 +66,11 @@ public class HtmlCCA extends AbstractHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         writeTitle(stream);
-        new HtmlAutomised(title, doc).write(stream);
+        if (rawName == null || rawName.isBlank()) {
+            new HtmlAutomised(title, doc).write(stream);
+        } else {
+            new HtmlAutomised(rawName, doc).write(stream);
+        }
         if (spec != null) {
             writeSpecification(stream);
         }

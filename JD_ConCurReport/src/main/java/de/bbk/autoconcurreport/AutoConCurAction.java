@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package autoconcurreport;
+package de.bbk.autoconcurreport;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,7 +24,7 @@ import org.openide.util.NbBundle;
 @ActionRegistration(
         displayName = "#CTL_AutoConCurAction"
 )
-@ActionReference(path = "Menu/Tools", position = 2000)
+@ActionReference(path = "Menu/Tools", position = 2200)
 @NbBundle.Messages("CTL_AutoConCurAction=Create compRes Recommendations")
 public class AutoConCurAction implements ActionListener {
 

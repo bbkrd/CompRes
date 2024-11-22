@@ -50,7 +50,7 @@ public class HTMLFiles {
     private String errorMessage = "";
     private OverrideOption override = OverrideOption.ASK; //
 
-    private static final String LAST_FOLDER = "concurreport_lastfolder";
+    public static final String LAST_FOLDER = "concurreport_lastfolder";
 
     public HTMLFiles() {
         currentDir = NbPreferences.forModule(HTMLFiles.class).get(LAST_FOLDER, null);
@@ -145,19 +145,28 @@ public class HTMLFiles {
         errorMessage = "";
         boolean saved = false;
         try {
-            saItemName = removeCharacters(saItemName);
+            File file = createHtmlFileForSaItem(saItemName);
+            saved = writeHTMLFile(html, file);
+        } catch (Exception ex) {
+            errorMessage = ex.getMessage();
+            LOGGER.error(ex.getMessage());
 
-            StringBuilder path = new StringBuilder();
-            path.append(currentDir);
-            path.append("\\").append(Frozen.removeFrozen(saItemName));
-            path.append(".html");
-            //   fileName = NumberForFile(fileName);
-            File file = new File(path.toString());
-            if (file.exists()) {
+        } finally {
+            return saved;
+        }
+    }
+
+    public boolean writeHTMLFile(String html, File file) {
+        errorMessage = "";
+        boolean saved = false;
+        try {
+            if (file != null && file.exists()) {
                 int option;
+                String filename = file.getName();
+                filename = filename.replaceAll(".html", "");
                 switch (override) {
                     case ASK:
-                        option = JOptionPane.showOptionDialog(WindowManager.getDefault().getMainWindow(), "The file for " + saItemName + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                        option = JOptionPane.showOptionDialog(WindowManager.getDefault().getMainWindow(), "The file for " + filename + " already exists! Do you want to override it?", "The file already exists!", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                                 new Object[]{"Yes", "Yes to all", "Select new name", "No", "No to all"}, "");
                         break;
                     case YES:
@@ -176,18 +185,19 @@ public class HTMLFiles {
                         break;
                     case 2:
                         file = selectFileName(file);
+                        this.filePath = file.getPath();
                         break;
                     case 4:
                         override = OverrideOption.NO;
                     case 3:
                     default:
-                        this.filePath = path.toString();
+                        this.filePath = file.getPath();
                         errorMessage = "File already exists";
                         return false;
                 }
             }
             if (file != null) {
-
+                this.filePath = file.getPath();
                 com.google.common.io.Files.write(html, file, Charset.defaultCharset());
                 saved = true;
             } else {
@@ -200,7 +210,6 @@ public class HTMLFiles {
         } finally {
             return saved;
         }
-
     }
 
     /**
@@ -243,6 +252,18 @@ public class HTMLFiles {
         return true;
     }
 
+    public File createHtmlFileForSaItem(String saItemName) throws IOException {
+        saItemName = removeCharacters(saItemName);
+
+        StringBuilder path = new StringBuilder();
+        path.append(currentDir);
+        path.append("\\").append(Frozen.removeFrozen(saItemName));
+        path.append(".html");
+        //   fileName = NumberForFile(fileName);
+        this.filePath = path.toString();
+        return new File(path.toString());
+    }
+
     public File createHtmlFile(String fileName) throws IOException {
         return createHtmlFile(fileName, "");
     }
@@ -258,6 +279,7 @@ public class HTMLFiles {
         path.append("\\").append(fileName);
         path = numberForFile(path);
         path.append(".html");
+        this.filePath = path.toString();
         return new File(path.toString());
     }
 
@@ -306,6 +328,7 @@ public class HTMLFiles {
      */
     public String getFilePath() {
         return filePath;
+
     }
 
     private static enum OverrideOption {
