@@ -5,8 +5,7 @@
  */
 package de.bbk.autoconcurreport;
 
-import de.bbk.autoconcur.AutoConCur;
-import de.bbk.autoconcur.BeanCollector;
+import de.bbk.autoconcur.DecisionBeanCollector;
 import de.bbk.autoconcur.Decision;
 import de.bbk.autoconcur.DecisionBean;
 import de.bbk.concurreport.Processing;
@@ -24,7 +23,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -41,16 +42,16 @@ public class AutoConCurReport {
     private static HTMLAutoConCurSummary htmlf;
     private static final DecimalFormat DF = new DecimalFormat("0.00");
 
-    private static final String[] HEADSNEW = {"Series",
+    private static final String[] HEADS = {//"Series",
         "Series Name",
         "Recommendations",
         "Plausibility checks",
-        "Max Revision %",
+        //"Max Revision %",
         "GrowthOld[t]",
-        "Update History",
+        //"Update History",
         "Info"};
 
-    private static final String[] HEADSCHECKS = {"classic",
+    private static final String[] HEADSCHECKS = {"seasonal factor",
         "growth rate",
         "sign change",
         "extreme value",
@@ -85,36 +86,19 @@ public class AutoConCurReport {
         DF.setRoundingMode(RoundingMode.HALF_UP);
     }
 
-    private static boolean makeHtmlf() {
-        htmlf = new HTMLAutoConCurSummary();
-        if (htmlf.selectFolder()) {
-            return true;
-        } else if (!htmlf.getErrorMessage().isEmpty()) {
-            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), htmlf.getErrorMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(WindowManager.getDefault().getMainWindow(), "The HTML is not generated, you haven't selected a folder. ");
-        }
-        return false;
+    public static ReportMessages call() {
+        return process();
     }
 
-    public static ReportMessages call2() {
-        return process(true);
-    }
-
-    public static void call() {
-        ReportMessages messages = process(false);
+    public static void callAndShowMessages() {
+        ReportMessages messages = process();
         showMessages(messages);
     }
 
-    private static ReportMessages process(boolean master) {
-        
-        List<DecisionBean> beans;
-        if (master) {
-            beans = BeanCollector.getBeans();
-        } else {
-            AutoConCur acc = new AutoConCur();
-            beans = acc.makeDecisions();
-        }
+    private static ReportMessages process() {
+
+        List<DecisionBean> beans = DecisionBeanCollector.getBeans();
+        Collections.sort(beans, (DecisionBean bean1, DecisionBean bean2) -> bean1.getTitle().compareToIgnoreCase(bean2.getTitle()));
 
         StringBuilder sbError = new StringBuilder();
         StringBuilder sbSuccessful = new StringBuilder();
@@ -123,22 +107,10 @@ public class AutoConCurReport {
             return new ReportMessages(sbSuccessful.toString(), sbError.toString());
         }
         //HTMLAutoConCurSummary autoConCurfile = new HTMLAutoConCurSummary();
-        
-        if(master){
-             htmlf = new HTMLAutoConCurSummary();
-        }else if (!makeHtmlf()) {
-            return ReportMessages.EMPTY;
-        }
+        htmlf = new HTMLAutoConCurSummary();
 
-        String filename;
-        String headline = "compRes Recommendations";
-        if (master) {
-            filename = "Masterfile_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName();
-            headline = headline.concat(": Master overview");
-        } else {
-            filename = "Summary_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName();
-            headline = headline.concat(" for WS " + WorkspaceFactory.getInstance().getActiveWorkspace().getName());
-        }
+        String filename = "Masterfile_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName();;
+        String headline = "compRes Recommendations: Overview for WS " + WorkspaceFactory.getInstance().getActiveWorkspace().getName();
 
         try (FileWriter writer = new FileWriter(htmlf.createHTMLAutoConCurSummaryFile(filename), true); HtmlStream stream = new HtmlStream(writer)) {
             stream.open();
@@ -188,18 +160,18 @@ public class AutoConCurReport {
 
     private static void initTable(HtmlStream stream) throws IOException {
         stream.open(HtmlTag.TABLEROW);
-        for (int j = 0; j < HEADSNEW.length; ++j) {
-            if (!"Plausibility checks".equals(HEADSNEW[j])) {
-                stream.write(new HtmlTableHeader(HEADSNEW[j]));
+        for (int j = 0; j < HEADS.length; ++j) {
+            if (!"Plausibility checks".equals(HEADS[j])) {
+                stream.write(new HtmlTableHeader(HEADS[j]));
             } else {
-                stream.write((HtmlTableHeader) (new HtmlTableHeader(HEADSNEW[j]).withColSpan(HEADSCHECKS.length)));
+                stream.write((HtmlTableHeader) (new HtmlTableHeader(HEADS[j]).withColSpan(HEADSCHECKS.length)));
             }
         }
         stream.close(HtmlTag.TABLEROW).newLine();
         stream.write('\n');
         stream.open(HtmlTag.TABLEROW);
-        for (int j = 0; j < HEADSNEW.length; ++j) {
-            if (!"Plausibility checks".equals(HEADSNEW[j])) {
+        for (int j = 0; j < HEADS.length; ++j) {
+            if (!"Plausibility checks".equals(HEADS[j])) {
                 stream.write(new HtmlTableHeader(""));
             } else {
                 for (String check : HEADSCHECKS) {
@@ -216,12 +188,10 @@ public class AutoConCurReport {
             stream.open(HtmlTag.TABLEROW);
             // bean.setFile(bean.getTitle());
             if (bean.getFile() == null || bean.getFile().isBlank()) {
-                stream.write(new HtmlTableCell(""));
+                stream.write(new HtmlTableCell(Frozen.removeFrozen(bean.getTitle())));
             } else {
-                stream.write(new HtmlTableCell("<a href=\"" + bean.getFile() + "#" + bean.getTitle() + "\" target=\"_blank\">" + bean.getFile() + "</a>"));
+                stream.write(new HtmlTableCell("<a href=\"" + bean.getFile() + "#" + bean.getTitle() + "\" target=\"_blank\">" + Frozen.removeFrozen(bean.getTitle()) + "</a>"));
             }
-
-            stream.write(new HtmlTableCell(Frozen.removeFrozen(bean.getTitle())));
             if (bean.isManual()) {
                 stream.write(new HtmlTableCell(String.valueOf(bean.getDecision()), WHITESTYLE), "Black");
                 if (bean.getDecision() == Decision.UNKNOWN) {
@@ -245,38 +215,23 @@ public class AutoConCurReport {
                         break;
                 }
             }
-            if (bean.isClassic()) {
-                stream.write(new HtmlTableCell("X", HtmlStyle.Center));
-            } else {
-                stream.write(new HtmlTableCell(""));
-            }
-            if (bean.isGrowthRate()) {
-                stream.write(new HtmlTableCell("X", HtmlStyle.Center));
-            } else {
-                stream.write(new HtmlTableCell(""));
-            }
-            if (bean.isSignChange()) {
-                stream.write(new HtmlTableCell("X", HtmlStyle.Center));
-            } else {
-                stream.write(new HtmlTableCell(""));
-            }
-            if (bean.isExtremevalue()) {
-                stream.write(new HtmlTableCell("X", HtmlStyle.Center));
-            } else {
-                stream.write(new HtmlTableCell(""));
-            }
-            if (bean.isFixOutlier()) {
-                stream.write(new HtmlTableCell("X", HtmlStyle.Center));
-            } else {
-                stream.write(new HtmlTableCell(""));
-            }
 
-            //ToDo: MaxRevision
-            stream.write(new HtmlTableCell(String.valueOf(Double.NaN)));
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSeasonalFactor), HtmlStyle.Center));
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isGrowthRate), HtmlStyle.Center));
+            if (bean.isCheckSign()) {
+               stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSignChange), HtmlStyle.Center));
+            } else {
+                stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSignChange)), "lightgrey\" style=\"text-align:center");
+            }           
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isExtremevalue), HtmlStyle.Center));
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isFixOutlier), HtmlStyle.Center));
+
+//            //ToDo: MaxRevision
+//            stream.write(new HtmlTableCell(String.valueOf(Double.NaN)));
             //Current growth rate (old factor)
             stream.write(new HtmlTableCell(Double.isNaN(bean.getGrowthOld()) ? "NOT CALCULATED" : DF.format(bean.getGrowthOld())));
-            //ToDo: Update History
-            stream.write(new HtmlTableCell(""));
+//            //ToDo: Update History
+//            stream.write(new HtmlTableCell(""));
 
             if (bean.getErrortext() == null) {
                 stream.write(new HtmlTableCell(""));
@@ -295,10 +250,11 @@ public class AutoConCurReport {
     }
 
     private static void fillUnknownRow(HtmlStream stream, DecisionBean bean, StringBuilder sbSuccessful) throws IOException {
-        for (String string : HEADSCHECKS) {
+        for (String entry : HEADSCHECKS) {
             stream.write(new HtmlTableCell(""));
         }
-        for (int i = 3; i < HEADSNEW.length - 1; i++) {
+
+        for (int i = java.util.Arrays.asList(HEADS).indexOf("Plausibility checks") + 1; i < HEADS.length - 1; i++) {
             stream.write(new HtmlTableCell(""));
         }
         if (bean.getErrortext() == null) {
@@ -323,5 +279,18 @@ public class AutoConCurReport {
         beans.stream().filter(b -> b.isManual() == manual && b.getDecision() == Decision.KEEP).forEach((bean -> {
             AutoConCurReport.writeTable(stream, bean, sbSuccessful, sbError);
         }));
+    }
+
+    private static String isBeanProperty(DecisionBean bean, Function<DecisionBean, Boolean> isProperty) {
+        StringBuilder output = new StringBuilder();
+        if (bean != null) {
+            if (isProperty.apply(bean)) {
+                output.append("X");
+            }
+            if (bean.getPreperiodbean() != null && isProperty.apply(bean.getPreperiodbean())) {
+                output.append("(X)");
+            }
+        }
+        return output.toString();
     }
 }

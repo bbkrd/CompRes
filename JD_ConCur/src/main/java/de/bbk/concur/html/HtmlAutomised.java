@@ -112,6 +112,12 @@ public class HtmlAutomised extends AbstractHtmlElement {
 
     private String writeMeta() {
         StringBuilder sbuilder = new StringBuilder()
+                .append("is partial=")
+                .append(bean.isPartial())
+                .append("  |  ")
+                .append("check previous period=")
+                .append(bean.isCheckPrevious())
+                .append("  |  ")
                 .append("check sign=")
                 .append(bean.isCheckSign())
                 .append("  |  ")

@@ -20,7 +20,7 @@ import javax.swing.JSplitPane;
 
 /**
  *
- * @author s4504gj
+ * @author Jan Gerhardt
  */
 public class SIRatioView extends JComponent implements IDisposable {
 
@@ -53,7 +53,7 @@ public class SIRatioView extends JComponent implements IDisposable {
             return;
         }
         HtmlCCA ccaFilters = new HtmlCCA(MultiLineNameUtil.join(((Ts) doc.getInput()).getName()), doc);
-        lblFilters.setText(ccaFilters.writeFilters());
+        lblFilters.setText(ccaFilters.writeFilters()); 
         siViewSavedLast.setDoc(doc);
     }
 

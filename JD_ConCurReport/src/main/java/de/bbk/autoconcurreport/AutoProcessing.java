@@ -1,6 +1,6 @@
 package de.bbk.autoconcurreport;
 
-import de.bbk.autoconcur.BeanCollector;
+import de.bbk.autoconcur.DecisionBeanCollector;
 import de.bbk.concurreport.Processing;
 import de.bbk.concurreport.ReportMessages;
 import ec.nbdemetra.sa.MultiProcessingDocument;
@@ -13,17 +13,12 @@ import ec.nbdemetra.ws.WorkspaceItem;
 import ec.nbdemetra.ws.nodes.ItemWsNode;
 import ec.tss.sa.SaItem;
 import ec.tss.sa.SaProcessing;
-import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import org.openide.nodes.Node;
-import org.openide.windows.WindowManager;
 
 public class AutoProcessing implements Callable<ReportMessages> {
 
@@ -69,15 +64,15 @@ public class AutoProcessing implements Callable<ReportMessages> {
 
     @Override
     public ReportMessages call() {
-        BeanCollector.initialize();
+        DecisionBeanCollector.initialize();
         ReportMessages messages1 = concurProcessing.call();
-        ReportMessages messages2 = AutoConCurReport.call2();
+        ReportMessages messages2 = AutoConCurReport.call();
         
-        BeanCollector.dispose();
+        DecisionBeanCollector.dispose();
         return new ReportMessages(messages1.getSuccessMessages().concat(messages2.getSuccessMessages()), messages1.getErrorMessages().concat(messages2.getErrorMessages()));
     }
     
-    public void call2(){
+    public void callAndShowMessages(){
         ReportMessages messages = this.call();
         AutoConCurReport.showMessages(messages);
     }

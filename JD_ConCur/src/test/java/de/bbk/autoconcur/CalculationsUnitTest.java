@@ -6,9 +6,6 @@
 package de.bbk.autoconcur;
 
 import static de.bbk.autoconcur.Calculations.quantiles;
-import static de.bbk.autoconcur.Calculations.truncDouble;
-import static de.bbk.autoconcur.Calculations.truncStDev;
-import static de.bbk.autoconcur.Calculations.truncMean;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsDomain;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
@@ -17,6 +14,9 @@ import java.util.Arrays;
 import org.junit.Assert;
 import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
+import static de.bbk.autoconcur.Calculations.trimmedMean;
+import static de.bbk.autoconcur.Calculations.trimmedStDev;
+import static de.bbk.autoconcur.Calculations.trimmedDouble;
 
 /**
  *
@@ -126,29 +126,29 @@ public class CalculationsUnitTest {
     }
 
     @Test
-    public void testTruncDouble() {
+    public void testTrimmedDouble() {
         TsData data = values();
         double[] expectedDoubles = new double[]{1.2, -8.9, -16.5, 7.9, 7.7, 6.3, -5.2, 22.28, -16.861, 14.7, -8.9, -0.2, -3.4, -0.997, 1 / 3, -5 / 9, -16 / 11, 7.89};
         Arrays.sort(expectedDoubles);
-        double[] actualDoubles = truncDouble(data.internalStorage().clone(), 0.05);
+        double[] actualDoubles = trimmedDouble(data.internalStorage().clone(), 0.05);
         assertArrayEquals(expectedDoubles, actualDoubles, eps);
     }
 
     @Test
-    public void testTruncMean() {
+    public void testTrimmedMean() {
         TsData data = values();
 
         double expectedMean = 0.334;
-        double actualMean = truncMean(data, 0.05);
+        double actualMean = trimmedMean(data, 0.05);
         Assert.assertEquals(expectedMean, actualMean, eps);
     }
 
     @Test
-    public void testTruncStDev() {
+    public void testTrimmedStDev() {
         TsData data = values();
 
         double expectedStDev = 9.97397;
-        double actualStDev = truncStDev(data, 0.05);
+        double actualStDev = trimmedStDev(data, 0.05);
         Assert.assertEquals(expectedStDev, actualStDev, eps);
     }
 

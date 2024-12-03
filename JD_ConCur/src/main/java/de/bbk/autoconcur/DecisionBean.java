@@ -16,7 +16,9 @@ public class DecisionBean {
 
     private String title;
 
+    private boolean partial = "1".equals(AutoConCur.PARTIALDEFAULT);
     private boolean manual = "1".equals(AutoConCur.MANUALDEFAULT);
+    private boolean checkPrevious ="1".equals(AutoConCur.CHECKPREVIOUSDEFAULT);
     private boolean checkSign = "1".equals(AutoConCur.CHECKSIGNDEFAULT);
     private int nSD = Integer.valueOf(AutoConCur.NSDDEFAULT);
     private int nD8 = Integer.valueOf(AutoConCur.ND8DEFAULT);
@@ -27,7 +29,7 @@ public class DecisionBean {
 
     private Decision decision = Decision.UNKNOWN;
 
-    private boolean classic;
+    private boolean seasonalFactor;
     private boolean growthRate;
     private boolean signChange;
     private boolean extremevalue;

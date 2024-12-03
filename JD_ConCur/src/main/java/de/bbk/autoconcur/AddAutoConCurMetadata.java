@@ -24,7 +24,6 @@ import ec.nbdemetra.sa.MultiProcessingManager;
 import ec.nbdemetra.sa.SaBatchUI;
 import ec.nbdemetra.ws.actions.AbstractViewAction;
 import ec.tss.sa.SaItem;
-import ec.tstoolkit.MetaData;
 import static javax.swing.Action.NAME;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -62,21 +61,7 @@ public class AddAutoConCurMetadata extends AbstractViewAction<SaBatchUI> {
     @Override
     protected void process(SaBatchUI cur) {
         SaItem[] selection = cur.getSelection();
-        for (SaItem item : selection) {
-            MetaData meta = item.getMetaData();
-            if (meta == null) {
-                meta = new MetaData();
-            }
-            meta.putIfAbsent(AutoConCur.MANUAL, AutoConCur.MANUALDEFAULT);
-            meta.putIfAbsent(AutoConCur.CHECKSIGN, AutoConCur.CHECKSIGNDEFAULT);
-            meta.putIfAbsent(AutoConCur.NSD, AutoConCur.NSDDEFAULT);
-            meta.putIfAbsent(AutoConCur.ND8, AutoConCur.ND8DEFAULT);
-            meta.putIfAbsent(AutoConCur.NGROWTH, AutoConCur.NGROWTHDEFAULT);
-            meta.putIfAbsent(AutoConCur.TOLD8, AutoConCur.TOLD8DEFAULT);
-            meta.putIfAbsent(AutoConCur.TOLGROWTH, AutoConCur.TOLGROWTHDEFAULT);
-            meta.putIfAbsent(AutoConCur.TRIM, AutoConCur.TRIMDEFAULT);
-            item.setMetaData(meta);
-        }
+        AutoConCurMetadataUtil.putMetadataIfAbsent(selection);   
         cur.setSelection(new SaItem[0]);
         cur.setSelection(selection);
     }

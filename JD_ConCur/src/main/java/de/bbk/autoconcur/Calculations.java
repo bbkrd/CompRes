@@ -53,15 +53,15 @@ public class Calculations {
         return ts.pctVariation(1);
     }
 
-    public static double truncMean(TsData tsdata, double trim) {
-        return Arrays.stream(truncDouble(tsdata.internalStorage().clone(), trim)).average().orElse(Double.NaN);
+    public static double trimmedMean(TsData tsdata, double trim) {
+        return Arrays.stream(trimmedDouble(tsdata.internalStorage().clone(), trim)).average().orElse(Double.NaN);
     }
 
-    public static double truncStDev(TsData tsdata, double trim) {
+    public static double trimmedStDev(TsData tsdata, double trim) {
         double stDev = 0.0;
-        double[] truncated = truncDouble(tsdata.internalStorage().clone(), trim);
+        double[] truncated = trimmedDouble(tsdata.internalStorage().clone(), trim);
         if (truncated.length > 1) {
-            double mean = truncMean(tsdata, trim);
+            double mean = trimmedMean(tsdata, trim);
             for (double summand : truncated) {
                 stDev += Math.pow(summand - mean, 2);
             }
@@ -70,7 +70,7 @@ public class Calculations {
         return stDev;
     }
 
-    public static double[] truncDouble(double[] values, double trim) {
+    public static double[] trimmedDouble(double[] values, double trim) {
         double[] valuelist = values;
         if (values != null) {
             valuelist = Arrays.stream(valuelist.clone()).filter(d -> !Double.isNaN(d)).toArray();

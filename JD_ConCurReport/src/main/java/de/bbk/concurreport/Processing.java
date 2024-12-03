@@ -21,7 +21,6 @@
 package de.bbk.concurreport;
 
 import de.bbk.autoconcur.AutoConCur;
-import de.bbk.autoconcur.BeanCollector;
 import de.bbk.concurreport.files.HTMLFiles;
 import de.bbk.concurreport.html.*;
 import de.bbk.concurreport.options.ConCurReportOptionsPanel;
@@ -62,7 +61,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Christieane Hofer
+ * @author Christiane Hofer
  */
 public class Processing implements Callable<ReportMessages> {
 

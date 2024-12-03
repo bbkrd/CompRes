@@ -43,8 +43,8 @@ import org.openide.util.NbPreferences;
  */
 public class AutoConCur {
 
-    public static final String OUTPUTFILE = "compres.outputfile", MANUAL = "compres.manual", CHECKSIGN = "compres.checksign", NSD = "compres.nsd", ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TOLD8 = "compres.told8", TOLGROWTH = "compres.tolgrowth", TRIM = "compres.trim";
-    public static final String MANUALDEFAULT = "0", CHECKSIGNDEFAULT = "0", NSDDEFAULT = "2", ND8DEFAULT = "3", NGROWTHDEFAULT = "5", TOLD8DEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0", TRIMDEFAULT = "0.05";
+    public static final String CHECKPREVIOUS = "compres.checkprevious", OUTPUTFILE = "compres.outputfile", PARTIAL = "compres.partial", MANUAL = "compres.manual", CHECKSIGN = "compres.checksign", NSD = "compres.nsd", ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TOLD8 = "compres.told8", TOLGROWTH = "compres.tolgrowth", TRIM = "compres.trim";
+    public static final String CHECKPREVIOUSDEFAULT = "1", PARTIALDEFAULT = "0", MANUALDEFAULT = "0", CHECKSIGNDEFAULT = "0", NSDDEFAULT = "2", ND8DEFAULT = "3", NGROWTHDEFAULT = "5", TOLD8DEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0", TRIMDEFAULT = "0.05";
     private final Map<String, List<SaItem>> map;
 
     public AutoConCur() {
@@ -64,17 +64,6 @@ public class AutoConCur {
         this.map = map;
     }
 
-    public List<DecisionBean> makeDecisions() {
-        List<DecisionBean> decisionBeans = new ArrayList<>();
-        map.values().forEach(itemlist -> {
-            itemlist.forEach(item -> {
-                decisionBeans.add(decision(item.getRawName(), item.toDocument()));
-            });
-        });
-        Collections.sort(decisionBeans, (DecisionBean bean1, DecisionBean bean2) -> bean1.getTitle().compareToIgnoreCase(bean2.getTitle()));
-        return decisionBeans;
-    }
-
     public static DecisionBean decision(String title, SaDocument doc) {
         try {
             if (MetaData.isNullOrEmpty(doc.getMetaData())) {
@@ -83,6 +72,10 @@ public class AutoConCur {
             if (doc instanceof TramoSeatsDocument) {
                 return DecisionBean.ErrorBean(title, "Recommendation not implemented for TramoSeats.");
             }
+            boolean checkPrevious = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(CHECKPREVIOUS, CHECKPREVIOUSDEFAULT).trim())
+                    || "TRUE".equalsIgnoreCase(doc.getMetaData().getOrDefault(CHECKPREVIOUS, CHECKPREVIOUSDEFAULT).trim());
+            boolean partial = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(PARTIAL, PARTIALDEFAULT).trim())
+                    || "TRUE".equalsIgnoreCase(doc.getMetaData().getOrDefault(PARTIAL, PARTIALDEFAULT).trim());
             boolean manual = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(MANUAL, MANUALDEFAULT).trim())
                     || "TRUE".equalsIgnoreCase(doc.getMetaData().getOrDefault(MANUAL, MANUALDEFAULT).trim());
             boolean checkSign = "1".equalsIgnoreCase(doc.getMetaData().getOrDefault(CHECKSIGN, CHECKSIGNDEFAULT).trim())
@@ -93,11 +86,11 @@ public class AutoConCur {
             double tolD8 = Double.parseDouble(doc.getMetaData().getOrDefault(TOLD8, TOLD8DEFAULT));
             double tolGrowth = Double.parseDouble(doc.getMetaData().getOrDefault(TOLGROWTH, TOLGROWTHDEFAULT));
             double trim = Double.parseDouble(doc.getMetaData().getOrDefault(TRIM, TRIMDEFAULT));
-            DecisionBean bean = decision(title, doc, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim);
-            if(doc.getMetaData().containsKey(OUTPUTFILE)){
+            DecisionBean bean = decision(title, doc, partial, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim, checkPrevious);
+            if (doc.getMetaData().containsKey(OUTPUTFILE)) {
                 bean.setFile(doc.getMetaData().getOrDefault(OUTPUTFILE, "").trim());
             }
-            BeanCollector.add(bean);
+            DecisionBeanCollector.add(bean);
             return bean;
         } catch (NumberFormatException e) {
             return DecisionBean.ErrorBean(title, "Incorrect metadata. " + e.getMessage());
@@ -108,7 +101,7 @@ public class AutoConCur {
         }
     }
 
-    private static DecisionBean decision(String title, SaDocument doc, boolean manual, boolean checkSign, int nSD, int n, int m, double w, double t, double trim) {
+    private static DecisionBean decision(String title, SaDocument doc, boolean partial, boolean manual, boolean checkSign, int nSD, int n, int m, double w, double t, double trim, boolean previous) {
         if (nSD <= 0) {
             return DecisionBean.ErrorBean(title, "nSD must be positive.");
         }
@@ -127,9 +120,9 @@ public class AutoConCur {
         if (trim < 0 || trim >= 0.5) {
             return DecisionBean.ErrorBean(title, "trim must be non-negative and smaller 0.5.");
         }
-        DecisionBean bean0 = decide(doc, title, manual, checkSign, nSD, n, m, w, t, trim, 0);
-        if (bean0.getDecision() != Decision.UNKNOWN) {
-            DecisionBean bean1 = decide(doc, title, manual, checkSign, nSD, n, m, w, t, trim, 1);
+        DecisionBean bean0 = decide(doc, title, partial, manual, checkSign, nSD, n, m, w, t, trim, 0);
+        if (bean0.getDecision() != Decision.UNKNOWN && previous) {
+            DecisionBean bean1 = decide(doc, title, partial, manual, checkSign, nSD, n, m, w, t, trim, 1);
             switch (bean1.getDecision()) {
                 case UNKNOWN:
                     return bean1;
@@ -157,7 +150,7 @@ public class AutoConCur {
         }
     }
 
-    private static DecisionBean decide(SaDocument doc, String name, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double tolD8, double trim, double tolGrowth, int preperiod) {
+    private static DecisionBean decide(SaDocument doc, String name, boolean partial, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double tolD8, double tolGrowth, double trim, int preperiod) {
         try {
             DecisionBean bean = new DecisionBean(name, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim);
             //Get Tables: 
@@ -254,8 +247,8 @@ public class AutoConCur {
             TsPeriodSelector selector = new TsPeriodSelector();
             selector.last(nGrowth * frequency);
             TsData lastMYears = growthOld.select(selector);
-            double meanTruncGrowthOld = Calculations.truncMean(lastMYears, trim);
-            double stDevTruncGrowthOld = Calculations.truncStDev(lastMYears, trim);
+            double meanTruncGrowthOld = Calculations.trimmedMean(lastMYears, trim);
+            double stDevTruncGrowthOld = Calculations.trimmedStDev(lastMYears, trim);
             //ToDo: include mean and stDev in bean?
             if (bean.getGrowthOld() > (meanTruncGrowthOld + nSD * stDevTruncGrowthOld) && bean.getGrowthOld() < (meanTruncGrowthOld - nSD * stDevTruncGrowthOld)) {
                 bean.setGrowthRate(true);
@@ -283,9 +276,9 @@ public class AutoConCur {
             bean.setIntervalSF(new double[]{minSF, maxSF});
             bean.setLastSF(lastSF);
             bean.setLastD10(lastD10);
-            if (lastSF > maxSF + tolD8 || lastSF < minSF - tolD8) {
+            if (partial || lastSF > maxSF + tolD8 || lastSF < minSF - tolD8) {
                 if ((lastD10 <= maxSF + tolD8 && lastD10 >= minSF - tolD8)) {
-                    if (diffGrowth >= tolGrowth) {
+                    if (partial ||   diffGrowth >= tolGrowth) {
                         if (isGrowthRateOrSign(bean) || bean.isExtremevalue() || bean.isFixOutlier()) {
                             bean.setDecision(Decision.CHECK);
                             return bean;
@@ -295,7 +288,7 @@ public class AutoConCur {
                         }
                     }
                 } else {
-                    bean.setClassic(true);
+                    bean.setSeasonalFactor(true);
                     bean.setDecision(Decision.CHECK);
                     return bean;
                 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Deprecated
 @lombok.experimental.UtilityClass
-public class BeanCollector {
+public class DecisionBeanCollector {
 
     private List<DecisionBean> beans = null;
 
