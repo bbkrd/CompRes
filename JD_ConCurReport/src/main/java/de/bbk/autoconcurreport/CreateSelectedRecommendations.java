@@ -23,7 +23,7 @@ import org.openide.util.actions.NodeAction;
         displayName = "#CTL_CompResSelectedMasterAction", lazy = false
 )
 @ActionReference(path = "Menu/Tools", position = 2300)
-@NbBundle.Messages({"CTL_CompResSelectedMasterAction=Create HTML for selected multi-documents w/masterfile",
+@NbBundle.Messages({"CTL_CompResSelectedMasterAction=Create HTML for selected multi-documents w/ masterfile",
         "CTL_CompResSelectedMasterAction_Message=Do you really want to create the output for the selected multi-documents?"})
 public final class CreateSelectedRecommendations  extends NodeAction {
 

@@ -20,7 +20,7 @@ import org.openide.util.NbBundle;
         displayName = "#CTL_CompResMasterAction"
 )
 @ActionReference(path = "Menu/Tools", position = 2400)
-@NbBundle.Messages("CTL_CompResMasterAction=Create HTML for all multi-documents w/masterfile")
+@NbBundle.Messages("CTL_CompResMasterAction=Create HTML for all multi-documents w/ masterfile")
 public class CreateAllRecommendations implements ActionListener {
 
     @Override

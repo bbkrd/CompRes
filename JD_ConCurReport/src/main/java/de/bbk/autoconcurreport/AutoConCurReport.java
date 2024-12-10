@@ -52,10 +52,10 @@ public class AutoConCurReport {
         "Info"};
 
     private static final String[] HEADSCHECKS = {"seasonal factor",
-        "growth rate",
-        "sign change",
+        "fix outlier",
         "extreme value",
-        "fix outlier"
+        "growth rate",
+        "sign change"
     };
 
     private static final String STYLE = "<style>\n" + "body{\n"
@@ -217,15 +217,14 @@ public class AutoConCurReport {
             }
 
             stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSeasonalFactor), HtmlStyle.Center));
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isFixOutlier), HtmlStyle.Center));
+            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isExtremevalue), HtmlStyle.Center));
             stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isGrowthRate), HtmlStyle.Center));
             if (bean.isCheckSign()) {
-               stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSignChange), HtmlStyle.Center));
+                stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSignChange), HtmlStyle.Center));
             } else {
                 stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isSignChange)), "lightgrey\" style=\"text-align:center");
-            }           
-            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isExtremevalue), HtmlStyle.Center));
-            stream.write(new HtmlTableCell(isBeanProperty(bean, DecisionBean::isFixOutlier), HtmlStyle.Center));
-
+            }
 //            //ToDo: MaxRevision
 //            stream.write(new HtmlTableCell(String.valueOf(Double.NaN)));
             //Current growth rate (old factor)
