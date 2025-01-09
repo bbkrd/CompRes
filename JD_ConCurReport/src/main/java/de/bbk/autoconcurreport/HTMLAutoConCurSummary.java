@@ -34,7 +34,6 @@ public class HTMLAutoConCurSummary {
     //private OverrideOption override = OverrideOption.ASK; //
 
     //private static final String LAST_FOLDER = "concurreport_lastfolder";
-
     public HTMLAutoConCurSummary() {
         currentDir = NbPreferences.forModule(HTMLFiles.class).get(HTMLFiles.LAST_FOLDER, null);
     }
@@ -98,7 +97,9 @@ public class HTMLAutoConCurSummary {
 
         java.nio.file.Files.createDirectories(Paths.get(path.toString()));
         path.append("\\").append(fileName);
-        path = numberForFile(path);
+//        if (NbPreferences.forModule(ConCurReportOptionsPanel.class).getBoolean(ConCurReportOptionsPanel.JUST_ONE_HTML, true)) {
+//            path = numberForFile(path);
+//        }
         path.append(".html");
         return new File(path.toString());
     }

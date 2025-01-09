@@ -19,6 +19,7 @@ import ec.tss.html.HtmlTableCell;
 import ec.tss.html.HtmlTableHeader;
 import ec.tss.html.HtmlTag;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.RoundingMode;
@@ -109,10 +110,14 @@ public class AutoConCurReport {
         //HTMLAutoConCurSummary autoConCurfile = new HTMLAutoConCurSummary();
         htmlf = new HTMLAutoConCurSummary();
 
-        String filename = "Masterfile_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName();;
+        String filename = "Masterfile_" + WorkspaceFactory.getInstance().getActiveWorkspace().getName();
+        String filenameTemp = filename + "_tmp";
         String headline = "compRes Recommendations: Overview for WS " + WorkspaceFactory.getInstance().getActiveWorkspace().getName();
+        File file = null;
+        File fileTemp = null;
 
-        try (FileWriter writer = new FileWriter(htmlf.createHTMLAutoConCurSummaryFile(filename), true); HtmlStream stream = new HtmlStream(writer)) {
+        try (FileWriter writer = new FileWriter(fileTemp = htmlf.createHTMLAutoConCurSummaryFile(filenameTemp), true); HtmlStream stream = new HtmlStream(writer)) {
+            file = htmlf.createHTMLAutoConCurSummaryFile(filename);
             stream.open();
             stream.write(STYLE);
             stream.write(HtmlTag.HEADER2, headline);
@@ -136,6 +141,11 @@ public class AutoConCurReport {
                     .append(" because ")
                     .append(htmlf.getErrorMessage())
                     .append(System.lineSeparator());
+        } finally {
+            if (file != null && fileTemp != null) {
+                file.delete();
+                fileTemp.renameTo(file);
+            }
         }
         return new ReportMessages(sbSuccessful.toString(), sbError.toString());
     }
