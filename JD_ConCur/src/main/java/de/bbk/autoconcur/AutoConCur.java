@@ -250,7 +250,7 @@ public class AutoConCur {
             double meanTruncGrowthOld = Calculations.trimmedMean(lastMYears, trim);
             double stDevTruncGrowthOld = Calculations.trimmedStDev(lastMYears, trim);
             //ToDo: include mean and stDev in bean?
-            if (bean.getGrowthOld() > (meanTruncGrowthOld + nSD * stDevTruncGrowthOld) && bean.getGrowthOld() < (meanTruncGrowthOld - nSD * stDevTruncGrowthOld)) {
+            if (bean.getGrowthOld() > (meanTruncGrowthOld + nSD * stDevTruncGrowthOld) || bean.getGrowthOld() < (meanTruncGrowthOld - nSD * stDevTruncGrowthOld)) {
                 bean.setGrowthRate(true);
             }
 
