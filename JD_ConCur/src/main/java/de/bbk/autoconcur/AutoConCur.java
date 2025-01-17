@@ -220,7 +220,7 @@ public class AutoConCur {
             boolean fixedOutlier = false;
             ModelDescription description = doc.getPreprocessingPart().description;
             TsVariableSelection.Item<ITsVariable>[] select = description.buildRegressionVariables().select(var -> var instanceof IOutlierVariable
-                    && description.isPrespecified((IOutlierVariable) var)).elements();
+                    && !description.isPrespecified((IOutlierVariable) var)).elements();
             TsPeriod last = a1.getDomain().getLast();
             for (TsVariableSelection.Item<ITsVariable> var : select) {
                 if (last.equals(new TsPeriod(freq, ((IOutlierVariable) var.variable).getPosition()))) {
@@ -278,7 +278,7 @@ public class AutoConCur {
             bean.setLastD10(lastD10);
             if (partial || lastSF > maxSF + tolD8 || lastSF < minSF - tolD8) {
                 if ((lastD10 <= maxSF + tolD8 && lastD10 >= minSF - tolD8)) {
-                    if (partial ||   diffGrowth >= tolGrowth) {
+                    if (partial || diffGrowth >= tolGrowth) {
                         if (isGrowthRateOrSign(bean) || bean.isExtremevalue() || bean.isFixOutlier()) {
                             bean.setDecision(Decision.CHECK);
                             return bean;
