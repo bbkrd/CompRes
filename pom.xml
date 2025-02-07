@@ -122,8 +122,9 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <showDeprecation>true</showDeprecation>
-                        <source>${jdk.version}</source>
-                        <target>${jdk.version}</target>
+                        <release>8</release>
+<!--                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>-->
                     </configuration>
                 </plugin>
                 <plugin>

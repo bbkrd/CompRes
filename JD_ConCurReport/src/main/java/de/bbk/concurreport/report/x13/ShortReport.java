@@ -56,7 +56,7 @@ public class ShortReport implements IHtmlElement {
     @Override
     public void write(HtmlStream stream) throws IOException {
         final HTMLBBkHeader headerbbk = new HTMLBBkHeader(saProcessingName, item.getRawName(), item.getTs());
-        if (!item.getRawName().isBlank()) {
+        if (!item.getRawName().trim().isEmpty()) {
             stream.open(HtmlTag.DIV, "id", item.getRawName()).close(HtmlTag.DIV);
         }
         stream.write(headerbbk)

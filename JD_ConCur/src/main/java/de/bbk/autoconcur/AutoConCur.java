@@ -24,11 +24,8 @@ import ec.tstoolkit.MetaData;
 import ec.tstoolkit.modelling.arima.ModelDescription;
 import ec.tstoolkit.timeseries.TsPeriodSelector;
 import ec.tstoolkit.timeseries.regression.IOutlierVariable;
-import ec.tstoolkit.timeseries.regression.ITsVariable;
-import ec.tstoolkit.timeseries.regression.TsVariableSelection;
 import ec.tstoolkit.timeseries.simplets.TsData;
 import ec.tstoolkit.timeseries.simplets.TsFrequency;
-import ec.tstoolkit.timeseries.simplets.TsPeriod;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +43,8 @@ public class AutoConCur {
     public static final String CHECKPREVIOUS = "compres.checkprevious", OUTPUTFILE = "compres.outputfile", PARTIAL = "compres.partial", MANUAL = "compres.manual", CHECKSIGN = "compres.checksign", NSD = "compres.nsd", ND8 = "compres.nd8", NGROWTH = "compres.ngrowth", TOLD8 = "compres.told8", TOLGROWTH = "compres.tolgrowth", TRIM = "compres.trim";
     public static final String CHECKPREVIOUSDEFAULT = "1", PARTIALDEFAULT = "0", MANUALDEFAULT = "0", CHECKSIGNDEFAULT = "0", NSDDEFAULT = "2", ND8DEFAULT = "3", NGROWTHDEFAULT = "5", TOLD8DEFAULT = "0.05", TOLGROWTHDEFAULT = "1.0", TRIMDEFAULT = "0.05";
     private final Map<String, List<SaItem>> map;
+    public static final String NOSEASONALFACTORS = " contains no seasonal factors.";
+    public static final String NOCALENDARFACTORS = " contains no calendar factors.";
 
     public AutoConCur() {
         this.map = new TreeMap<>();
@@ -170,7 +169,7 @@ public class AutoConCur {
             d9 = checkTsData(d9, preperiod, name + " contains empty time series D9 in the decomposition.");
             d10 = checkTsData(d10, preperiod, name + " contains empty time series D10 in the decomposition.");
             d11 = checkTsData(d11, preperiod, name + " contains empty time series D11 in the decomposition.");
-            tsSeasonsalFactor = checkTsData(tsSeasonsalFactor, preperiod, name + " contains no seasonal factors.");
+            tsSeasonsalFactor = checkTsData(tsSeasonsalFactor, preperiod, name + NOSEASONALFACTORS);
             if (NbPreferences.forModule(DatasourceUpdateOptionsPanel.class).getBoolean(DatasourceUpdateOptionsPanel.CONST_SF, false)
                     && tsSeasonsalFactor.stream().mapToDouble(x -> x.getValue()).distinct().count() == 1) {
                 bean.setDecision(Decision.KEEP);
@@ -185,7 +184,7 @@ public class AutoConCur {
             if (NbPreferences.forModule(DatasourceUpdateOptionsPanel.class).getBoolean(DatasourceUpdateOptionsPanel.MISSING_CF, false) && tsCalendarFactor == null) {
                 tsCalendarFactor = new TsData(a1.getDomain(), multiplicative ? 100 : 0);
             } else {
-                tsCalendarFactor = checkTsData(tsCalendarFactor, preperiod, name + " contains no calendar factors.");
+                tsCalendarFactor = checkTsData(tsCalendarFactor, preperiod, name + NOCALENDARFACTORS);
             }
 
             if (a1.getLength() != d8.getLength()
@@ -217,18 +216,9 @@ public class AutoConCur {
             double diffGrowth = Math.abs(bean.getGrowthOld() - bean.getGrowthNew());
 
             //1. Fixed outlier
-            boolean fixedOutlier = false;
             ModelDescription description = doc.getPreprocessingPart().description;
-            TsVariableSelection.Item<ITsVariable>[] select = description.buildRegressionVariables().select(var -> var instanceof IOutlierVariable
-                    && !description.isPrespecified((IOutlierVariable) var)).elements();
-            TsPeriod last = a1.getDomain().getLast();
-            for (TsVariableSelection.Item<ITsVariable> var : select) {
-                if (last.equals(new TsPeriod(freq, ((IOutlierVariable) var.variable).getPosition()))) {
-                    fixedOutlier = true;
-                    break;
-                }
-            }
-            bean.setFixOutlier(fixedOutlier);
+            bean.setFixOutlier(!description.buildRegressionVariables().select(var -> var instanceof IOutlierVariable
+                    && !description.isPrespecified((IOutlierVariable) var)).isEmpty());
 
 //            //Large Movement
             //double lastGrowth = growthOld.internalStorage()[growthOld.getLength() - 1];

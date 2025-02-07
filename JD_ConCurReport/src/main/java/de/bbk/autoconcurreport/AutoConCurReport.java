@@ -5,6 +5,7 @@
  */
 package de.bbk.autoconcurreport;
 
+import de.bbk.autoconcur.AutoConCur;
 import de.bbk.autoconcur.DecisionBeanCollector;
 import de.bbk.autoconcur.Decision;
 import de.bbk.autoconcur.DecisionBean;
@@ -41,7 +42,7 @@ public class AutoConCurReport {
 
 //    private final Map<String, List<SaItem>> map;
     private static HTMLAutoConCurSummary htmlf;
-    private static final DecimalFormat DF = new DecimalFormat("0.00");
+    private static final DecimalFormat DF = new DecimalFormat("0.0");
 
     private static final String[] HEADS = {//"Series",
         "Series Name",
@@ -49,6 +50,7 @@ public class AutoConCurReport {
         "Plausibility checks",
         //"Max Revision %",
         "GrowthOld[t]",
+        "GrowthNew[t]",
         //"Update History",
         "Info"};
 
@@ -197,10 +199,15 @@ public class AutoConCurReport {
         try {
             stream.open(HtmlTag.TABLEROW);
             // bean.setFile(bean.getTitle());
-            if (bean.getFile() == null || bean.getFile().isBlank()) {
+            if (bean.getFile() == null || bean.getFile().trim().isEmpty()) {
                 stream.write(new HtmlTableCell(Frozen.removeFrozen(bean.getTitle())));
             } else {
                 stream.write(new HtmlTableCell("<a href=\"" + bean.getFile() + "#" + bean.getTitle() + "\" target=\"_blank\">" + Frozen.removeFrozen(bean.getTitle()) + "</a>"));
+            }
+            if (bean.getDecision() == Decision.UNKNOWN && bean.getErrortext().contains(AutoConCur.NOSEASONALFACTORS)) {
+                stream.write(new HtmlTableCell(String.valueOf(bean.getDecision()), BLACKSTYLE));
+                fillUnknownRow(stream, bean, sbSuccessful);
+                return;
             }
             if (bean.isManual()) {
                 stream.write(new HtmlTableCell(String.valueOf(bean.getDecision()), WHITESTYLE), "Black");
@@ -239,6 +246,7 @@ public class AutoConCurReport {
 //            stream.write(new HtmlTableCell(String.valueOf(Double.NaN)));
             //Current growth rate (old factor)
             stream.write(new HtmlTableCell(Double.isNaN(bean.getGrowthOld()) ? "NOT CALCULATED" : DF.format(bean.getGrowthOld())));
+            stream.write(new HtmlTableCell(Double.isNaN(bean.getGrowthNew()) ? "NOT CALCULATED" : DF.format(bean.getGrowthNew())));
 //            //ToDo: Update History
 //            stream.write(new HtmlTableCell(""));
 
@@ -276,7 +284,7 @@ public class AutoConCurReport {
     }
 
     private static void writeTable(HtmlStream stream, List<DecisionBean> beans, boolean manual, StringBuilder sbSuccessful, StringBuilder sbError) {
-        beans.stream().filter(b -> b.isManual() == manual && b.getDecision() == Decision.UNKNOWN).forEach((bean -> {
+        beans.stream().filter(b -> b.isManual() == manual && b.getDecision() == Decision.UNKNOWN && !b.getErrortext().contains(AutoConCur.NOSEASONALFACTORS)).forEach((bean -> {
             AutoConCurReport.writeTable(stream, bean, sbSuccessful, sbError);
         }));
         beans.stream().filter(b -> b.isManual() == manual && b.getDecision() == Decision.CHECK).forEach((bean -> {
@@ -286,6 +294,9 @@ public class AutoConCurReport {
             AutoConCurReport.writeTable(stream, bean, sbSuccessful, sbError);
         }));
         beans.stream().filter(b -> b.isManual() == manual && b.getDecision() == Decision.KEEP).forEach((bean -> {
+            AutoConCurReport.writeTable(stream, bean, sbSuccessful, sbError);
+        }));
+        beans.stream().filter(b -> manual == false && b.getDecision() == Decision.UNKNOWN && b.getErrortext().contains(AutoConCur.NOSEASONALFACTORS)).forEach((bean -> {
             AutoConCurReport.writeTable(stream, bean, sbSuccessful, sbError);
         }));
     }

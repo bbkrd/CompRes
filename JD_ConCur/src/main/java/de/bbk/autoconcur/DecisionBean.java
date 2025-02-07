@@ -35,7 +35,7 @@ public class DecisionBean {
     private boolean extremevalue;
     private boolean fixOutlier;
 
-    private String errortext;
+    private String errortext="";
     private DecisionBean preperiodbean;
 
     //private double[] quantsGrowth;

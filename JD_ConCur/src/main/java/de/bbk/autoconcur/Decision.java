@@ -12,8 +12,8 @@ package de.bbk.autoconcur;
 public enum Decision {
     UNKNOWN("Unknown"),
     KEEP("Keep"),
-    UPDATE("Update"),
-    CHECK("Check");
+    UPDATE("Change"),
+    CHECK("Check"); //("new Spec");
 
     private final String name;
 

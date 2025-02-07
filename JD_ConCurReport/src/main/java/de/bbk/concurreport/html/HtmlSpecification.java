@@ -55,7 +55,7 @@ public class HtmlSpecification extends AbstractHtmlElement {
     }
 
     private void writeX13Specification(HtmlStream stream) throws IOException {
-        if (rawName == null || rawName.isBlank()) {
+        if (rawName == null || rawName.trim().isEmpty()) {
             new HtmlAutomised(MultiLineNameUtil.join(((X13Document) doc).getInput().getName()), doc).write(stream);
         } else {
             new HtmlAutomised(rawName, doc).write(stream);
