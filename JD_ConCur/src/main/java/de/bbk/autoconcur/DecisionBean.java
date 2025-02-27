@@ -18,7 +18,7 @@ public class DecisionBean {
 
     private boolean partial = "1".equals(AutoConCur.PARTIALDEFAULT);
     private boolean manual = "1".equals(AutoConCur.MANUALDEFAULT);
-    private boolean checkPrevious ="1".equals(AutoConCur.CHECKPREVIOUSDEFAULT);
+    private boolean checkPrevious = "1".equals(AutoConCur.CHECKPREVIOUSDEFAULT);
     private boolean checkSign = "1".equals(AutoConCur.CHECKSIGNDEFAULT);
     private int nSD = Integer.valueOf(AutoConCur.NSDDEFAULT);
     private int nD8 = Integer.valueOf(AutoConCur.ND8DEFAULT);
@@ -35,7 +35,7 @@ public class DecisionBean {
     private boolean extremevalue;
     private boolean fixOutlier;
 
-    private String errortext="";
+    private String errortext = "";
     private DecisionBean preperiodbean;
 
     //private double[] quantsGrowth;
@@ -52,7 +52,7 @@ public class DecisionBean {
         decision = Decision.UNKNOWN;
     }
 
-    public DecisionBean(String title, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double toleranceD8, double toleranceGrowth, double trim) {
+    public DecisionBean(String title, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double toleranceD8, double toleranceGrowth, double trim, boolean partial) {
         this.title = title;
         this.manual = manual;
         this.checkSign = checkSign;
@@ -62,6 +62,7 @@ public class DecisionBean {
         this.tolD8 = toleranceD8;
         this.toleranceGrowth = toleranceGrowth;
         this.trim = trim;
+        this.partial = partial;
         decision = Decision.UNKNOWN;
     }
 

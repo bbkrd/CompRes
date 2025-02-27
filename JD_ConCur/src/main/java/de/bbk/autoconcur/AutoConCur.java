@@ -151,7 +151,7 @@ public class AutoConCur {
 
     private static DecisionBean decide(SaDocument doc, String name, boolean partial, boolean manual, boolean checkSign, int nSD, int nD8, int nGrowth, double tolD8, double tolGrowth, double trim, int preperiod) {
         try {
-            DecisionBean bean = new DecisionBean(name, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim);
+            DecisionBean bean = new DecisionBean(name, manual, checkSign, nSD, nD8, nGrowth, tolD8, tolGrowth, trim, partial);
             //Get Tables: 
             //A1(unadjusted ts), D8(SI ratios), D9(extreme values), D10(new SF), D11(seasonally adjusted ts), Seasonal Factors, Calendar Factors, Growth rates(old), Growth rates(new)
             TsData a1, d8, d9, d10, d11, tsSeasonsalFactor, tsCalendarFactor;
