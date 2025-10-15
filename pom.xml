@@ -10,10 +10,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdk.version>1.8</jdk.version>
-        <netbeans.version>RELEASE200</netbeans.version>
+        <jdk.version>17</jdk.version>
+        <netbeans.version>RELEASE220</netbeans.version>
         <brandingToken>bundesbank</brandingToken>
-        <jdemetra.version>2.2.2</jdemetra.version>
+        <jdemetra.version>2.2.6</jdemetra.version>
         <jdemetra.groupid>eu.europa.ec.joinup.sat</jdemetra.groupid>
         <!-- plugins versions > -->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.34</version>
+                <version>1.18.42</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -122,9 +122,7 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <showDeprecation>true</showDeprecation>
-                        <release>8</release>
-<!--                        <source>${jdk.version}</source>
-                        <target>${jdk.version}</target>-->
+                        <release>${jdk.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>
